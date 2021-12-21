@@ -39,12 +39,11 @@ SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
 
     optionsListBox = CheckListBox::Connect(ui, "optionsListBox");
 
-
-    //Fill CBoxes that only need one write;
+    // Fill CBoxes that only need one write;
     addDataEntryTypeToCBox(dataEntryTypeCBox);
     addEdgeCondToCBox(edgeTypeCBox);
 
-    //Fill options box
+    // Fill options box
     addItemsToOptionsListBox(optionsListBox);
 
     // Add submit event to submit button
@@ -64,7 +63,6 @@ SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
     ////}*/
 
     uniqueIDIndex = maxUniqueID;
-
 }
 
 SetupWindow::~SetupWindow()
@@ -73,13 +71,12 @@ SetupWindow::~SetupWindow()
 
 void SetupWindow::setupEnter()
 {
-    //Fill comboboxes for channels
+    // Fill comboboxes for channels
     addChannelsToTriggerChannelCBox(triggerChanCBox);
     addChannelsToChannelSelectionCBox(channelSelectionCBox);
 
-    //Add saved items to list box
+    // Add saved items to list box
     addItemsToChannelListBox(channelListBox);
-    
 
     // Get created relays and loop through and add to listbox
     // std::vector<Webrelay> webrelayList = bridge.getRelayListForUI();
@@ -126,6 +123,7 @@ void SetupWindow::addItemsToOptionsListBox(Dewesoft::MUI::CheckListBox& checkLis
     checkListBox.addItem("Open Excel On New Data");
     checkListBox.addItem("Force Close Excel On New Data");
     checkListBox.addItem("Create New File On Write Error");
+    checkListBox.addItem("Use Relative Report Directories");
 }
 
 void SetupWindow::addChannelsToChannelSelectionCBox(Dewesoft::MUI::ComboBox& comboBox)
