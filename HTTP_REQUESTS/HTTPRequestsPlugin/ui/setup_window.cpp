@@ -124,6 +124,8 @@ void SetupWindow::addItemsToOptionsListBox(Dewesoft::MUI::CheckListBox& checkLis
     checkListBox.clear();
     checkListBox.addItem("Append Date To Report Filename");
     checkListBox.addItem("Open Excel On New Data");
+    checkListBox.addItem("Force Close Excel On New Data");
+    checkListBox.addItem("Create New File On Write Error")
 }
 
 void SetupWindow::addChannelsToChannelSelectionCBox(Dewesoft::MUI::ComboBox& comboBox)
