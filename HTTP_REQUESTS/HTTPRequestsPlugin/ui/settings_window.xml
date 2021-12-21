@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window xmlns="https://mui.dewesoft.com/schema/1.1" Name="settingsWindow" Background="white">
+    <StackPanel>
+		<Label Text="Settings"/>
+	</StackPanel>	
+</Window>

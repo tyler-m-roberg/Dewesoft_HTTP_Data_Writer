@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window xmlns="https://mui.dewesoft.com/schema/1.1">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100%"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="290"/>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="100%"/>
+        </Grid.RowDefinitions>
+
+        <CaptionPanel Grid.Row="0" Grid.Column="0" Title="General Settings" Name="generalSettingsPanel">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="250"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="440"/>
+                    <ColumnDefinition Width="10"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Row="1" Grid.Column="1"  Text="Trigger Channel" Name="triggerChanLabel" Align="Fill" TextAlign="Center" FontWeight="Bold"/>
+                <ComboBox Grid.Row="2" Grid.Column="1"  Name="triggerChanCBox" />
+
+                <Label Grid.Row="1" Grid.Column="3"  Text="Trigger Level" Name="triggerLevelLabel" Align="Fill" TextAlign="Center" FontWeight="Bold"/>
+                <TextBox Grid.Row="2" Grid.Column="3" Placeholder="" Name="triggerLevelTextBox" ValidateType="Double" />
+
+                <Label Grid.Row="1" Grid.Column="5" Text="Edge Type" Name ="edgeTypeLabel" Align="Fill" TextAlign="Center" FontWeight="Bold"/>
+                <ComboBox Grid.Row="2" Grid.Column="5" Name="edgeTypeCBox"/>
+
+                <Label Grid.Row="4" Grid.Column="1"  Text="Template File (.xlsx)" Name="templateFileLabel" Align="Fill" TextAlign="Center" Grid.ColumnSpan="5" FontWeight="Bold"/>
+                <TextBox Grid.Row="5" Grid.Column="1" Placeholder="" Name="templateFileTextBox" Grid.ColumnSpan="5"/>
+
+                <Label Grid.Row="7" Grid.Column="1"  Text="Report Directory (Absolute or Relative)" Name="reportDirLabel" Align="Fill" TextAlign="Center" Grid.ColumnSpan="5" FontWeight="Bold"/>
+                <TextBox Grid.Row="8" Grid.Column="1" Placeholder="" Name="reportDirTextBox" Grid.ColumnSpan="5"/>
+
+                <Label Grid.Row="10" Grid.Column="1"  Text="Report Name" Name="reportNameLabel" Align="Fill" TextAlign="Center" Grid.ColumnSpan="5" FontWeight="Bold"/>
+                <TextBox Grid.Row="11" Grid.Column="1" Placeholder="" Name="reportNameTextBox" Grid.ColumnSpan="5"/>
+
+                <Label Grid.Row="1" Grid.Column="7" Text="Additional Options" Name="optionsLabel" TextAlign="Center" FontWeight="Bold"/>
+                <CheckListBox Grid.Row="2" Grid.Column="7" Name="optionsListBox" Grid.RowSpan="10"/>
+        
+                
+                
+            </Grid>
+        </CaptionPanel>
+
+        <CaptionPanel Grid.Row="1" Grid.Column="0" Title="Add Channel" Name="addChannelPanel">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="360"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="100"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Row="1" Grid.Column="1"  Text="Data Entry Type" Name="dataEntryTypeLabel" Align="Fill" TextAlign="Center" FontWeight="Bold"/>
+                <ComboBox Grid.Row="2" Grid.Column="1" Name="dataEntryTypeCBox" />
+
+                <Label Grid.Row="1" Grid.Column="3" Text="Channel" Name="channelSelectionLabel" Align="Fill" TextAlign="Center" FontWeight="Bold"/>
+                <ComboBox Grid.Row="2" Grid.Column="3" Name="channelSelectionCBox"/>
+
+                <Label Grid.Row="1" Grid.Column="5" Text="Page #" Name ="pageNumLabel" Align="Fill" TextAlign="Center" FontWeight="Bold"/>
+                <TextBox Grid.Row="2" Grid.Column="5" Placeholder="1" Name="pageNumTextBox" ValidateType="Integer"/>
+
+                <Label Grid.Row="1" Grid.Column="7" Text="Cell / Starting Cell" Name="cellRefLabel" Align="Fill" TextAlign="Center" FontWeight="Bold"/>
+                <TextBox Grid.Row="2" Grid.Column="7" Placeholder="A1" Name="cellRefTextBox" TextHint="'A1'" />
+
+                <Button Grid.Row="2" Grid.Column="9" Label="Add Channel" Name="addChannelBtn" FontWeight="Bold" Align="Top"/>
+
+            </Grid>
+        </CaptionPanel>
+        <CaptionPanel Grid.Row="2" Grid.Column="0" Title="Channel List" Name="currentChannelsPanel">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="490"/>
+                    <ColumnDefinition Width="400"/>
+                    <ColumnDefinition Width="100"/>
+
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+
+                <Button Grid.Column="3" Grid.Row="3" Label="Delete" Name="deleteChannelBtn" FontWeight="Bold"/>
+                <ListBox Grid.Row="1" Grid.Column="1" SelectionMode="Single" Name="channelListBox" Grid.ColumnSpan="3" />
+
+            </Grid>
+        </CaptionPanel>
+    </Grid>
+</Window>

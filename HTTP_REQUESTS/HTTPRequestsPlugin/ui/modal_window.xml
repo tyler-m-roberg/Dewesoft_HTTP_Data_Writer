@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Grid Height="100" Width="200">
+    <Button Name="closeButton">Close</Button>    
+</Grid>

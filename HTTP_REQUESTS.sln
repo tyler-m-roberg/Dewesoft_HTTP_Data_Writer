@@ -1,0 +1,67 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1585
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HTTPRequestsPlugin", "HTTP_REQUESTS\HTTPRequestsPlugin\HTTPRequestsPlugin.vcxproj", "{C2A25EC6-7AEE-4C93-89D8-13D13386A8C7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HTTPRequestsPluginLib", "HTTP_REQUESTS\HTTPRequestsPluginLib\HTTPRequestsPluginLib.vcxproj", "{E27EE983-FF56-4C9B-ADE2-309021F56F49}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gtest", "HTTP_REQUESTS\gtest\gtest.vcxproj", "{0C59E23F-0A43-4EF0-8169-2B8B989ECE18}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HTTPRequestsPluginTest", "HTTP_REQUESTS\HTTPRequestsPluginTest\HTTPRequestsPluginTest.vcxproj", "{9DEFE282-0547-4925-8F47-E32177CEB11E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DE70FA80-C323-4E88-B64C-28038A29351F}"
+	ProjectSection(SolutionItems) = preProject
+		HTTP_REQUESTS\.clang-format = HTTP_REQUESTS\.clang-format
+		HTTP_REQUESTS\.editorconfig = HTTP_REQUESTS\.editorconfig
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C2A25EC6-7AEE-4C93-89D8-13D13386A8C7}.Debug|x64.ActiveCfg = Debug|x64
+		{C2A25EC6-7AEE-4C93-89D8-13D13386A8C7}.Debug|x64.Build.0 = Debug|x64
+		{C2A25EC6-7AEE-4C93-89D8-13D13386A8C7}.Debug|x86.ActiveCfg = Debug|Win32
+		{C2A25EC6-7AEE-4C93-89D8-13D13386A8C7}.Debug|x86.Build.0 = Debug|Win32
+		{C2A25EC6-7AEE-4C93-89D8-13D13386A8C7}.Release|x64.ActiveCfg = Release|x64
+		{C2A25EC6-7AEE-4C93-89D8-13D13386A8C7}.Release|x64.Build.0 = Release|x64
+		{C2A25EC6-7AEE-4C93-89D8-13D13386A8C7}.Release|x86.ActiveCfg = Release|Win32
+		{C2A25EC6-7AEE-4C93-89D8-13D13386A8C7}.Release|x86.Build.0 = Release|Win32
+		{E27EE983-FF56-4C9B-ADE2-309021F56F49}.Debug|x64.ActiveCfg = Debug|x64
+		{E27EE983-FF56-4C9B-ADE2-309021F56F49}.Debug|x64.Build.0 = Debug|x64
+		{E27EE983-FF56-4C9B-ADE2-309021F56F49}.Debug|x86.ActiveCfg = Debug|Win32
+		{E27EE983-FF56-4C9B-ADE2-309021F56F49}.Debug|x86.Build.0 = Debug|Win32
+		{E27EE983-FF56-4C9B-ADE2-309021F56F49}.Release|x64.ActiveCfg = Release|x64
+		{E27EE983-FF56-4C9B-ADE2-309021F56F49}.Release|x64.Build.0 = Release|x64
+		{E27EE983-FF56-4C9B-ADE2-309021F56F49}.Release|x86.ActiveCfg = Release|Win32
+		{E27EE983-FF56-4C9B-ADE2-309021F56F49}.Release|x86.Build.0 = Release|Win32
+		{0C59E23F-0A43-4EF0-8169-2B8B989ECE18}.Debug|x64.ActiveCfg = Debug|x64
+		{0C59E23F-0A43-4EF0-8169-2B8B989ECE18}.Debug|x64.Build.0 = Debug|x64
+		{0C59E23F-0A43-4EF0-8169-2B8B989ECE18}.Debug|x86.ActiveCfg = Debug|Win32
+		{0C59E23F-0A43-4EF0-8169-2B8B989ECE18}.Debug|x86.Build.0 = Debug|Win32
+		{0C59E23F-0A43-4EF0-8169-2B8B989ECE18}.Release|x64.ActiveCfg = Release|x64
+		{0C59E23F-0A43-4EF0-8169-2B8B989ECE18}.Release|x64.Build.0 = Release|x64
+		{0C59E23F-0A43-4EF0-8169-2B8B989ECE18}.Release|x86.ActiveCfg = Release|Win32
+		{0C59E23F-0A43-4EF0-8169-2B8B989ECE18}.Release|x86.Build.0 = Release|Win32
+		{9DEFE282-0547-4925-8F47-E32177CEB11E}.Debug|x64.ActiveCfg = Debug|x64
+		{9DEFE282-0547-4925-8F47-E32177CEB11E}.Debug|x64.Build.0 = Debug|x64
+		{9DEFE282-0547-4925-8F47-E32177CEB11E}.Debug|x86.ActiveCfg = Debug|Win32
+		{9DEFE282-0547-4925-8F47-E32177CEB11E}.Debug|x86.Build.0 = Debug|Win32
+		{9DEFE282-0547-4925-8F47-E32177CEB11E}.Release|x64.ActiveCfg = Release|x64
+		{9DEFE282-0547-4925-8F47-E32177CEB11E}.Release|x64.Build.0 = Release|x64
+		{9DEFE282-0547-4925-8F47-E32177CEB11E}.Release|x86.ActiveCfg = Release|Win32
+		{9DEFE282-0547-4925-8F47-E32177CEB11E}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A7CB1366-0FA3-4804-AE0F-974132D6E302}
+	EndGlobalSection
+EndGlobal
