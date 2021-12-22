@@ -31,6 +31,7 @@ SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
     edgeTypeCBox = ComboBox::Connect(ui, "edgeTypeCBox");
     dataEntryTypeCBox = ComboBox::Connect(ui, "dataEntryTypeCBox");
     channelSelectionCBox = ComboBox::Connect(ui, "channelSelectionCBox");
+    channelTypeCBox = ComboBox::Connect(ui, "channelTypeCBox");
 
     deleteChannelBtn = Button::Connect(ui, "deleteChannelBtn");
     addChannelBtn = Button::Connect(ui, "addChannelBtn");
@@ -42,6 +43,7 @@ SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
     // Fill CBoxes that only need one write;
     addDataEntryTypeToCBox(dataEntryTypeCBox);
     addEdgeCondToCBox(edgeTypeCBox);
+    addChannelTypeToCBox(channelTypeCBox);
 
     // Fill options box
     addItemsToOptionsListBox(optionsListBox);
@@ -151,6 +153,12 @@ void SetupWindow::addDataEntryTypeToCBox(Dewesoft::MUI::ComboBox& comboBox)
 {
     comboBox.addItem("Single Value");
     comboBox.addItem("Multi Value");
+}
+
+void SetupWindow::addChannelTypeToCBox(Dewesoft::MUI::ComboBox& comboBox)
+{
+    comboBox.addItem("Standard Channel");
+    comboBox.addItem("Special Channel");
 }
 
 // Return a unique ID for a new relay

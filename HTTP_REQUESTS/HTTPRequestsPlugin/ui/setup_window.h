@@ -19,15 +19,17 @@ public:
 
     void addChannelsToTriggerChannelCBox(Dewesoft::MUI::ComboBox& comboBox);
     void addChannelsToChannelSelectionCBox(Dewesoft::MUI::ComboBox& comboBox);
-    void addEdgeCondToCBox(Dewesoft::MUI::ComboBox &comboBox);
 
     void addItemsToChannelListBox(Dewesoft::MUI::ListBox &listBox);
     void addItemsToOptionsListBox(Dewesoft::MUI::CheckListBox &checkListBox);
 
+
     void addDataEntryTypeToCBox(Dewesoft::MUI::ComboBox& comboBox);
+    void addEdgeCondToCBox(Dewesoft::MUI::ComboBox& comboBox);
+    void addChannelTypeToCBox(Dewesoft::MUI::ComboBox& comboBox);
+
 
     static int uniqueIDIndex;
-
     static int getUniqueID();
 
 private:
@@ -47,6 +49,7 @@ private:
     Dewesoft::MUI::ComboBox edgeTypeCBox;
     Dewesoft::MUI::ComboBox dataEntryTypeCBox;
     Dewesoft::MUI::ComboBox channelSelectionCBox;
+    Dewesoft::MUI::ComboBox channelTypeCBox;
 
     Dewesoft::MUI::Button deleteChannelBtn;
     Dewesoft::MUI::Button addChannelBtn;

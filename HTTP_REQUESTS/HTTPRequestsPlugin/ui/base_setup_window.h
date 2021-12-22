@@ -39,6 +39,7 @@ protected:
     Dewesoft::MUI::CaptionPanel addChannelPanel;
     Dewesoft::MUI::Label dataEntryTypeLabel;
     Dewesoft::MUI::ComboBox dataEntryTypeCBox;
+    Dewesoft::MUI::ComboBox channelTypeCBox;
     Dewesoft::MUI::Label channelSelectionLabel;
     Dewesoft::MUI::ComboBox channelSelectionCBox;
     Dewesoft::MUI::Label pageNumLabel;
@@ -71,6 +72,7 @@ protected:
         addChannelPanel = Dewesoft::MUI::CaptionPanel::Connect(ui, "addChannelPanel");
         dataEntryTypeLabel = Dewesoft::MUI::Label::Connect(ui, "dataEntryTypeLabel");
         dataEntryTypeCBox = Dewesoft::MUI::ComboBox::Connect(ui, "dataEntryTypeCBox");
+        channelTypeCBox = Dewesoft::MUI::ComboBox::Connect(ui, "channelTypeCBox");
         channelSelectionLabel = Dewesoft::MUI::Label::Connect(ui, "channelSelectionLabel");
         channelSelectionCBox = Dewesoft::MUI::ComboBox::Connect(ui, "channelSelectionCBox");
         pageNumLabel = Dewesoft::MUI::Label::Connect(ui, "pageNumLabel");
