@@ -93,27 +93,59 @@ void Request::getData(
 
 void Request::saveSetup(const NodePtr& node) const
 {
-    /* node->write(u8"OutputChannelName", outputChannelName);
-     node->write(u8"RelayID", relayID);
-     node->write(u8"IPAddress", ipAddress);
-     node->write(u8"RelayNum", relayNum);
+    //Save main settings
      node->write(u8"TriggerChannel", triggerChannel);
-     node->write(u8"EdgeType", (edgeType == RisingEdge) ? 0 : 1);
-     node->write(u8"TriggerLevel", triggerLevel);*/
+     node->write(u8"TriggerLevel", triggerLevel);
+     node->write(u8"EdgeType", edgeType);
+     node->write(u8"TemplateFile", templateFile);
+     node->write(u8"ReportDirectory", reportDirectory);
+     node->write(u8"ReportName", reportName);
+
+
+     //Create subnode for additional options and add child each option
+     const auto additionalOptionsNode = node->addChild(u8"AdditionalOptions");
+     for (auto& item : additionalOptionsList)
+     {
+         const auto additionalOptionNode = additionalOptionsNode->addChild(u8"AdditionalOption");
+         item.saveSetup(additionalOptionNode);
+     }
+
+     const auto selectedChannelsNode = node->addChild(u8"SelectedChannels");
+     for (auto& item : selectedChannelList)
+     {
+         const auto selectedChannelNode = selectedChannelsNode->addChild(u8"SelectedChannel");
+         item.saveSetup(selectedChannelNode);
+     }
 }
 
 void Request::loadSetup(const NodePtr& node)
 {
-    // node->read(u8"OutputChannelName", outputChannelName, 1);
-    // node->read(u8"RelayID", relayID, 1);
-    // node->read(u8"IPAddress", ipAddress, 1);
-    // node->read(u8"relayNum", relayNum, 1);
-    // node->read(u8"TriggerChannel", triggerChannel, 1);
+     node->read(u8"TriggerChannel", triggerChannel, "");
+     node->read(u8"TriggerLevel", triggerLevel, "");
+     node->read(u8"EdgeType", edgeType, "");
+     node->read(u8"TemplateFile", templateFile, "");
+     node->read(u8"ReportDirectory", reportDirectory,"");
+     node->read(u8"ReportName", reportName, "");
 
-    // int tempEdgeType;
-    // node->read(u8"EdgeType", tempEdgeType, 1);
-    // edgeType = (tempEdgeType == 0) ? RisingEdge : FallingEdge;
-    // node->read(u8"TriggerLevel", triggerLevel, 1);
+     const auto additionalOptionsNode = node->findChildNode(u8"AdditionalOptions");
+     if (additionalOptionsNode)
+     {
+
+     }
+     else
+     {
+
+     }
+
+     const auto selectedChannelsNode = node->findChildNode(u8"SelectedChannels");
+     if (selectedChannelsNode)
+     {
+
+     }
+     else
+     {
+
+     }
 }
 
 void Request::clear()
@@ -126,5 +158,6 @@ void Request::clear()
     reportName = "";
 
     selectedChannelList.clear();
+
 }
 

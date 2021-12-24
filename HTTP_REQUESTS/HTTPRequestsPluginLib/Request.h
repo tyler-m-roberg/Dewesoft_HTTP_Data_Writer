@@ -15,6 +15,11 @@ struct AdditionalOptions
     {
     }
 
+    void saveSetup(const NodePtr& node)
+    {
+        node->write(u8"OptionName", optionName);
+        node->write(u8"Enabled", enabled);
+    }
 
 };
 

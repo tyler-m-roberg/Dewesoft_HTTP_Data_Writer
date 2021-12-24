@@ -1,5 +1,8 @@
 #include "SelectedChannel.h"
 
+using namespace Dewesoft::Utils::Serialization;
+using namespace Dewesoft::Utils::Dcom::Utils;
+
 SelectedChannel::SelectedChannel()
 {
 }
@@ -18,6 +21,15 @@ SelectedChannel::SelectedChannel(std::string dataEntryType,
     
 
 {
+}
+
+void SelectedChannel::saveSetup(const NodePtr& node) const
+{
+    node->write(u8"DataEntryType", dataEntryType);
+    node->write(u8"ChannelName", channelName);
+    node->write(u8"PageNum", pageNum);
+    node->write(u8"CellRef", cellRef);
+    node->write(u8"ChannelType", channelType);
 }
 
 bool SelectedChannel::operator==(const SelectedChannel& selectedChannel) const
