@@ -63,9 +63,9 @@
 
                 <Label Grid.Row="1" Grid.Column="7" Text="Additional Options" Name="optionsLabel" TextAlign="Center" FontWeight="Bold"/>
                 <CheckListBox Grid.Row="2" Grid.Column="7" Name="optionsListBox" Grid.RowSpan="10"/>
-        
-                
-                
+
+
+
             </Grid>
         </CaptionPanel>
 
@@ -81,6 +81,8 @@
                     <ColumnDefinition Width="20"/>
                     <ColumnDefinition Width="200"/>
                     <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="10"/>
                     <ColumnDefinition Width="360"/>
                     <ColumnDefinition Width="10"/>
                     <ColumnDefinition Width="100"/>
@@ -93,16 +95,19 @@
                 <Label Grid.Row="1" Grid.Column="1"  Text="Data Entry Type" Name="dataEntryTypeLabel" Align="Fill" TextAlign="Center" FontWeight="Bold"/>
                 <ComboBox Grid.Row="2" Grid.Column="1" Name="dataEntryTypeCBox" />
 
-                <Label Grid.Row="1" Grid.Column="3" Text="Channel" Name="channelSelectionLabel" Align="Fill" TextAlign="Center" FontWeight="Bold"/>
-                <ComboBox Grid.Row="2" Grid.Column="3" Name="channelSelectionCBox"/>
+                <Label Grid.Row="1" Grid.Column="3" Text="Channel Type" Align="Fill" TextAlign="Center" FontWeight="Bold"/>
+                <ComboBox Grid.Row="2" Grid.Column="3" Name="channelTypeCBox"/>
 
-                <Label Grid.Row="1" Grid.Column="5" Text="Page #" Name ="pageNumLabel" Align="Fill" TextAlign="Center" FontWeight="Bold"/>
-                <TextBox Grid.Row="2" Grid.Column="5" Placeholder="1" Name="pageNumTextBox" ValidateType="Integer"/>
+                <Label Grid.Row="1" Grid.Column="5" Text="Channel" Name="channelSelectionLabel" Align="Fill" TextAlign="Center" FontWeight="Bold"/>
+                <ComboBox Grid.Row="2" Grid.Column="5" Name="channelSelectionCBox"/>
 
-                <Label Grid.Row="1" Grid.Column="7" Text="Cell / Starting Cell" Name="cellRefLabel" Align="Fill" TextAlign="Center" FontWeight="Bold"/>
-                <TextBox Grid.Row="2" Grid.Column="7" Placeholder="A1" Name="cellRefTextBox" TextHint="'A1'" />
+                <Label Grid.Row="1" Grid.Column="7" Text="Page #" Name ="pageNumLabel" Align="Fill" TextAlign="Center" FontWeight="Bold"/>
+                <TextBox Grid.Row="2" Grid.Column="7" Placeholder="1" Name="pageNumTextBox" ValidateType="Integer"/>
 
-                <Button Grid.Row="2" Grid.Column="9" Label="Add Channel" Name="addChannelBtn" FontWeight="Bold" Align="Top"/>
+                <Label Grid.Row="1" Grid.Column="9" Text="Cell / Starting Cell" Name="cellRefLabel" Align="Fill" TextAlign="Center" FontWeight="Bold"/>
+                <TextBox Grid.Row="2" Grid.Column="9" Placeholder="A1" Name="cellRefTextBox" TextHint="'A1'" />
+
+                <Button Grid.Row="2" Grid.Column="11" Label="Add Channel" Name="addChannelBtn" FontWeight="Bold" Align="Top"/>
 
             </Grid>
         </CaptionPanel>

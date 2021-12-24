@@ -11,7 +11,7 @@
     </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
-	  <Platform>x64</Platform>	  
+      <Platform>x64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
       <Configuration>Release</Configuration>
@@ -22,34 +22,34 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{E27EE983-FF56-4C9B-ADE2-309021F56F49}</ProjectGuid>
     <RootNamespace>TestPluginLib</RootNamespace>
-	<WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>	
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>	
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>	
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-	<PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>  	
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -68,7 +68,7 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-<PropertyGroup Label="UserMacros" />
+  <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IntDir>$(Platform)\$(Configuration)\Intermediate\</IntDir>
     <IncludePath>$(DCOM_LIB_ROOT)/include;$(COMMON_LIB_ROOT)/include;$(IncludePath)</IncludePath>
@@ -86,8 +86,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IntDir>$(Platform)\$(Configuration)\Intermediate\</IntDir>
-    <IncludePath>$(DCOM_LIB_ROOT)/include;$(COMMON_LIB_ROOT)/include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(DCOM_LIB_ROOT)/lib;$(COMMON_LIB_ROOT)/lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\theoz\OneDrive\Documents\GitHub\Dewesoft_HTTP_Data_Writer\Includes\json-3.10.4\include;C:\Users\theoz\OneDrive\Documents\GitHub\Dewesoft_HTTP_Data_Writer\Includes\curl\builds\libcurl-vc-x64-release-static-ipv6-sspi-schannel\include;$(DCOM_LIB_ROOT)/include;$(COMMON_LIB_ROOT)/include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\theoz\OneDrive\Documents\GitHub\Dewesoft_HTTP_Data_Writer\Includes\curl\builds\libcurl-vc-x64-release-static-ipv6-sspi-schannel\lib;$(DCOM_LIB_ROOT)/lib;$(COMMON_LIB_ROOT)/lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -97,21 +97,21 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
-	<Lib>
-	  <AdditionalDependencies>dcom_output_channel_debug.lib;serialization_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Lib>	
+    <Lib>
+      <AdditionalDependencies>dcom_output_channel_debug.lib;serialization_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <LanguageStandard>stdcpp17</LanguageStandard>	  
-      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>	  	  
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
-	<Lib>
-	  <AdditionalDependencies>dcom_output_channel64_debug.lib;serialization64_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
-	</Lib>	
+    <Lib>
+      <AdditionalDependencies>dcom_output_channel64_debug.lib;serialization64_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -121,7 +121,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_NDEBUG;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>stdcpp17</LanguageStandard>	  
+      <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -129,8 +129,8 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-	  <AdditionalDependencies>dcom_output_channel.lib;serialization.lib;%(AdditionalDependencies)</AdditionalDependencies>
-	</Lib>	
+      <AdditionalDependencies>dcom_output_channel.lib;serialization.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -140,22 +140,26 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_NDEBUG;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>stdcpp17</LanguageStandard>	  
-      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>	  
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
-	<Lib>
+    <Lib>
       <AdditionalDependencies>dcom_output_channel64.lib;serialization64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Request.cpp" />
+    <ClCompile Include="SelectedChannel.cpp" />
     <ClCompile Include="sine_generator.cpp" />
     <ClCompile Include="sine_wave.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Request.h" />
+    <ClInclude Include="SelectedChannel.h" />
     <ClInclude Include="sine_generator.h" />
     <ClInclude Include="sine_wave.h" />
   </ItemGroup>
