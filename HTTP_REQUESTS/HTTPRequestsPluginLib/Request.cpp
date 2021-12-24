@@ -1,149 +1,130 @@
 #include "Request.h"
-#include "SelectedChannel.h"
+#include <curl\curl.h>
+#include <thread>
+#include <iostream>
+#include <chrono>
+#include <nlohmann/json.hpp>
 
 
-
-using namespace Dewesoft::Utils::Dcom::OutputChannel;
 using namespace Dewesoft::Utils::Serialization;
+using namespace Dewesoft::Utils::Dcom::Utils;
 
-Webrelay::Webrelay(OutputChannelPtr outputChannel)
-    : Webrelay(std::move(outputChannel), "", 0, 1.0, "10.200.47.1", 1, RisingEdge, "")
+void curlThread(std::string data)
 {
-}
+    CURL* curl;
+    CURLcode res;
 
-Webrelay::Webrelay(OutputChannelPtr outputChannel,
-                   std::string outputChannelName,
-                   int relayID,
-                   double triggerLevel,
-                   std::string ipAddress,
-                   int relayNum,
-                   EdgeTypes edgeType,
-                   std::string triggerChannel)
+    /* In windows, this will init the winsock stuff */
+    curl_global_init(CURL_GLOBAL_ALL);
 
-    :
-
-    outputChannel(std::move(outputChannel))
-    , outputChannelName(outputChannelName)
-    , relayID(relayID)
-    , triggerLevel(triggerLevel)
-    , ipAddress(ipAddress)
-    , relayNum(relayNum)
-    , edgeType(edgeType)
-    , triggerChannel(triggerChannel)
-
-{
-}
-
-OutputChannelPtr Webrelay::getOutputChannel() const
-{
-    return outputChannel;
-}
-
-std::string Webrelay::getOutputChannelName() const
-{
-    return outputChannelName;
-}
-
-void Webrelay::getData(const double& startTime, const double& sampleRate, const size_t& numSamples)
-{
-    // Add code to loop through channelData vector until data object is found with correct channel name. Then check if
-    // criteria is met for trigger for rising or falling edge based on edge type and trigger level selection
-    // **Possibly add some sort of delay value to prevent false triggering**
-    // If triggered then send code for get request, possibly off load get request to sepperate thread.
-    // Example if trigger type is rising, if prev value was less than trigger level and current value is = or greater than trigger
-    // level then trigger and send get request to turn relay on. If triggered wait delay time (delay time will need to be added
-    // as relay value) and if a falling edge is detected ie. prev data greater than trigger and current val less than or = then send
-    // get request to turn relay off and set wait delay time. and repeat, reverse steps for falling edge trigger.
-
-    const double dt = 1 / sampleRate;
-
-    for (size_t i = 0; i < numSamples; ++i)
+    /* get a curl handle */
+    curl = curl_easy_init();
+    if (curl)
     {
-        outputChannel->addSyncSample(1.0);
+        /* First set the URL that is about to receive our POST. This URL can
+           just as well be a https:// URL if that is what should receive the
+           data. */
+        struct curl_slist* hs = NULL;
+        hs = curl_slist_append(hs, "Content-Type: application/json");
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, hs);
+        curl_easy_setopt(curl, CURLOPT_URL, "https://webhook.site/7b6c7f77-2d4c-4d56-bc1c-ad9c4ae9bf66");
+        /* Now specify the POST data */
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
+
+        /* Perform the request, res will get the return code */
+        res = curl_easy_perform(curl);
+        /* Check for errors */
+
+        /* always cleanup */
+        curl_easy_cleanup(curl);
     }
+    curl_global_cleanup();
 }
 
-void Webrelay::saveSetup(const NodePtr& node) const
+Request::Request()
+    : Request("", 1.0, "Rising", "", "", "")
 {
-    node->write(u8"OutputChannelName", outputChannelName);
-    node->write(u8"RelayID", relayID);
-    node->write(u8"IPAddress", ipAddress);
-    node->write(u8"RelayNum", relayNum);
-    node->write(u8"TriggerChannel", triggerChannel);
-    node->write(u8"EdgeType", (edgeType == RisingEdge) ? 0 : 1);
-    node->write(u8"TriggerLevel", triggerLevel);
+    
 }
 
-void Webrelay::loadSetup(const NodePtr& node)
+Request::Request(std::string triggerChannel,
+                 double triggerLevel,
+                 std::string edgeType,
+                 std::string templateFile,
+                 std::string reportDirectory,
+                 std::string reportName)
+
+    : triggerChannel(triggerChannel)
+    , triggerLevel(triggerLevel)
+    , edgeType(edgeType)
+    , templateFile(templateFile)
+    , reportDirectory(reportDirectory)
+    , reportName(reportName)
 {
-    node->read(u8"OutputChannelName", outputChannelName, 1);
-    node->read(u8"RelayID", relayID, 1);
-    node->read(u8"IPAddress", ipAddress, 1);
-    node->read(u8"relayNum", relayNum, 1);
-    node->read(u8"TriggerChannel", triggerChannel, 1);
+    additionalOptionsList.emplace_back("Append Date To Report Filename", false);
+    additionalOptionsList.emplace_back("Open Excel On New Data", false);
+    additionalOptionsList.emplace_back("Force Close Excel On New Data", false);
+    additionalOptionsList.emplace_back("Create New File On Write Error", false);
+    additionalOptionsList.emplace_back("Use Relative Report Directories", false);
 
-    int tempEdgeType;
-    node->read(u8"EdgeType", tempEdgeType, 1);
-    edgeType = (tempEdgeType == 0) ? RisingEdge : FallingEdge;
-    node->read(u8"TriggerLevel", triggerLevel, 1);
+    specialChannelsList.emplace_back("Filename");
+    specialChannelsList.emplace_back("Date");
 }
 
-int Webrelay::getRelayID() const
+void Request::getData(
+    const double& startTime, const double& sampleRate, const size_t& numSamples, const int64_t beginPos, const int64_t endPos)
 {
-    return this->relayID;
+    // nlohmann::json postData;
+
+    // InputListPtr inputList = inputManager.getInputList();
+    // postData["Input List Size"] = inputList->size();
+
+    // postData["Begin Pos"] = beginPos;
+    // postData["End Pos"] = endPos;
+
+    // for (auto it = inputList->begin(); it != inputList->end(); ++it)
+    //{
+    //    postData[it->getName()] = it->getValueAtPos<float>(0, nullptr, true);
+    //}
+
+    // std::thread threadObj(curlThread, postData.dump());
+    // threadObj.detach();
 }
 
-double Webrelay::getTriggerLevel() const
+void Request::saveSetup(const NodePtr& node) const
 {
-    return this->triggerLevel;
+    /* node->write(u8"OutputChannelName", outputChannelName);
+     node->write(u8"RelayID", relayID);
+     node->write(u8"IPAddress", ipAddress);
+     node->write(u8"RelayNum", relayNum);
+     node->write(u8"TriggerChannel", triggerChannel);
+     node->write(u8"EdgeType", (edgeType == RisingEdge) ? 0 : 1);
+     node->write(u8"TriggerLevel", triggerLevel);*/
 }
 
-std::string Webrelay::getIPAddress() const
+void Request::loadSetup(const NodePtr& node)
 {
-    return this->ipAddress;
+    // node->read(u8"OutputChannelName", outputChannelName, 1);
+    // node->read(u8"RelayID", relayID, 1);
+    // node->read(u8"IPAddress", ipAddress, 1);
+    // node->read(u8"relayNum", relayNum, 1);
+    // node->read(u8"TriggerChannel", triggerChannel, 1);
+
+    // int tempEdgeType;
+    // node->read(u8"EdgeType", tempEdgeType, 1);
+    // edgeType = (tempEdgeType == 0) ? RisingEdge : FallingEdge;
+    // node->read(u8"TriggerLevel", triggerLevel, 1);
 }
 
-int Webrelay::getRelayNum() const
+void Request::clear()
 {
-    return this->relayNum;
+    triggerChannel == "";
+    triggerLevel == 0.0;
+    edgeType = "Rising";
+    templateFile = "";
+    reportDirectory = "";
+    reportName = "";
+
+    selectedChannelList.clear();
 }
 
-EdgeTypes Webrelay::getEdgeType() const
-{
-    return this->edgeType;
-}
-
-std::string Webrelay::getTriggerChannel() const
-{
-    return this->triggerChannel;
-}
-
-void Webrelay::setTriggerLevel(double triggerLevel)
-{
-    this->triggerLevel = triggerLevel;
-}
-
-void Webrelay::setIPAddress(std::string ipAddress)
-{
-    this->ipAddress = ipAddress;
-}
-
-void Webrelay::setRelayNum(int relayNum)
-{
-    this->relayNum = relayNum;
-}
-
-void Webrelay::setEdgeType(EdgeTypes edgeType)
-{
-    this->edgeType = edgeType;
-}
-
-bool Webrelay::operator==(const Webrelay& relay1) const
-{
-    return (!this->ipAddress.compare(relay1.ipAddress) && this->relayNum == relay1.relayNum);
-}
-
-bool Webrelay::operator!=(const Webrelay& relay1) const
-{
-    return !(*this == relay1);
-}

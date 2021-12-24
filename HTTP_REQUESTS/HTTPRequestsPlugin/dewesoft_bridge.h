@@ -8,69 +8,73 @@
 #include "ui/setup_window.h"
 #include <dcomlib/dcom_input_channel/input_manager_impl.h>
 #include <dcomlib/dcom_output_channel/output_factory_impl.h>
+#include "../HTTPRequestsPluginLib/Request.h"
 
 struct IApp;
 
 class DewesoftBridge
 {
 public:
-	using NodePtr = Dewesoft::Utils::Serialization::NodePtr;
-	using InputManagerImpl = Dewesoft::Utils::Dcom::InputChannel::InputManagerImpl;
-	using OutputFactoryImpl = Dewesoft::Utils::Dcom::OutputChannel::OutputFactoryImpl;
+    using NodePtr = Dewesoft::Utils::Serialization::NodePtr;
+    using InputManagerImpl = Dewesoft::Utils::Dcom::InputChannel::InputManagerImpl;
+    using OutputFactoryImpl = Dewesoft::Utils::Dcom::OutputChannel::OutputFactoryImpl;
 
-	DewesoftBridge(InputManagerImpl& inputManager, OutputFactoryImpl& outputFactory, IAppPtr app = nullptr);
+    DewesoftBridge(InputManagerImpl& inputManager, OutputFactoryImpl& outputFactory, IAppPtr app = nullptr);
 
-	void setPluginProps(IAppPtr app, _bstr_t pluginGuid, IPluginGroup* pluginGroup);
+    void setPluginProps(IAppPtr app, _bstr_t pluginGuid, IPluginGroup* pluginGroup);
 
-	bool checkSupportedDewesoftVersion(std::string& errorMessage) const;
+    bool checkSupportedDewesoftVersion(std::string& errorMessage) const;
 
-	void onEnterHardwareSetup();
-	void onUpdateSettings(NodePtr node);
-	void onInitiateHardware();
+    void onEnterHardwareSetup();
+    void onUpdateSettings(NodePtr node);
+    void onInitiateHardware();
 
-	void onSetupEnter(bool analysisMode);
-	void onSetupLeave(bool analysisMode);
-	
-	void onClearSetup();
-	void onNewSetup();
-	void onLoadSetup(NodePtr node, bool dataFile);
-	void onSaveSetup(NodePtr node, bool dataFile);
-	
-	void onPreInitiate();
-	
-	void onStartData();
-	void onGetData(const Dewesoft::Utils::Dcom::InputChannel::AcquiredDataInfo& acquiredDataInfo);
-	void onStopData();
+    void onSetupEnter(bool analysisMode);
+    void onSetupLeave(bool analysisMode);
 
-	void onStartStoring();
-	void onStopStoring();
+    void onClearSetup();
+    void onNewSetup();
+    void onLoadSetup(NodePtr node, bool dataFile);
+    void onSaveSetup(NodePtr node, bool dataFile);
 
-	void onPrepareAnalysis();
-	void onStartAnalysis();
-	bool isRecalculationRequired() const;
+    void onPreInitiate();
 
-	bool showSetup(Dewesoft::MUI::IWindow* window);
-	void hideSetup();
+    void onStartData();
+    void onGetData(const Dewesoft::Utils::Dcom::InputChannel::AcquiredDataInfo& acquiredDataInfo);
+    void onStopData();
 
-	bool showSettings(Dewesoft::MUI::IWindow* window);
-	void hideSettings();
+    void onStartStoring();
+    void onStopStoring();
 
-	static HMODULE DllModule;
+    void onPrepareAnalysis();
+    void onStartAnalysis();
+    bool isRecalculationRequired() const;
+
+    bool showSetup(Dewesoft::MUI::IWindow* window);
+    void hideSetup();
+
+    bool showSettings(Dewesoft::MUI::IWindow* window);
+    void hideSettings();
+
+    static HMODULE DllModule;
 
     std::vector<IChannelPtr> getUsedChannelsForUI();
     std::vector<IGHObjectPtr> getHeaderChannelsForUI();
 
+    Request requestObj;
+
+    std::vector<AdditionalOptions> getAdditionalOptionsFromRequest();
+
+
 private:
-	InputManagerImpl& inputManager;
-	OutputFactoryImpl& outputFactory;
-	IAppPtr app;
-	_bstr_t pluginGuid;
-	IPluginGroup* pluginGroup;
+    InputManagerImpl& inputManager;
+    OutputFactoryImpl& outputFactory;
+    IAppPtr app;
+    _bstr_t pluginGuid;
+    IPluginGroup* pluginGroup;
 
-	std::unique_ptr<SetupWindow> setupWindow;
-	std::unique_ptr<SettingsWindow> settingsWindow;
+    std::unique_ptr<SetupWindow> setupWindow;
+    std::unique_ptr<SettingsWindow> settingsWindow;
 
-
-
-	SineGenerator sineGenerator;
+    SineGenerator sineGenerator;
 };

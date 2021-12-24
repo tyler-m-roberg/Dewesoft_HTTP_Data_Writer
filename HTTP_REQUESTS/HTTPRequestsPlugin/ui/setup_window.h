@@ -5,6 +5,8 @@
 #include "base_setup_window.h"
 #include "modal_window.h"
 #include <mui/controls/timer_ptr.h>
+#include "../../HTTPRequestsPluginLib/Request.h"
+#include "../../HTTPRequestsPluginLib/SelectedChannel.h"
 
 class DewesoftBridge;
 
@@ -20,14 +22,12 @@ public:
     void addChannelsToTriggerChannelCBox(Dewesoft::MUI::ComboBox& comboBox);
     void addChannelsToChannelSelectionCBox(Dewesoft::MUI::ComboBox& comboBox);
 
-    void addItemsToChannelListBox(Dewesoft::MUI::ListBox &listBox);
-    void addItemsToOptionsListBox(Dewesoft::MUI::CheckListBox &checkListBox);
-
+    void addItemsToChannelListBox(Dewesoft::MUI::ListBox& listBox);
+    void addItemsToOptionsListBox(Dewesoft::MUI::CheckListBox& checkListBox);
 
     void addDataEntryTypeToCBox(Dewesoft::MUI::ComboBox& comboBox);
     void addEdgeCondToCBox(Dewesoft::MUI::ComboBox& comboBox);
     void addChannelTypeToCBox(Dewesoft::MUI::ComboBox& comboBox);
-
 
     static int uniqueIDIndex;
     static int getUniqueID();
@@ -35,8 +35,18 @@ public:
 private:
     DewesoftBridge& bridge;
 
-    //void onSubmitClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::EventArgs& args);
-    //void onDeleteClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::EventArgs& args);
+    void onAddChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::EventArgs& args);
+    void onDeleteChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::EventArgs& args);
+
+    // Event handlers for settings changes
+    void onTriggerLevelTextChanged(Dewesoft::MUI::TextBox& txtBox, Dewesoft::MUI::EventArgs& args);
+    void onTemplateFileTextChanged(Dewesoft::MUI::TextBox& txtBox, Dewesoft::MUI::EventArgs& args);
+    void onReportDirTextChanged(Dewesoft::MUI::TextBox& txtBox, Dewesoft::MUI::EventArgs& args);
+    void onReportNameTextChanged(Dewesoft::MUI::TextBox& txtBox, Dewesoft::MUI::EventArgs& args);
+    void onTriggerChanChanged(Dewesoft::MUI::ComboBox& comboBox, Dewesoft::MUI::EventArgs& args);
+    void onEdgeTypeChanged(Dewesoft::MUI::ComboBox& comboBox, Dewesoft::MUI::EventArgs& args);
+    void onOptionsSelectionChanged(Dewesoft::MUI::CheckListBox& chkListBox, Dewesoft::MUI::EventArgs& args);
+    void onChannelTypeChanged(Dewesoft::MUI::ComboBox& comboBox, Dewesoft::MUI::EventArgs& args);
 
     Dewesoft::MUI::TextBox triggerLevelTextBox;
     Dewesoft::MUI::TextBox templateFileTextBox;

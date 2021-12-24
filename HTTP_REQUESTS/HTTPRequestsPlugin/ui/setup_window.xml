@@ -63,9 +63,9 @@
 
                 <Label Grid.Row="1" Grid.Column="7" Text="Additional Options" Name="optionsLabel" TextAlign="Center" FontWeight="Bold"/>
                 <CheckListBox Grid.Row="2" Grid.Column="7" Name="optionsListBox" Grid.RowSpan="10"/>
-        
-                
-                
+
+
+
             </Grid>
         </CaptionPanel>
 
