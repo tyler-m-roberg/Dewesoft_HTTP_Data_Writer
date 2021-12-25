@@ -108,6 +108,7 @@ void Request::saveSetup(const NodePtr& node) const
          item.saveSetup(additionalOptionNode);
      }
 
+     //Create subnode for selected channels and add each selected channel
      const auto selectedChannelsNode = node->addChild(u8"SelectedChannels");
      for (const auto& item : selectedChannelList)
      {
@@ -118,32 +119,41 @@ void Request::saveSetup(const NodePtr& node) const
 
 void Request::loadSetup(const NodePtr& node)
 {
-     //node->read(u8"TriggerChannel", triggerChannel, 1);
-     //node->read(u8"TriggerLevel", triggerLevel, 1);
-     //node->read(u8"EdgeType", edgeType, 1);
-     //node->read(u8"TemplateFile", templateFile, 1);
-     //node->read(u8"ReportDirectory", reportDirectory,1);
-     //node->read(u8"ReportName", reportName, 1);
+     node->read(u8"TriggerChannel", triggerChannel, 1);
+     node->read(u8"TriggerLevel", triggerLevel, 1);
+     node->read(u8"EdgeType", edgeType, 1);
+     node->read(u8"TemplateFile", templateFile, 1);
+     node->read(u8"ReportDirectory", reportDirectory,1);
+     node->read(u8"ReportName", reportName, 1);
 
-     //const auto additionalOptionsNode = node->findChildNode(u8"AdditionalOptions");
-     //if (additionalOptionsNode)
-     //{
+    const auto selectedChannelsNode = node->findChildNode(u8"SelectedChannels");
+    if (!selectedChannelsNode)
+    {
 
-     //}
-     //else
-     //{
+    }
+    else
+    {
+        for (size_t i = 0; i < selectedChannelsNode->getChildCount(); ++i)
+        {
+            const auto selectedChannelNode = selectedChannelsNode->getChild(i);
+            selectedChannelList.emplace_back();
+            selectedChannelList.back().loadSetup(selectedChannelNode);
+        }
+    }
 
-     //}
-
-     //const auto selectedChannelsNode = node->findChildNode(u8"SelectedChannels");
-     //if (selectedChannelsNode)
-     //{
-
-     //}
-     //else
-     //{
-
-     //}
+    const auto additionalOptionsNode = node->findChildNode(u8"AdditionalOptions");
+    if (!additionalOptionsNode)
+    {
+    }
+    else
+    {
+        for (size_t i = 0; i < additionalOptionsNode->getChildCount(); ++i)
+        {
+            const auto additionalOptionNode = additionalOptionsNode->getChild(i);
+            //Need code to check existing options and only load settings from options
+            //that match option list
+        }
+    }
 }
 
 void Request::clear()

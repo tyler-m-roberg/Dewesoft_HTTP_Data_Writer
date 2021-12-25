@@ -1,6 +1,6 @@
 #pragma once
+#include <string>
 #include <dcomlib/dcom_output_channel/output_channel.h>
-#include <dcomlib/dcom_output_channel/output_factory.h>
 
 class SelectedChannel
 {
@@ -10,7 +10,7 @@ public:
     explicit SelectedChannel(std::string dataEntryType, std::string channelType, std::string channelName, int pageNum, std::string cellRef);
 
     void saveSetup(const Dewesoft::Utils::Serialization::NodePtr& node) const;
-
+    void loadSetup(const Dewesoft::Utils::Serialization::NodePtr& node);
 
     bool operator==(const SelectedChannel& requestObj) const;
 

@@ -1,6 +1,6 @@
 #pragma once
+#include <string>
 #include <dcomlib/dcom_output_channel/output_channel.h>
-#include <dcomlib/dcom_output_channel/output_factory.h>
 
 class AdditionalOptions
 {
@@ -11,4 +11,5 @@ public:
     AdditionalOptions(std::string optionName, bool enabled);
 
     void saveSetup(const Dewesoft::Utils::Serialization::NodePtr& node) const;
+    void loadSetup(const Dewesoft::Utils::Serialization::NodePtr& node);
 };

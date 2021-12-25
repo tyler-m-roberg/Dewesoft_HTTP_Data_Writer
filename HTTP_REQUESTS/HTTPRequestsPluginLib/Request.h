@@ -1,10 +1,9 @@
 #pragma once
 #define CURL_STATICLIB
-#include <dcomlib/dcom_output_channel/output_factory.h>
 #include <commonlib/serialization/node.h>
-
 #include "SelectedChannel.h"
 #include "AdditionalOptions.h"
+#include <vector>
 
 class Request
 {

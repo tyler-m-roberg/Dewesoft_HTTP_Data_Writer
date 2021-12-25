@@ -129,7 +129,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\theoz\OneDrive\Documents\GitHub\Dewesoft_HTTP_Data_Writer\Includes\json-3.10.4\include\;C:\Users\theoz\OneDrive\Documents\GitHub\Dewesoft_HTTP_Data_Writer\Includes\curl\builds\libcurl-vc-x64-release-static-ipv6-sspi-schannel\include;$(DCOM_LIB_ROOT)\include;$(ProjectDir)\Generated;../HTTPRequestsPluginLib/;$(MUI3_LIB_ROOT)\include;$(ProjectDir);$(IncludePath);$(COMMON_LIB_ROOT)\include\;$(COMMON_LIB_ROOT)\external\libxml\include</IncludePath>
+    <IncludePath>C:\Users\theoz\OneDrive\Documents\GitHub\Dewesoft_HTTP_Data_Writer\Includes\json-3.10.4\include;C:\Users\theoz\OneDrive\Documents\GitHub\Dewesoft_HTTP_Data_Writer\Includes\curl\builds\libcurl-vc-x64-release-static-ipv6-sspi-schannel\include;$(DCOM_LIB_ROOT)\include;$(ProjectDir)\Generated;../HTTPRequestsPluginLib/;$(MUI3_LIB_ROOT)\include;$(ProjectDir);$(IncludePath);$(COMMON_LIB_ROOT)\include\;$(COMMON_LIB_ROOT)\external\libxml\include</IncludePath>
     <OutDir>$(DEWESOFT_EXE_X64)\Addons64</OutDir>
     <IntDir>$(Platform)\$(Configuration)\Intermediate\</IntDir>
     <LibraryPath>C:\Users\theoz\OneDrive\Documents\GitHub\Dewesoft_HTTP_Data_Writer\Includes\curl\builds\libcurl-vc-x64-release-static-ipv6-sspi-schannel\lib;$(DCOM_LIB_ROOT)\lib;$(MUI3_LIB_ROOT)\lib;$(LibraryPath);$(COMMON_LIB_ROOT)\lib;$(COMMON_LIB_ROOT)\external\libxml\lib\lib64</LibraryPath>
@@ -332,6 +332,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
     </ClCompile>
     <Midl>
       <TypeLibraryName>TypeLib.tlb</TypeLibraryName>
@@ -370,6 +371,9 @@
       <Command>
       </Command>
     </PreBuildEvent>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dewesoft_bridge.cpp" />
@@ -432,7 +436,9 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <None Include="PluginConfig.props" />
+    <None Include="PluginConfig.props">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="HTTPRequestsPlugin.def" />
   </ItemGroup>
   <ItemGroup>
