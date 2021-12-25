@@ -19,12 +19,6 @@ c:\users\theoz\appdata\local\dewesoft extensions\library\include\coretypes\07000
   c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xlocbuf(478): note: see declaration of 'std::wstring_convert<convert_type,wchar_t,std::allocator<wchar_t>,std::allocator<char>>::to_bytes'
 c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(2): warning C4005: 'CURL_STATICLIB': macro redefinition
   c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestsplugin\stdafx.cpp: note: see previous definition of 'CURL_STATICLIB'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\selectedchannel.h(11): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\selectedchannel.h(11): error C2143: syntax error: missing ',' before '&'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(18): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(18): error C2143: syntax error: missing ',' before '&'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(20): error C2065: 'node': undeclared identifier
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(21): error C2065: 'node': undeclared identifier
   plugin_info.cpp
 c:\users\theoz\appdata\local\dewesoft extensions\library\include\coretypes\070000\coretype_traits.h(359): warning C4996: 'std::codecvt_utf8<wchar_t,1114111,0>': warning STL4017: std::wbuffer_convert, std::wstring_convert, and the <codecvt> header (containing std::codecvt_mode, std::codecvt_utf8, std::codecvt_utf16, and std::codecvt_utf8_utf16) are deprecated in C++17. (The std::codecvt class template is NOT deprecated.) The C++ Standard doesn't provide equivalent non-deprecated functionality; consider using MultiByteToWideChar() and WideCharToMultiByte() from <Windows.h> instead. You can define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING or _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS to acknowledge that you have received this warning.
   c:\users\theoz\appdata\local\dewesoft extensions\library\include\coretypes\070000\coretype_traits.h(359): note: see declaration of 'std::codecvt_utf8<wchar_t,1114111,0>'
@@ -44,12 +38,6 @@ c:\users\theoz\appdata\local\dewesoft extensions\library\include\coretypes\07000
   c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xlocbuf(478): note: see declaration of 'std::wstring_convert<convert_type,wchar_t,std::allocator<wchar_t>,std::allocator<char>>::to_bytes'
 c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(2): warning C4005: 'CURL_STATICLIB': macro redefinition
   c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestsplugin\stdafx.cpp: note: see previous definition of 'CURL_STATICLIB'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\selectedchannel.h(11): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\selectedchannel.h(11): error C2143: syntax error: missing ',' before '&'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(18): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(18): error C2143: syntax error: missing ',' before '&'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(20): error C2065: 'node': undeclared identifier
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(21): error C2065: 'node': undeclared identifier
   dllmain.cpp
 c:\users\theoz\appdata\local\dewesoft extensions\library\include\coretypes\070000\coretype_traits.h(359): warning C4996: 'std::codecvt_utf8<wchar_t,1114111,0>': warning STL4017: std::wbuffer_convert, std::wstring_convert, and the <codecvt> header (containing std::codecvt_mode, std::codecvt_utf8, std::codecvt_utf16, and std::codecvt_utf8_utf16) are deprecated in C++17. (The std::codecvt class template is NOT deprecated.) The C++ Standard doesn't provide equivalent non-deprecated functionality; consider using MultiByteToWideChar() and WideCharToMultiByte() from <Windows.h> instead. You can define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING or _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS to acknowledge that you have received this warning.
   c:\users\theoz\appdata\local\dewesoft extensions\library\include\coretypes\070000\coretype_traits.h(359): note: see declaration of 'std::codecvt_utf8<wchar_t,1114111,0>'
@@ -69,12 +57,6 @@ c:\users\theoz\appdata\local\dewesoft extensions\library\include\coretypes\07000
   c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xlocbuf(478): note: see declaration of 'std::wstring_convert<convert_type,wchar_t,std::allocator<wchar_t>,std::allocator<char>>::to_bytes'
 c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(2): warning C4005: 'CURL_STATICLIB': macro redefinition
   c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestsplugin\stdafx.cpp: note: see previous definition of 'CURL_STATICLIB'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\selectedchannel.h(11): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\selectedchannel.h(11): error C2143: syntax error: missing ',' before '&'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(18): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(18): error C2143: syntax error: missing ',' before '&'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(20): error C2065: 'node': undeclared identifier
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(21): error C2065: 'node': undeclared identifier
   dewesoft_bridge.cpp
 c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestsplugin\dewesoft_bridge.cpp(4): warning C4005: 'CURL_STATICLIB': macro redefinition
   c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestsplugin\dewesoft_bridge.cpp: note: see previous definition of 'CURL_STATICLIB'
@@ -99,12 +81,6 @@ c:\users\theoz\appdata\local\dewesoft extensions\library\include\coretypes\07000
   c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xlocbuf(478): note: see declaration of 'std::wstring_convert<convert_type,wchar_t,std::allocator<wchar_t>,std::allocator<char>>::to_bytes'
 c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(2): warning C4005: 'CURL_STATICLIB': macro redefinition
   c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestsplugin\stdafx.cpp: note: see previous definition of 'CURL_STATICLIB'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\selectedchannel.h(11): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\selectedchannel.h(11): error C2143: syntax error: missing ',' before '&'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(18): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(18): error C2143: syntax error: missing ',' before '&'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(20): error C2065: 'node': undeclared identifier
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(21): error C2065: 'node': undeclared identifier
   plugin_impl.cpp
 c:\users\theoz\appdata\local\dewesoft extensions\library\include\coretypes\070000\coretype_traits.h(359): warning C4996: 'std::codecvt_utf8<wchar_t,1114111,0>': warning STL4017: std::wbuffer_convert, std::wstring_convert, and the <codecvt> header (containing std::codecvt_mode, std::codecvt_utf8, std::codecvt_utf16, and std::codecvt_utf8_utf16) are deprecated in C++17. (The std::codecvt class template is NOT deprecated.) The C++ Standard doesn't provide equivalent non-deprecated functionality; consider using MultiByteToWideChar() and WideCharToMultiByte() from <Windows.h> instead. You can define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING or _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS to acknowledge that you have received this warning.
   c:\users\theoz\appdata\local\dewesoft extensions\library\include\coretypes\070000\coretype_traits.h(359): note: see declaration of 'std::codecvt_utf8<wchar_t,1114111,0>'
@@ -124,9 +100,28 @@ c:\users\theoz\appdata\local\dewesoft extensions\library\include\coretypes\07000
   c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xlocbuf(478): note: see declaration of 'std::wstring_convert<convert_type,wchar_t,std::allocator<wchar_t>,std::allocator<char>>::to_bytes'
 c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(2): warning C4005: 'CURL_STATICLIB': macro redefinition
   c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestsplugin\stdafx.cpp: note: see previous definition of 'CURL_STATICLIB'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\selectedchannel.h(11): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\selectedchannel.h(11): error C2143: syntax error: missing ',' before '&'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(18): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(18): error C2143: syntax error: missing ',' before '&'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(20): error C2065: 'node': undeclared identifier
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(21): error C2065: 'node': undeclared identifier
+  Embedding MUI resources.
+dcom_utils64_debug.lib(setup_utils.obj) : error LNK2038: mismatch detected for '_ITERATOR_DEBUG_LEVEL': value '2' doesn't match value '0' in dewesoft_bridge.obj
+dcom_utils64_debug.lib(setup_utils.obj) : error LNK2038: mismatch detected for 'RuntimeLibrary': value 'MDd_DynamicDebug' doesn't match value 'MD_DynamicRelease' in dewesoft_bridge.obj
+dcom_utils64_debug.lib(properties_impl.obj) : error LNK2038: mismatch detected for '_ITERATOR_DEBUG_LEVEL': value '2' doesn't match value '0' in dewesoft_bridge.obj
+dcom_utils64_debug.lib(properties_impl.obj) : error LNK2038: mismatch detected for 'RuntimeLibrary': value 'MDd_DynamicDebug' doesn't match value 'MD_DynamicRelease' in dewesoft_bridge.obj
+dcom_utils64_debug.lib(axis_properties.obj) : error LNK2038: mismatch detected for '_ITERATOR_DEBUG_LEVEL': value '2' doesn't match value '0' in dewesoft_bridge.obj
+dcom_utils64_debug.lib(axis_properties.obj) : error LNK2038: mismatch detected for 'RuntimeLibrary': value 'MDd_DynamicDebug' doesn't match value 'MD_DynamicRelease' in dewesoft_bridge.obj
+dcom_utils64_debug.lib(axis_properties_helper.obj) : error LNK2038: mismatch detected for '_ITERATOR_DEBUG_LEVEL': value '2' doesn't match value '0' in dewesoft_bridge.obj
+dcom_utils64_debug.lib(axis_properties_helper.obj) : error LNK2038: mismatch detected for 'RuntimeLibrary': value 'MDd_DynamicDebug' doesn't match value 'MD_DynamicRelease' in dewesoft_bridge.obj
+     Creating library x64\Release\Intermediate\HTTPRequestsPlugin64.lib and object x64\Release\Intermediate\HTTPRequestsPlugin64.exp
+MSVCRT.lib(initializers.obj) : warning LNK4098: defaultlib 'msvcrtd.lib' conflicts with use of other libs; use /NODEFAULTLIB:library
+dcom_utils64_debug.lib(setup_utils.obj) : error LNK2001: unresolved external symbol __imp__invalid_parameter
+dcom_utils64_debug.lib(properties_impl.obj) : error LNK2001: unresolved external symbol __imp__invalid_parameter
+dcom_utils64_debug.lib(axis_properties.obj) : error LNK2001: unresolved external symbol __imp__invalid_parameter
+dcom_utils64_debug.lib(axis_properties_helper.obj) : error LNK2001: unresolved external symbol __imp__invalid_parameter
+dcom_utils64_debug.lib(setup_utils.obj) : error LNK2001: unresolved external symbol __imp__calloc_dbg
+dcom_utils64_debug.lib(properties_impl.obj) : error LNK2001: unresolved external symbol __imp__calloc_dbg
+dcom_utils64_debug.lib(axis_properties_helper.obj) : error LNK2001: unresolved external symbol __imp__calloc_dbg
+dcom_utils64_debug.lib(setup_utils.obj) : error LNK2001: unresolved external symbol __imp__CrtDbgReport
+dcom_utils64_debug.lib(properties_impl.obj) : error LNK2001: unresolved external symbol __imp__CrtDbgReport
+dcom_utils64_debug.lib(axis_properties.obj) : error LNK2001: unresolved external symbol __imp__CrtDbgReport
+dcom_utils64_debug.lib(axis_properties_helper.obj) : error LNK2001: unresolved external symbol __imp__CrtDbgReport
+msvcrtd.lib(init.obj) : error LNK2001: unresolved external symbol _CrtDbgReport
+msvcrtd.lib(init.obj) : error LNK2001: unresolved external symbol _CrtDbgReportW
+C:\Program Files\DewesoftX\Bin64\Addons64\HTTPRequestsPlugin64.dll : fatal error LNK1120: 5 unresolved externals

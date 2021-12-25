@@ -1,5 +1,4 @@
 #include "sine_generator.h"
-#include <string>
 
 using namespace Dewesoft::Utils::Dcom::OutputChannel;
 using namespace Dewesoft::Utils::Dcom::InputChannel;

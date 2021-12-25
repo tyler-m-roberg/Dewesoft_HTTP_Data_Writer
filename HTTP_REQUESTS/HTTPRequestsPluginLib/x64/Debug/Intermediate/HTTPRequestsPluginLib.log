@@ -1,4 +1,4 @@
-﻿  sine_generator.cpp
-  sine_wave.cpp
-  Generating Code...
-  HTTPRequestsPluginLib.vcxproj -> C:\Users\theoz\OneDrive\Documents\GitHub\HTTP_REQUESTS\x64\Debug\HTTPRequestsPluginLib.lib
+﻿  Request.cpp
+c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(151): warning C4834: discarding return value of function with 'nodiscard' attribute
+c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(152): warning C4553: '==': result of expression not used; did you intend '='?
+  HTTPRequestsPluginLib.vcxproj -> C:\Users\theoz\OneDrive\Documents\GitHub\Dewesoft_HTTP_Data_Writer\x64\Debug\HTTPRequestsPluginLib.lib

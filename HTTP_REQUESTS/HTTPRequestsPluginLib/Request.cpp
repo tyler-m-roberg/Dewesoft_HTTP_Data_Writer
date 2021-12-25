@@ -1,13 +1,11 @@
 #include "Request.h"
-#include <curl\curl.h>
 #include <thread>
-#include <iostream>
 #include <chrono>
+#include <curl\curl.h>
 #include <nlohmann/json.hpp>
 
 
 using namespace Dewesoft::Utils::Serialization;
-using namespace Dewesoft::Utils::Dcom::Utils;
 
 void curlThread(std::string data)
 {
@@ -103,15 +101,15 @@ void Request::saveSetup(const NodePtr& node) const
 
 
      //Create subnode for additional options and add child each option
-     const auto additionalOptionsNode = node->addChild(u8"AdditionalOptions");
-     for (auto& item : additionalOptionsList)
+     const NodePtr additionalOptionsNode = node->addChild(u8"AdditionalOptions");
+     for (const AdditionalOptions& item : additionalOptionsList)
      {
-         const auto additionalOptionNode = additionalOptionsNode->addChild(u8"AdditionalOption");
+         const NodePtr additionalOptionNode = additionalOptionsNode->addChild(u8"AdditionalOption");
          item.saveSetup(additionalOptionNode);
      }
 
      const auto selectedChannelsNode = node->addChild(u8"SelectedChannels");
-     for (auto& item : selectedChannelList)
+     for (const auto& item : selectedChannelList)
      {
          const auto selectedChannelNode = selectedChannelsNode->addChild(u8"SelectedChannel");
          item.saveSetup(selectedChannelNode);
@@ -120,32 +118,32 @@ void Request::saveSetup(const NodePtr& node) const
 
 void Request::loadSetup(const NodePtr& node)
 {
-     node->read(u8"TriggerChannel", triggerChannel, "");
-     node->read(u8"TriggerLevel", triggerLevel, "");
-     node->read(u8"EdgeType", edgeType, "");
-     node->read(u8"TemplateFile", templateFile, "");
-     node->read(u8"ReportDirectory", reportDirectory,"");
-     node->read(u8"ReportName", reportName, "");
+     //node->read(u8"TriggerChannel", triggerChannel, 1);
+     //node->read(u8"TriggerLevel", triggerLevel, 1);
+     //node->read(u8"EdgeType", edgeType, 1);
+     //node->read(u8"TemplateFile", templateFile, 1);
+     //node->read(u8"ReportDirectory", reportDirectory,1);
+     //node->read(u8"ReportName", reportName, 1);
 
-     const auto additionalOptionsNode = node->findChildNode(u8"AdditionalOptions");
-     if (additionalOptionsNode)
-     {
+     //const auto additionalOptionsNode = node->findChildNode(u8"AdditionalOptions");
+     //if (additionalOptionsNode)
+     //{
 
-     }
-     else
-     {
+     //}
+     //else
+     //{
 
-     }
+     //}
 
-     const auto selectedChannelsNode = node->findChildNode(u8"SelectedChannels");
-     if (selectedChannelsNode)
-     {
+     //const auto selectedChannelsNode = node->findChildNode(u8"SelectedChannels");
+     //if (selectedChannelsNode)
+     //{
 
-     }
-     else
-     {
+     //}
+     //else
+     //{
 
-     }
+     //}
 }
 
 void Request::clear()

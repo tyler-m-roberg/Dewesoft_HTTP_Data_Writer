@@ -1,27 +1,7 @@
-﻿  Request.cpp
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\x64\release\intermediate\dewesoft.tlh(12488): warning C4002: too many arguments for function-like macro invocation 'GetCurrentTime'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\x64\release\intermediate\dewesoft.tlh(15430): warning C4002: too many arguments for function-like macro invocation 'GetCurrentTime'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\selectedchannel.h(11): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\selectedchannel.h(11): error C2143: syntax error: missing ',' before '&'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(18): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(18): error C2143: syntax error: missing ',' before '&'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(20): error C2065: 'node': undeclared identifier
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.h(21): error C2065: 'node': undeclared identifier
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(110): error C2662: 'void AdditionalOptions::saveSetup(const int)': cannot convert 'this' pointer from 'const AdditionalOptions' to 'AdditionalOptions &'
-  c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(110): note: Conversion loses qualifiers
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(117): error C2664: 'void SelectedChannel::saveSetup(const int) const': cannot convert argument 1 from 'const Dewesoft::Utils::Serialization::NodePtr' to 'const int'
-  c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(117): note: No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(153): warning C4834: discarding return value of function with 'nodiscard' attribute
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(154): warning C4553: '==': result of expression not used; did you intend '='?
+﻿  AdditionalOptions.cpp
+  Request.cpp
+c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(151): warning C4834: discarding return value of function with 'nodiscard' attribute
+c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(152): warning C4553: '==': result of expression not used; did you intend '='?
   SelectedChannel.cpp
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\x64\release\intermediate\dewesoft.tlh(12488): warning C4002: too many arguments for function-like macro invocation 'GetCurrentTime'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\x64\release\intermediate\dewesoft.tlh(15430): warning C4002: too many arguments for function-like macro invocation 'GetCurrentTime'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\selectedchannel.h(11): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\selectedchannel.h(11): error C2143: syntax error: missing ',' before '&'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\selectedchannel.cpp(27): error C2511: 'void SelectedChannel::saveSetup(const Dewesoft::Utils::Serialization::NodePtr &) const': overloaded member function not found in 'SelectedChannel'
-  c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\selectedchannel.h(4): note: see declaration of 'SelectedChannel'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\selectedchannel.cpp(28): error C2597: illegal reference to non-static member 'SelectedChannel::dataEntryType'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\selectedchannel.cpp(29): error C2597: illegal reference to non-static member 'SelectedChannel::channelName'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\selectedchannel.cpp(30): error C2597: illegal reference to non-static member 'SelectedChannel::pageNum'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\selectedchannel.cpp(31): error C2597: illegal reference to non-static member 'SelectedChannel::cellRef'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\selectedchannel.cpp(32): error C2597: illegal reference to non-static member 'SelectedChannel::channelType'
+  sine_generator.cpp
+  HTTPRequestsPluginLib.vcxproj -> C:\Users\theoz\OneDrive\Documents\GitHub\Dewesoft_HTTP_Data_Writer\x64\Release\HTTPRequestsPluginLib.lib

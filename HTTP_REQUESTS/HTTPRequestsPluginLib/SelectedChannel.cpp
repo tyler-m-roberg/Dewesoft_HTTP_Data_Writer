@@ -1,7 +1,8 @@
 #include "SelectedChannel.h"
 
+
+using namespace Dewesoft::Utils::Dcom::OutputChannel;
 using namespace Dewesoft::Utils::Serialization;
-using namespace Dewesoft::Utils::Dcom::Utils;
 
 SelectedChannel::SelectedChannel()
 {

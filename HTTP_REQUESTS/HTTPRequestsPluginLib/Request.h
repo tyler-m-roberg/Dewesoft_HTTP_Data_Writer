@@ -1,27 +1,10 @@
 #pragma once
 #define CURL_STATICLIB
-#include "dcomlib/dcom_utils/dewesoft_dcom_node.h"
+#include <dcomlib/dcom_output_channel/output_factory.h>
+#include <commonlib/serialization/node.h>
+
 #include "SelectedChannel.h"
-
-struct AdditionalOptions
-{
-
-    std::string optionName;
-    bool enabled;
-
-    AdditionalOptions(std::string optionName, bool enabled)
-        : optionName(optionName)
-        , enabled(enabled)
-    {
-    }
-
-    void saveSetup(const NodePtr& node)
-    {
-        node->write(u8"OptionName", optionName);
-        node->write(u8"Enabled", enabled);
-    }
-
-};
+#include "AdditionalOptions.h"
 
 class Request
 {
@@ -52,6 +35,4 @@ public:
     std::vector<AdditionalOptions> additionalOptionsList;
     std::vector<SelectedChannel> selectedChannelList;
     std::vector<std::string> specialChannelsList;
-
 };
-
