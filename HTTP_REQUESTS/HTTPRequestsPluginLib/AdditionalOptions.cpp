@@ -16,7 +16,5 @@ void AdditionalOptions::saveSetup(const NodePtr& node) const
 
 void AdditionalOptions::loadSetup(const NodePtr& node)
 {
-    node->write(u8"OptionName", optionName);
-    node->write(u8"Enabled", enabled);
 }
 

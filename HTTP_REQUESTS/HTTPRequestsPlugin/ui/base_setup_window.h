@@ -34,8 +34,8 @@ protected:
     Dewesoft::MUI::TextBox reportDirTextBox;
     Dewesoft::MUI::Label reportNameLabel;
     Dewesoft::MUI::TextBox reportNameTextBox;
-    Dewesoft::MUI::Label optionsLabel;
-    Dewesoft::MUI::CheckListBox optionsListBox;
+    Dewesoft::MUI::CaptionPanel optionsListPanel;
+    Dewesoft::MUI::StackPanel optionsListStackPanel;
     Dewesoft::MUI::CaptionPanel addChannelPanel;
     Dewesoft::MUI::Label dataEntryTypeLabel;
     Dewesoft::MUI::ComboBox dataEntryTypeCBox;
@@ -67,8 +67,8 @@ protected:
         reportDirTextBox = Dewesoft::MUI::TextBox::Connect(ui, "reportDirTextBox");
         reportNameLabel = Dewesoft::MUI::Label::Connect(ui, "reportNameLabel");
         reportNameTextBox = Dewesoft::MUI::TextBox::Connect(ui, "reportNameTextBox");
-        optionsLabel = Dewesoft::MUI::Label::Connect(ui, "optionsLabel");
-        optionsListBox = Dewesoft::MUI::CheckListBox::Connect(ui, "optionsListBox");
+        optionsListPanel = Dewesoft::MUI::CaptionPanel::Connect(ui, "optionsListPanel");
+        optionsListStackPanel = Dewesoft::MUI::StackPanel::Connect(ui, "optionsListStackPanel");
         addChannelPanel = Dewesoft::MUI::CaptionPanel::Connect(ui, "addChannelPanel");
         dataEntryTypeLabel = Dewesoft::MUI::Label::Connect(ui, "dataEntryTypeLabel");
         dataEntryTypeCBox = Dewesoft::MUI::ComboBox::Connect(ui, "dataEntryTypeCBox");

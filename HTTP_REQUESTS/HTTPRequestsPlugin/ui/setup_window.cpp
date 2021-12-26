@@ -32,16 +32,13 @@ SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
     addChannelBtn = Button::Connect(ui, "addChannelBtn");
 
     channelListBox = ListBox::Connect(ui, "channelListBox");
+    optionsStackPanel = StackPanel::Connect(ui, "optionsListStackPanel");
 
-    optionsListBox = CheckListBox::Connect(ui, "optionsListBox");
 
     // Fill CBoxes that only need one write;
     addDataEntryTypeToCBox(dataEntryTypeCBox);
     addEdgeCondToCBox(edgeTypeCBox);
     addChannelTypeToCBox(channelTypeCBox);
-
-    // Fill options box
-    addItemsToOptionsListBox(optionsListBox);
 
     // Add submit event to addChannelBtn
     addChannelBtn.OnClick += event(&SetupWindow::onAddChannelClick);
@@ -56,17 +53,15 @@ SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
     reportNameTextBox.OnTextChanged += event(&SetupWindow::onReportNameTextChanged);
     triggerChanCBox.OnSelectedIndexChanged += event(&SetupWindow::onTriggerChanChanged);
     edgeTypeCBox.OnSelectedIndexChanged += event(&SetupWindow::onEdgeTypeChanged);
-    optionsListBox.OnClickCheck += event(&SetupWindow::onOptionsSelectionChanged);
     channelTypeCBox.OnSelectedIndexChanged += event(&SetupWindow::onChannelTypeChanged);
 
-    // Get list of relays that have been created and loop through relays to determine max uniqueID and set uniqueIDIndex to 1 greater than
-    // current max std::vector<Webrelay> webrelayList = bridge.getRelayListForUI();
+    uiPtr = ui;
+
 }
 
 SetupWindow::~SetupWindow()
 {
 }
-
 void SetupWindow::setupEnter()
 {
     // Fill comboboxes for channels
@@ -76,20 +71,15 @@ void SetupWindow::setupEnter()
     // Add saved items to list box
     addItemsToChannelListBox(channelListBox);
 
-    //TODO
-    //Add logic to load selected channels from vector for selected channel list
+    
+    addItemsToOptionsListBox(uiPtr, optionsStackPanel);
 
-    // Get created relays and loop through and add to listbox
-    // std::vector<Webrelay> webrelayList = bridge.getRelayListForUI();
-
-    /*for (auto& webrelay : webrelayList)
-    {
-        std::string edgeType = (webrelay.getEdgeType() == RisingEdge) ? "Rising Edge" : "Falling Edge";
-
-        listBox.addItem(std::string("Unique ID: ") + std::to_string(webrelay.getRelayID()) + ", IP Address: " + webrelay.getIPAddress() +
-                            ", Relay #: " + std::to_string(webrelay.getRelayNum()) + ", Trigger Channel: " + webrelay.getTriggerChannel() +
-                            ", Trigger Level: " + std::to_string(webrelay.getTriggerLevel()) + ", Edge Type: " + edgeType);
-    }*/
+    templateFileTextBox.setText(bridge.requestObj.templateFile);
+    reportDirTextBox.setText(bridge.requestObj.reportDirectory);
+    reportNameTextBox.setText(bridge.requestObj.reportName);
+    //triggerChanCBox.setSelectedItem(bridge.requestObj.triggerChannel); //Fix to match off index instead of string
+    triggerLevelTextBox.setText(std::to_string(bridge.requestObj.triggerLevel));
+    //edgeTypeCBox.setSelectedItem(bridge.requestObj.edgeType); //Fix to match off index instead of string
 }
 
 void SetupWindow::setupLeave()
@@ -115,15 +105,30 @@ void SetupWindow::addChannelsToTriggerChannelCBox(Dewesoft::MUI::ComboBox& combo
 void SetupWindow::addItemsToChannelListBox(Dewesoft::MUI::ListBox& listBox)
 {
     listBox.clear();
+
+    for (auto& selectedChannel : bridge.requestObj.selectedChannelList)
+    {
+        listBox.addItem(SelectedChannel::stringifyChannel(&selectedChannel));
+    }
+
 }
 
-void SetupWindow::addItemsToOptionsListBox(Dewesoft::MUI::CheckListBox& checkListBox)
+void SetupWindow::addItemsToOptionsListBox(WindowPtr ui, Dewesoft::MUI::StackPanel& stackPanel)
 {
-    checkListBox.clear();
-
-    for (auto& listItem : bridge.requestObj.additionalOptionsList)
+    for (auto& control : stackPanel.getChildControls())
     {
-        checkListBox.addItem(listItem.optionName);
+        stackPanel.removeControl(control);
+    }
+
+    for (auto& option : bridge.requestObj.additionalOptionsList)
+    {
+        Dewesoft::MUI::CheckBox checkBox;
+        checkBox = CheckBox::Create(ui);
+        checkBox.setLabel(option.optionName);
+        checkBox.setIsChecked(option.enabled);
+        stackPanel.addControl(checkBox);
+        checkBox.OnCheckedChanged += event(&SetupWindow::onOptionsSelectionChanged);
+        
     }
 }
 
@@ -172,14 +177,9 @@ void SetupWindow::onAddChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::E
     std::string selectedChannel = channelSelectionCBox.getSelectedItem().toStdString();
     int pageNum = std::stoi(pageNumTextBox.getText().toStdString());
     std::string cellRef = cellRefTextBox.getText().toStdString();
-   
-    std::string  listBoxString = std::string("Data Entry Type : ") + dataEntryType + "    ,    Channel Type : " + channelType +
-                                "    ,    Channel : " + selectedChannel + "    ,    Page# : " + std::to_string(pageNum) +
-                               "    ,    Cell / Starting Cell : " + cellRef;
-
-    channelListBox.addItem(listBoxString);
 
     bridge.requestObj.selectedChannelList.emplace_back(dataEntryType, channelType, selectedChannel, pageNum, cellRef);
+    channelListBox.addItem(SelectedChannel::stringifyChannel(&bridge.requestObj.selectedChannelList.back()));
 
 }
 
@@ -230,31 +230,7 @@ void SetupWindow::onEdgeTypeChanged(Dewesoft::MUI::ComboBox& comboBox, Dewesoft:
 {
     bridge.requestObj.edgeType = comboBox.getSelectedItem();
 }
-void SetupWindow::onOptionsSelectionChanged(Dewesoft::MUI::CheckListBox& chkListBox, Dewesoft::MUI::EventArgs& args)
-{
-    //Loop through options list
-    for (int x = 0; x < bridge.requestObj.additionalOptionsList.size(); x++)
-    {
-        //Loop through checkbox items
-        for (int i = 0; i < chkListBox.getCount(); i++)
-        {
 
-            //Check if option name from class and check list are equal
-            if (!chkListBox.getItemAt(i).toStdString().compare(bridge.requestObj.additionalOptionsList[x].optionName))
-            {
-                //Set enabled value to match check box
-                if (chkListBox.isChecked(i))
-                {
-                    bridge.requestObj.additionalOptionsList[x].enabled = true;
-                }
-                else
-                {
-                    bridge.requestObj.additionalOptionsList[x].enabled = false;
-                }
-            }            
-        }
-    }
-}
 
 void SetupWindow::onChannelTypeChanged(Dewesoft::MUI::ComboBox& comboBox, Dewesoft::MUI::EventArgs& args)
 {
@@ -269,5 +245,23 @@ void SetupWindow::onChannelTypeChanged(Dewesoft::MUI::ComboBox& comboBox, Deweso
     else
     {
         addChannelsToChannelSelectionCBox(channelSelectionCBox);
+    }
+}
+
+void SetupWindow::onOptionsSelectionChanged(Dewesoft::MUI::CheckBox& checkBox, Dewesoft::MUI::EventArgs& args)
+{
+    for (auto& option : bridge.requestObj.additionalOptionsList)
+    {
+        if (!option.optionName.compare(checkBox.getLabel().toStdString()))
+        {
+            if (checkBox.getIsChecked())
+            {
+                option.enabled = true;
+            }
+            else
+            {
+                option.enabled = false;
+            }
+        }
     }
 }

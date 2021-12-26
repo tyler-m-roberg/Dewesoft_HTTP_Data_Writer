@@ -41,6 +41,13 @@ void SelectedChannel::loadSetup(const NodePtr& node)
     node->read(u8"ChannelType", channelType,"");
 }
 
+std::string SelectedChannel::stringifyChannel(SelectedChannel* channel)
+{
+    return std::string("Data Entry Type : ") + channel->dataEntryType + "    ,    Channel Type : " + channel->channelType +
+                                "    ,    Channel : " + channel->channelName + "    ,    Page# : " + std::to_string(channel->pageNum) +
+                                "    ,    Cell / Starting Cell : " + channel->cellRef;
+}
+
 bool SelectedChannel::operator==(const SelectedChannel& selectedChannel) const
 {
     return (!this->dataEntryType.compare(selectedChannel.dataEntryType) && !this->channelType.compare(selectedChannel.channelType) &&

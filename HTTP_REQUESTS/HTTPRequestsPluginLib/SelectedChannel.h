@@ -12,6 +12,8 @@ public:
     void saveSetup(const Dewesoft::Utils::Serialization::NodePtr& node) const;
     void loadSetup(const Dewesoft::Utils::Serialization::NodePtr& node);
 
+    static std::string stringifyChannel(SelectedChannel* channel);
+
     bool operator==(const SelectedChannel& requestObj) const;
 
     bool operator!=(const SelectedChannel& requestObj) const;

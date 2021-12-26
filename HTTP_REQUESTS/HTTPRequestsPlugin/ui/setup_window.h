@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <vector>
 #include <mui/ds_window.h>
 #include <mui/controls.h>
 #include <mui/layout.h>
@@ -23,14 +24,11 @@ public:
     void addChannelsToChannelSelectionCBox(Dewesoft::MUI::ComboBox& comboBox);
 
     void addItemsToChannelListBox(Dewesoft::MUI::ListBox& listBox);
-    void addItemsToOptionsListBox(Dewesoft::MUI::CheckListBox& checkListBox);
+    void addItemsToOptionsListBox(Dewesoft::MUI::WindowPtr ui, Dewesoft::MUI::StackPanel& stackPanel);
 
     void addDataEntryTypeToCBox(Dewesoft::MUI::ComboBox& comboBox);
     void addEdgeCondToCBox(Dewesoft::MUI::ComboBox& comboBox);
     void addChannelTypeToCBox(Dewesoft::MUI::ComboBox& comboBox);
-
-    static int uniqueIDIndex;
-    static int getUniqueID();
 
 private:
     DewesoftBridge& bridge;
@@ -45,7 +43,7 @@ private:
     void onReportNameTextChanged(Dewesoft::MUI::TextBox& txtBox, Dewesoft::MUI::EventArgs& args);
     void onTriggerChanChanged(Dewesoft::MUI::ComboBox& comboBox, Dewesoft::MUI::EventArgs& args);
     void onEdgeTypeChanged(Dewesoft::MUI::ComboBox& comboBox, Dewesoft::MUI::EventArgs& args);
-    void onOptionsSelectionChanged(Dewesoft::MUI::CheckListBox& chkListBox, Dewesoft::MUI::EventArgs& args);
+    void onOptionsSelectionChanged(Dewesoft::MUI::CheckBox& checkBox, Dewesoft::MUI::EventArgs& args);
     void onChannelTypeChanged(Dewesoft::MUI::ComboBox& comboBox, Dewesoft::MUI::EventArgs& args);
 
     Dewesoft::MUI::TextBox triggerLevelTextBox;
@@ -66,5 +64,8 @@ private:
 
     Dewesoft::MUI::ListBox channelListBox;
 
-    Dewesoft::MUI::CheckListBox optionsListBox;
+    Dewesoft::MUI::StackPanel optionsStackPanel;
+
+    Dewesoft::MUI::WindowPtr uiPtr;
+    
 };

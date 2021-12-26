@@ -4,7 +4,6 @@
 #include <curl\curl.h>
 #include <nlohmann/json.hpp>
 
-
 using namespace Dewesoft::Utils::Serialization;
 
 void curlThread(std::string data)
@@ -42,7 +41,6 @@ void curlThread(std::string data)
 Request::Request()
     : Request("", 1.0, "Rising", "", "", "")
 {
-    
 }
 
 Request::Request(std::string triggerChannel,
@@ -91,45 +89,44 @@ void Request::getData(
 
 void Request::saveSetup(const NodePtr& node) const
 {
-    //Save main settings
-     node->write(u8"TriggerChannel", triggerChannel);
-     node->write(u8"TriggerLevel", triggerLevel);
-     node->write(u8"EdgeType", edgeType);
-     node->write(u8"TemplateFile", templateFile);
-     node->write(u8"ReportDirectory", reportDirectory);
-     node->write(u8"ReportName", reportName);
+    // Save main settings
+    node->write(u8"TriggerChannel", triggerChannel);
+    node->write(u8"TriggerLevel", triggerLevel);
+    node->write(u8"EdgeType", edgeType);
+    node->write(u8"TemplateFile", templateFile);
+    node->write(u8"ReportDirectory", reportDirectory);
+    node->write(u8"ReportName", reportName);
 
+    // Create subnode for additional options and add child each option
+    const NodePtr additionalOptionsNode = node->addChild(u8"AdditionalOptions");
+    for (const AdditionalOptions& item : additionalOptionsList)
+    {
+        const NodePtr additionalOptionNode = additionalOptionsNode->addChild(u8"AdditionalOption");
+        item.saveSetup(additionalOptionNode);
+    }
 
-     //Create subnode for additional options and add child each option
-     const NodePtr additionalOptionsNode = node->addChild(u8"AdditionalOptions");
-     for (const AdditionalOptions& item : additionalOptionsList)
-     {
-         const NodePtr additionalOptionNode = additionalOptionsNode->addChild(u8"AdditionalOption");
-         item.saveSetup(additionalOptionNode);
-     }
-
-     //Create subnode for selected channels and add each selected channel
-     const auto selectedChannelsNode = node->addChild(u8"SelectedChannels");
-     for (const auto& item : selectedChannelList)
-     {
-         const auto selectedChannelNode = selectedChannelsNode->addChild(u8"SelectedChannel");
-         item.saveSetup(selectedChannelNode);
-     }
+    // Create subnode for selected channels and add each selected channel
+    const auto selectedChannelsNode = node->addChild(u8"SelectedChannels");
+    for (const auto& item : selectedChannelList)
+    {
+        const auto selectedChannelNode = selectedChannelsNode->addChild(u8"SelectedChannel");
+        item.saveSetup(selectedChannelNode);
+    }
 }
 
 void Request::loadSetup(const NodePtr& node)
 {
-     node->read(u8"TriggerChannel", triggerChannel, 1);
-     node->read(u8"TriggerLevel", triggerLevel, 1);
-     node->read(u8"EdgeType", edgeType, 1);
-     node->read(u8"TemplateFile", templateFile, 1);
-     node->read(u8"ReportDirectory", reportDirectory,1);
-     node->read(u8"ReportName", reportName, 1);
+    node->read(u8"TriggerChannel", triggerChannel, 1);
+    node->read(u8"TriggerLevel", triggerLevel, 1);
+    node->read(u8"EdgeType", edgeType, 1);
+    node->read(u8"TemplateFile", templateFile, 1);
+    node->read(u8"ReportDirectory", reportDirectory, 1);
+    node->read(u8"ReportName", reportName, 1);
 
     const auto selectedChannelsNode = node->findChildNode(u8"SelectedChannels");
     if (!selectedChannelsNode)
     {
-
+        //Do nothing
     }
     else
     {
@@ -144,14 +141,36 @@ void Request::loadSetup(const NodePtr& node)
     const auto additionalOptionsNode = node->findChildNode(u8"AdditionalOptions");
     if (!additionalOptionsNode)
     {
+        //Do Nothing
     }
     else
     {
         for (size_t i = 0; i < additionalOptionsNode->getChildCount(); ++i)
         {
             const auto additionalOptionNode = additionalOptionsNode->getChild(i);
-            //Need code to check existing options and only load settings from options
-            //that match option list
+
+            // Need code to check existing options and only load settings from options
+            // that match option listbox
+            std::string optionName;
+            bool enabled;
+
+            additionalOptionNode->read(u8"OptionName", optionName, "");
+            additionalOptionNode->read(u8"Enabled", enabled, false);
+
+            for (auto& additionalOptionsListItem : additionalOptionsList)
+            {
+                if (!additionalOptionsListItem.optionName.compare(optionName))
+                {
+                    if (enabled)
+                    {
+                        additionalOptionsListItem.enabled = true;
+                    }
+                    else
+                    {
+                        additionalOptionsListItem.enabled = false;
+                    }
+                }
+            }
         }
     }
 }
@@ -167,5 +186,8 @@ void Request::clear()
 
     selectedChannelList.clear();
 
+    for (auto& option : additionalOptionsList)
+    {
+        option.enabled = false;
+    }
 }
-
