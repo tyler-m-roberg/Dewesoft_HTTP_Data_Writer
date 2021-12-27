@@ -62,7 +62,7 @@
                 <TextBox Grid.Row="11" Grid.Column="1" Placeholder="" Name="reportNameTextBox" Grid.ColumnSpan="5"/>
 
                 <CaptionPanel Grid.Row="1" Grid.Column="7" Name="optionsListPanel" Grid.RowSpan="11" Title="Options List">
-                    <StackPanel Name="optionsListStackPanel"/>
+                    <StackPanel Name="optionsListStackPanel" MarginTop="5" PaddingTop="5"/>
                 </CaptionPanel>
 
 

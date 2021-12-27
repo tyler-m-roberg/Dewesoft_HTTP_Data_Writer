@@ -14,7 +14,7 @@ SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
     : BaseSetupWindow(ui, bridge, "ui/setup_window.xml")
     , bridge(bridge)
 {
-    // Connect to UI componenets
+    // Connect to UI componenets*****************************************
     triggerLevelTextBox = TextBox::Connect(ui, "triggerLevelTextBox");
     templateFileTextBox = TextBox::Connect(ui, "templateFileTextBox");
     reportDirTextBox = TextBox::Connect(ui, "reportDirTextBox");
@@ -33,12 +33,13 @@ SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
 
     channelListBox = ListBox::Connect(ui, "channelListBox");
     optionsStackPanel = StackPanel::Connect(ui, "optionsListStackPanel");
-
+    //********************************************************************
 
     // Fill CBoxes that only need one write;
     addDataEntryTypeToCBox(dataEntryTypeCBox);
     addEdgeCondToCBox(edgeTypeCBox);
     addChannelTypeToCBox(channelTypeCBox);
+    //*******************************************************************
 
     // Add submit event to addChannelBtn
     addChannelBtn.OnClick += event(&SetupWindow::onAddChannelClick);
@@ -115,21 +116,42 @@ void SetupWindow::addItemsToChannelListBox(Dewesoft::MUI::ListBox& listBox)
 
 void SetupWindow::addItemsToOptionsListBox(WindowPtr ui, Dewesoft::MUI::StackPanel& stackPanel)
 {
+    //Clear all check box controls from stack panel on open
     for (auto& control : stackPanel.getChildControls())
     {
         stackPanel.removeControl(control);
     }
 
+    //Loop through options in request object from bridge and add check box for each option
+    //Set check status based on status saved in request obejct
     for (auto& option : bridge.requestObj.additionalOptionsList)
     {
+        //Create control and link to ui
         Dewesoft::MUI::CheckBox checkBox;
         checkBox = CheckBox::Create(ui);
+
+        //Set checkbox options
         checkBox.setLabel(option.optionName);
         checkBox.setIsChecked(option.enabled);
+
+        //Add to stack panel
         stackPanel.addControl(checkBox);
+
+        //Add on selection change to checkbox
         checkBox.OnCheckedChanged += event(&SetupWindow::onOptionsSelectionChanged);
         
     }
+
+
+    //Issue with stack panel where last control gets overlayed on top of first control.
+    //The below code adds a hidden button of zero size to the stack panel last to
+    // work around this issue;
+    Dewesoft::MUI::Button blankLabel;
+    blankLabel = Button::Create(ui);
+    blankLabel.setHeight(0);
+    blankLabel.setWidth(0);
+    blankLabel.setVisibility(Dewesoft::MUI::Visibility::vHidden);
+    stackPanel.addControl(blankLabel);
 }
 
 void SetupWindow::addChannelsToChannelSelectionCBox(Dewesoft::MUI::ComboBox& comboBox)
@@ -200,7 +222,21 @@ void SetupWindow::onDeleteChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI
     }
 
     //Create Selected Channel object from values vector and use to compare to channels in Request Selected Channel Vector
-    //TODO
+    //TODO Needs work still
+
+    SelectedChannel* comparisonChannel = new SelectedChannel(values->at(0), values->at(1), values->at(2), std::stoi (values->at(3)), values->at(4));
+
+    int index = 0;
+    for (auto& channel : bridge.requestObj.selectedChannelList)
+    {
+        if (channel == *(comparisonChannel))
+        {
+            bridge.requestObj.selectedChannelList.erase(bridge.requestObj.selectedChannelList.begin() + index);
+            break;
+        }
+        index++;
+    }
+
 
     channelListBox.deleteSelected();
 
