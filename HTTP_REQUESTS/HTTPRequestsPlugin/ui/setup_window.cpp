@@ -209,8 +209,9 @@ void SetupWindow::onDeleteChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI
 {
     std::string selectedItem = channelListBox.getSelectedItem().toStdString();
 
+    //**Removed due to issue with removing white space in channel names
     //Remove white space from string
-    selectedItem.erase(std::remove_if(selectedItem.begin(), selectedItem.end(), isspace), selectedItem.end());
+    //selectedItem.erase(std::remove_if(selectedItem.begin(), selectedItem.end(), isspace), selectedItem.end());
 
     //Use string stream to tokenize string off delimiter and then take substring delimited by colon and store in vector
     std::stringstream ss(selectedItem);
@@ -221,15 +222,12 @@ void SetupWindow::onDeleteChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI
         values->emplace_back(token.substr(token.find(':') + 1, std::string::npos));
     }
 
-    //Create Selected Channel object from values vector and use to compare to channels in Request Selected Channel Vector
-    //TODO Needs work still
-
     SelectedChannel* comparisonChannel = new SelectedChannel(values->at(0), values->at(1), values->at(2), std::stoi (values->at(3)), values->at(4));
 
     int index = 0;
     for (auto& channel : bridge.requestObj.selectedChannelList)
     {
-        if (channel == *(comparisonChannel))
+        if (channel == comparisonChannel)
         {
             bridge.requestObj.selectedChannelList.erase(bridge.requestObj.selectedChannelList.begin() + index);
             break;

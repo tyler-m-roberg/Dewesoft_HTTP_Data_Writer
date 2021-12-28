@@ -1,4 +1,2 @@
-﻿  Request.cpp
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(180): warning C4834: discarding return value of function with 'nodiscard' attribute
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(181): warning C4553: '==': result of expression not used; did you intend '='?
+﻿  SelectedChannel.cpp
   HTTPRequestsPluginLib.vcxproj -> C:\Users\theoz\OneDrive\Documents\GitHub\Dewesoft_HTTP_Data_Writer\x64\Release\HTTPRequestsPluginLib.lib

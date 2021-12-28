@@ -14,7 +14,8 @@ public:
 
     static std::string stringifyChannel(SelectedChannel* channel);
 
-    bool operator==(const SelectedChannel& requestObj) const;
+    bool operator==(const SelectedChannel& selectedChannel) const;
+    bool operator==(const SelectedChannel* selectedChannel) const;
 
     bool operator!=(const SelectedChannel& requestObj) const;
 
