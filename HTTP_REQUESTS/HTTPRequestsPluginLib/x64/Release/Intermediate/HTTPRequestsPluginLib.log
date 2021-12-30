@@ -1,6 +1,6 @@
 ﻿  Request.cpp
 c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\x64\release\intermediate\dewesoft.tlh(12488): warning C4002: too many arguments for function-like macro invocation 'GetCurrentTime'
 c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\x64\release\intermediate\dewesoft.tlh(15430): warning C4002: too many arguments for function-like macro invocation 'GetCurrentTime'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(183): warning C4834: discarding return value of function with 'nodiscard' attribute
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(184): warning C4553: '==': result of expression not used; did you intend '='?
+c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(193): warning C4834: discarding return value of function with 'nodiscard' attribute
+c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(194): warning C4553: '==': result of expression not used; did you intend '='?
   HTTPRequestsPluginLib.vcxproj -> C:\Users\theoz\OneDrive\Documents\GitHub\Dewesoft_HTTP_Data_Writer\x64\Release\HTTPRequestsPluginLib.lib

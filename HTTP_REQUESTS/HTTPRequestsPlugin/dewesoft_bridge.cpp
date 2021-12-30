@@ -209,3 +209,8 @@ std::vector<AdditionalOptions> DewesoftBridge::getAdditionalOptionsFromRequest()
 {
     return requestObj.additionalOptionsList;
 }
+
+std::string DewesoftBridge::getStringChannelValue(long index)
+{
+    return std::string(app->Data->GetUsedChannels()->GetItem(index)->Text);
+}

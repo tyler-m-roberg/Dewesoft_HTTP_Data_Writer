@@ -6,6 +6,7 @@
 
 using namespace Dewesoft::Utils::Serialization;
 using namespace Dewesoft::Utils::Dcom::InputChannel;
+using namespace Dewesoft::Utils::Dcom::Utils;
 
 void curlThread(std::string data)
 {
@@ -25,7 +26,7 @@ void curlThread(std::string data)
         struct curl_slist* hs = NULL;
         hs = curl_slist_append(hs, "Content-Type: application/json");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, hs);
-        curl_easy_setopt(curl, CURLOPT_URL, "https://webhook.site/e9ddf2f3-c075-4d9b-aea6-15916dc1099c");
+        curl_easy_setopt(curl, CURLOPT_URL, "https://webhook.site/617fe306-3e2e-4b18-a675-d42e7cb01f42");
         /* Now specify the POST data */
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
 
@@ -83,8 +84,17 @@ void Request::getData(
 
     for (auto it = inputList->begin(); it != inputList->end(); ++it)
     {
-        postData[it->getName()] = it->getValueAtPos<float>(0, nullptr, true);
+        if (it->getDataType() == ChannelDataType::Text)
+        {
+            
+        }
+        else
+        {
+            postData[it->getName()] = it->getValueAtPos<float>(0, nullptr, true);
+        }
     }
+
+
 
     std::thread threadObj(curlThread, postData.dump());
     threadObj.detach();

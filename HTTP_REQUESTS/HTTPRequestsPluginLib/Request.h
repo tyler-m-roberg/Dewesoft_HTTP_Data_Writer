@@ -6,6 +6,8 @@
 #include "AdditionalOptions.h"
 #include <vector>
 
+struct IApp;
+
 class Request
 {
 public:
@@ -13,7 +15,8 @@ public:
 
     explicit Request(InputManagerImpl& inputManager);
 
-    explicit Request(InputManagerImpl& inputManager, std::string triggerChannel,
+    explicit Request(InputManagerImpl& inputManager,
+                     std::string triggerChannel,
                      double triggerLevel,
                      std::string edgeType,
                      std::string templateFile,

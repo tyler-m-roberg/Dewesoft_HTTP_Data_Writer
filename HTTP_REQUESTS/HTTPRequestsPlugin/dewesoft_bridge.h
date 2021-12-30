@@ -64,6 +64,7 @@ public:
     Request requestObj;
 
     std::vector<AdditionalOptions> getAdditionalOptionsFromRequest();
+    std::string getStringChannelValue(long index);
 
 
 private:
