@@ -1,6 +1,7 @@
 #pragma once
 #define CURL_STATICLIB
 #include <commonlib/serialization/node.h>
+#include <dcomlib/dcom_input_channel/input_manager_impl.h>
 #include "SelectedChannel.h"
 #include "AdditionalOptions.h"
 #include <vector>
@@ -8,9 +9,11 @@
 class Request
 {
 public:
-    explicit Request();
+    using InputManagerImpl = Dewesoft::Utils::Dcom::InputChannel::InputManagerImpl;
 
-    explicit Request(std::string triggerChannel,
+    explicit Request(InputManagerImpl& inputManager);
+
+    explicit Request(InputManagerImpl& inputManager, std::string triggerChannel,
                      double triggerLevel,
                      std::string edgeType,
                      std::string templateFile,
@@ -34,4 +37,6 @@ public:
     std::vector<AdditionalOptions> additionalOptionsList;
     std::vector<SelectedChannel> selectedChannelList;
     std::vector<std::string> specialChannelsList;
+
+    InputManagerImpl& inputManager;
 };

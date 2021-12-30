@@ -5,6 +5,7 @@
 #include <nlohmann/json.hpp>
 
 using namespace Dewesoft::Utils::Serialization;
+using namespace Dewesoft::Utils::Dcom::InputChannel;
 
 void curlThread(std::string data)
 {
@@ -24,7 +25,7 @@ void curlThread(std::string data)
         struct curl_slist* hs = NULL;
         hs = curl_slist_append(hs, "Content-Type: application/json");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, hs);
-        curl_easy_setopt(curl, CURLOPT_URL, "https://webhook.site/7b6c7f77-2d4c-4d56-bc1c-ad9c4ae9bf66");
+        curl_easy_setopt(curl, CURLOPT_URL, "https://webhook.site/e9ddf2f3-c075-4d9b-aea6-15916dc1099c");
         /* Now specify the POST data */
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
 
@@ -38,19 +39,21 @@ void curlThread(std::string data)
     curl_global_cleanup();
 }
 
-Request::Request()
-    : Request("", 1.0, "Rising", "", "", "")
+Request::Request(InputManagerImpl& inputManager)
+    : Request(inputManager,"", 1.0, "Rising", "", "", "")
 {
 }
 
-Request::Request(std::string triggerChannel,
+Request::Request(InputManagerImpl& inputManager,
+                 std::string triggerChannel,
                  double triggerLevel,
                  std::string edgeType,
                  std::string templateFile,
                  std::string reportDirectory,
                  std::string reportName)
 
-    : triggerChannel(triggerChannel)
+    : inputManager(std::move(inputManager))
+    ,triggerChannel(triggerChannel)
     , triggerLevel(triggerLevel)
     , edgeType(edgeType)
     , templateFile(templateFile)
@@ -70,21 +73,21 @@ Request::Request(std::string triggerChannel,
 void Request::getData(
     const double& startTime, const double& sampleRate, const size_t& numSamples, const int64_t beginPos, const int64_t endPos)
 {
-    // nlohmann::json postData;
+     nlohmann::json postData;
 
-    // InputListPtr inputList = inputManager.getInputList();
-    // postData["Input List Size"] = inputList->size();
+     InputListPtr inputList = inputManager.getInputList();
+     postData["Input List Size"] = inputList->size();
 
-    // postData["Begin Pos"] = beginPos;
-    // postData["End Pos"] = endPos;
+    postData["Begin Pos"] = beginPos;
+    postData["End Pos"] = endPos;
 
-    // for (auto it = inputList->begin(); it != inputList->end(); ++it)
-    //{
-    //    postData[it->getName()] = it->getValueAtPos<float>(0, nullptr, true);
-    //}
+    for (auto it = inputList->begin(); it != inputList->end(); ++it)
+    {
+        postData[it->getName()] = it->getValueAtPos<float>(0, nullptr, true);
+    }
 
-    // std::thread threadObj(curlThread, postData.dump());
-    // threadObj.detach();
+    std::thread threadObj(curlThread, postData.dump());
+    threadObj.detach();
 }
 
 void Request::saveSetup(const NodePtr& node) const

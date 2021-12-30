@@ -24,7 +24,7 @@ DewesoftBridge::DewesoftBridge(InputManagerImpl& inputManager, OutputFactoryImpl
     , app(app)
     , pluginGroup(nullptr)
     , sineGenerator(outputFactory)
-    , requestObj()
+    , requestObj(inputManager)
 {
 }
 
