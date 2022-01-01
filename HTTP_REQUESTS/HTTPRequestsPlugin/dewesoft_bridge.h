@@ -9,6 +9,7 @@
 #include <dcomlib/dcom_input_channel/input_manager_impl.h>
 #include <dcomlib/dcom_output_channel/output_factory_impl.h>
 #include "../HTTPRequestsPluginLib/Request.h"
+#include "../HTTPRequestsPluginLib/TextualChannel.h"
 
 struct IApp;
 
@@ -18,6 +19,8 @@ public:
     using NodePtr = Dewesoft::Utils::Serialization::NodePtr;
     using InputManagerImpl = Dewesoft::Utils::Dcom::InputChannel::InputManagerImpl;
     using OutputFactoryImpl = Dewesoft::Utils::Dcom::OutputChannel::OutputFactoryImpl;
+    using TextualChannel = HTTP_Requests::TextualChannel;
+    using Request = HTTP_Requests::Request;
 
     DewesoftBridge(InputManagerImpl& inputManager, OutputFactoryImpl& outputFactory, IAppPtr app = nullptr);
 
@@ -63,9 +66,8 @@ public:
 
     Request requestObj;
 
-    std::vector<AdditionalOptions> getAdditionalOptionsFromRequest();
     std::string getStringChannelValue(long index);
-
+    IChannelPtr getIChannelPtrFromChannelName(std::string chanName);
 
 private:
     InputManagerImpl& inputManager;
@@ -78,4 +80,5 @@ private:
     std::unique_ptr<SettingsWindow> settingsWindow;
 
     SineGenerator sineGenerator;
+    std::vector<TextualChannel> textChannelVector;
 };

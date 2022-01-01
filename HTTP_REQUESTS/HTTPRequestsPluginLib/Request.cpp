@@ -1,12 +1,19 @@
+#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 #include "Request.h"
+#include <codecvt>
 #include <thread>
 #include <chrono>
 #include <curl\curl.h>
 #include <nlohmann/json.hpp>
+#include <iomanip>
+#include <iostream>
+#include <limits>
+#include <functional>
 
 using namespace Dewesoft::Utils::Serialization;
 using namespace Dewesoft::Utils::Dcom::InputChannel;
 using namespace Dewesoft::Utils::Dcom::Utils;
+using namespace HTTP_Requests;
 
 void curlThread(std::string data)
 {
@@ -26,7 +33,7 @@ void curlThread(std::string data)
         struct curl_slist* hs = NULL;
         hs = curl_slist_append(hs, "Content-Type: application/json");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, hs);
-        curl_easy_setopt(curl, CURLOPT_URL, "https://webhook.site/617fe306-3e2e-4b18-a675-d42e7cb01f42");
+        curl_easy_setopt(curl, CURLOPT_URL, "https://webhook.site/842ede6d-8439-4a05-b2d3-ae3977b70692");
         /* Now specify the POST data */
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
 
@@ -40,12 +47,13 @@ void curlThread(std::string data)
     curl_global_cleanup();
 }
 
-Request::Request(InputManagerImpl& inputManager)
-    : Request(inputManager,"", 1.0, "Rising", "", "", "")
+Request::Request(InputManagerImpl& inputManager, IAppPtr app)
+    : Request(inputManager, app, "", 1.0, "Rising", "", "", "")
 {
 }
 
 Request::Request(InputManagerImpl& inputManager,
+                 IAppPtr app,
                  std::string triggerChannel,
                  double triggerLevel,
                  std::string edgeType,
@@ -54,7 +62,8 @@ Request::Request(InputManagerImpl& inputManager,
                  std::string reportName)
 
     : inputManager(std::move(inputManager))
-    ,triggerChannel(triggerChannel)
+    , app(std::move(app))
+    , triggerChannel(triggerChannel)
     , triggerLevel(triggerLevel)
     , edgeType(edgeType)
     , templateFile(templateFile)
@@ -69,35 +78,68 @@ Request::Request(InputManagerImpl& inputManager,
 
     specialChannelsList.emplace_back("Filename");
     specialChannelsList.emplace_back("Date");
-}
 
-void Request::getData(
-    const double& startTime, const double& sampleRate, const size_t& numSamples, const int64_t beginPos, const int64_t endPos)
-{
-     nlohmann::json postData;
-
-     InputListPtr inputList = inputManager.getInputList();
-     postData["Input List Size"] = inputList->size();
-
-    postData["Begin Pos"] = beginPos;
-    postData["End Pos"] = endPos;
-
-    for (auto it = inputList->begin(); it != inputList->end(); ++it)
+    if (!edgeType.compare("Rising"))
     {
-        if (it->getDataType() == ChannelDataType::Text)
-        {
-            
-        }
-        else
-        {
-            postData[it->getName()] = it->getValueAtPos<float>(0, nullptr, true);
-        }
+        this->prevTriggerSample = (std::numeric_limits<double>::max)();
+    }
+    else
+    {
+        this->prevTriggerSample = (std::numeric_limits<double>::lowest)();
     }
 
 
 
-    std::thread threadObj(curlThread, postData.dump());
-    threadObj.detach();
+}
+
+void Request::getData(const AcquiredDataInfo& acquiredDataInfo)
+{
+     nlohmann::json postData; //JSON Data object for post request
+
+     //Convert setting strings to JSON entries
+     postData["Template_File_Opt"] = this->templateFile;
+     postData["Report_Directory_Opt"] = this->reportDirectory;
+     postData["Report_Name_Opt"] = this->reportName;
+
+     nlohmann::json additionalOptionsJSON; //JSON Data object to hold additional options
+
+     //Loop through additional options and add each to additionalOptions JSON object
+     for (auto& option : additionalOptionsList)
+     {
+         additionalOptionsJSON.push_back(option.toJson());
+     }
+
+     postData["Options_Opt"] = additionalOptionsJSON; //Add additional options JSON object to post data object
+
+    InputListPtr inputList = inputManager.getInputList();
+
+    int64_t numSamples = acquiredDataInfo.endPos - acquiredDataInfo.beginPos;
+
+    if (triggerChannelPtr != nullptr)
+    {
+        //Need to test db buff reading vs input channel reading
+        InputChannel* inputChan = new InputChannelImpl(app, triggerChannelPtr);
+
+        if (inputChan != nullptr)
+        {
+            for (int64_t x = acquiredDataInfo.beginPos; x <= acquiredDataInfo.endPos; x++)
+            {
+                float currentTriggerSample = inputChan->getValueAtPos<float>(x, nullptr, true);
+
+                if (prevTriggerSample < triggerLevel && currentTriggerSample >= triggerLevel)
+                {
+                    InputChannel* dataChan = new InputChannelImpl(app, selectedChannelList[0].channelPtr);
+
+                    postData["Data"] = dataChan->getValueAtPos<float>(x, nullptr);
+
+                    std::thread threadObj(curlThread, postData.dump());  // Create new thread of curlThread with JSON postData as string
+                    threadObj.detach(); // Detatch thread to allow unblocking execution
+                }
+
+                prevTriggerSample = currentTriggerSample;
+            }
+        }
+    }
 }
 
 void Request::saveSetup(const NodePtr& node) const
@@ -203,4 +245,42 @@ void Request::clear()
     {
         option.enabled = false;
     }
+}
+
+bool Request::checkTrigger(const AcquiredDataInfo& acquiredDataInfo)
+{
+    int64_t numSamples = acquiredDataInfo.endPos - acquiredDataInfo.beginPos;
+
+    InputChannel* inputChan = new InputChannelImpl(app, triggerChannelPtr);
+
+    for (int64_t x = 0; x < numSamples; x++)
+    {
+        float currentTriggerSample = inputChan->getScaledValueAtPos<float>(x, nullptr, true);
+
+        prevTriggerSample = currentTriggerSample;
+        
+    }
+
+    return true;
+}
+
+void Request::preData()
+{
+    app->Data->BuildChannelList();
+    IChannelListPtr channelListPtr = app->Data->GetUsedChannels();
+    for (auto& selectedChannel : selectedChannelList)
+    {
+        for (int x = 0; x < channelListPtr->Count; x++)
+        {
+            BSTR bstrChanName = channelListPtr->GetItem(x)->GetName().GetBSTR();
+            std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+            std::string chanNameCompare = converter.to_bytes(bstrChanName);
+
+            if (!selectedChannel.channelName.compare(chanNameCompare))
+            {
+                selectedChannel.channelPtr = channelListPtr->GetItem(x);
+            }
+        }
+    }
+    
 }

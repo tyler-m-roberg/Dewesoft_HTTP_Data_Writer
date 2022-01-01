@@ -158,6 +158,7 @@
     <ClCompile Include="SelectedChannel.cpp" />
     <ClCompile Include="sine_generator.cpp" />
     <ClCompile Include="sine_wave.cpp" />
+    <ClCompile Include="TextualChannel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AdditionalOptions.h" />
@@ -165,6 +166,7 @@
     <ClInclude Include="SelectedChannel.h" />
     <ClInclude Include="sine_generator.h" />
     <ClInclude Include="sine_wave.h" />
+    <ClInclude Include="TextualChannel.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

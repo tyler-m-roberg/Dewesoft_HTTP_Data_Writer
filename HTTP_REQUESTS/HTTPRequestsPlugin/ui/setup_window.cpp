@@ -9,6 +9,7 @@
 
 using namespace Dewesoft::MUI;
 using namespace Dewesoft::RT::Core;
+using namespace HTTP_Requests;
 
 SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
     : BaseSetupWindow(ui, bridge, "ui/setup_window.xml")
@@ -78,9 +79,9 @@ void SetupWindow::setupEnter()
     templateFileTextBox.setText(bridge.requestObj.templateFile);
     reportDirTextBox.setText(bridge.requestObj.reportDirectory);
     reportNameTextBox.setText(bridge.requestObj.reportName);
-    //triggerChanCBox.setSelectedItem(bridge.requestObj.triggerChannel); //Fix to match off index instead of string
+    triggerChanCBox.setSelectedIndex(triggerChanCBox.getIndexOf(bridge.requestObj.triggerChannel));
     triggerLevelTextBox.setText(std::to_string(bridge.requestObj.triggerLevel));
-    //edgeTypeCBox.setSelectedItem(bridge.requestObj.edgeType); //Fix to match off index instead of string
+    edgeTypeCBox.setSelectedIndex(edgeTypeCBox.getIndexOf(bridge.requestObj.edgeType));
 }
 
 void SetupWindow::setupLeave()
@@ -95,7 +96,7 @@ void SetupWindow::addChannelsToTriggerChannelCBox(Dewesoft::MUI::ComboBox& combo
 
     for (int x = 0; x < channelPtrs.size(); x++)
     {
-        if (channelPtrs[x]->DataType != 9 && channelPtrs[x]->DataType != 10 && channelPtrs[x]->DataType != 11)
+        if (channelPtrs[x]->DataType != 9 && channelPtrs[x]->DataType != 10 && channelPtrs[x]->DataType != 11 && (channelPtrs[x]->GetIsSingleValue() || channelPtrs[x]->Async))
         {
             std::string channelName = channelPtrs[x]->GetName();
             comboBox.addItem(channelName);
@@ -201,6 +202,8 @@ void SetupWindow::onAddChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::E
     std::string cellRef = cellRefTextBox.getText().toStdString();
 
     bridge.requestObj.selectedChannelList.emplace_back(dataEntryType, channelType, selectedChannel, pageNum, cellRef);
+    bridge.requestObj.selectedChannelList.back().channelPtr = bridge.getIChannelPtrFromChannelName(selectedChannel);
+
     channelListBox.addItem(SelectedChannel::stringifyChannel(&bridge.requestObj.selectedChannelList.back()));
 
 }
@@ -259,6 +262,7 @@ void SetupWindow::onReportNameTextChanged(Dewesoft::MUI::TextBox& txtBox, Deweso
 void SetupWindow::onTriggerChanChanged(Dewesoft::MUI::ComboBox& comboBox, Dewesoft::MUI::EventArgs& args)
 {
     bridge.requestObj.triggerChannel = comboBox.getSelectedItem();
+    bridge.requestObj.triggerChannelPtr = bridge.getIChannelPtrFromChannelName(comboBox.getSelectedItem());
 }
 void SetupWindow::onEdgeTypeChanged(Dewesoft::MUI::ComboBox& comboBox, Dewesoft::MUI::EventArgs& args)
 {

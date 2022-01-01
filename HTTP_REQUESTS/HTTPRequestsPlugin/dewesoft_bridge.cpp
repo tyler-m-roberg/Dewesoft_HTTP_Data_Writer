@@ -2,6 +2,7 @@
 #pragma comment(lib, "crypt32.lib")
 #pragma comment(lib, "Ws2_32.lib")
 #define CURL_STATICLIB
+#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 #include "StdAfx.h"
 #include "dewesoft_bridge.h"
 #include <curl\curl.h>
@@ -9,6 +10,7 @@
 #include <iostream>
 #include <chrono>
 #include <nlohmann/json.hpp>
+#include <codecvt>
 
 #define _USE_MATH_DEFINES
 
@@ -17,6 +19,7 @@
 using namespace Dewesoft::Utils::Dcom::InputChannel;
 using namespace Dewesoft::Utils::Dcom::OutputChannel;
 using namespace Dewesoft::Utils::Dcom::Utils;
+using namespace HTTP_Requests;
 
 DewesoftBridge::DewesoftBridge(InputManagerImpl& inputManager, OutputFactoryImpl& outputFactory, const IAppPtr app)
     : inputManager(inputManager)
@@ -24,7 +27,7 @@ DewesoftBridge::DewesoftBridge(InputManagerImpl& inputManager, OutputFactoryImpl
     , app(app)
     , pluginGroup(nullptr)
     , sineGenerator(outputFactory)
-    , requestObj(inputManager)
+    , requestObj(inputManager, app)
 {
 }
 
@@ -101,6 +104,8 @@ void DewesoftBridge::onPreInitiate()
 
 void DewesoftBridge::onStartData()
 {
+    app->Data->BuildChannelList();
+    requestObj.preData();
 }
 
 void DewesoftBridge::onGetData(const AcquiredDataInfo& acquiredDataInfo)
@@ -109,7 +114,9 @@ void DewesoftBridge::onGetData(const AcquiredDataInfo& acquiredDataInfo)
     const double startTime = acquiredDataInfo.beginPos / sampleRate;
     const size_t numSamples = acquiredDataInfo.endPos - acquiredDataInfo.beginPos;
 
-    requestObj.getData(startTime, sampleRate, numSamples, acquiredDataInfo.beginPos, acquiredDataInfo.endPos);
+    requestObj.getData(acquiredDataInfo);
+
+    textChannelVector.clear();
 }
 
 void DewesoftBridge::onStopData()
@@ -205,12 +212,25 @@ std::vector<IGHObjectPtr> DewesoftBridge::getHeaderChannelsForUI()
     return headerPtrs;
 }
 
-std::vector<AdditionalOptions> DewesoftBridge::getAdditionalOptionsFromRequest()
-{
-    return requestObj.additionalOptionsList;
-}
-
 std::string DewesoftBridge::getStringChannelValue(long index)
 {
     return std::string(app->Data->GetUsedChannels()->GetItem(index)->Text);
+}
+
+IChannelPtr DewesoftBridge::getIChannelPtrFromChannelName(std::string chanName)
+{
+    app->Data->BuildChannelList();
+    IChannelListPtr channelListPtr = app->Data->GetUsedChannels();
+
+    for (int x = 0; x < channelListPtr->Count; x++)
+    {
+        BSTR bstrChanName = channelListPtr->GetItem(x)->GetName().GetBSTR();
+        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+        std::string chanNameCompare = converter.to_bytes(bstrChanName);
+
+        if (!chanName.compare(chanNameCompare))
+        {
+            return channelListPtr->GetItem(x);
+        }
+    }
 }

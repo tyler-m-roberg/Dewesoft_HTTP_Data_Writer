@@ -4,42 +4,53 @@
 #include <dcomlib/dcom_input_channel/input_manager_impl.h>
 #include "SelectedChannel.h"
 #include "AdditionalOptions.h"
+#include "TextualChannel.h"
 #include <vector>
 
-struct IApp;
-
-class Request
+namespace HTTP_Requests
 {
-public:
-    using InputManagerImpl = Dewesoft::Utils::Dcom::InputChannel::InputManagerImpl;
 
-    explicit Request(InputManagerImpl& inputManager);
+    class Request
+    {
+    public:
+        using InputManagerImpl = Dewesoft::Utils::Dcom::InputChannel::InputManagerImpl;
+        using AcquiredDataInfo = Dewesoft::Utils::Dcom::InputChannel::AcquiredDataInfo;
 
-    explicit Request(InputManagerImpl& inputManager,
-                     std::string triggerChannel,
-                     double triggerLevel,
-                     std::string edgeType,
-                     std::string templateFile,
-                     std::string reportDirectory,
-                     std::string reportName);
+        explicit Request(InputManagerImpl& inputManager, IAppPtr app);
 
-    void getData(const double& startTime, const double& sampleRate, const size_t& numSamples, const int64_t beginPos, const int64_t endPos);
+        explicit Request(InputManagerImpl& inputManager,
+                         IAppPtr app,
+                         std::string triggerChannel,
+                         double triggerLevel,
+                         std::string edgeType,
+                         std::string templateFile,
+                         std::string reportDirectory,
+                         std::string reportName);
+        void preData();
+        void getData(const AcquiredDataInfo& acquiredDataInfo);
+        bool checkTrigger(const AcquiredDataInfo& acquiredDataInfo);
 
-    void saveSetup(const Dewesoft::Utils::Serialization::NodePtr& node) const;
-    void loadSetup(const Dewesoft::Utils::Serialization::NodePtr& node);
+        void saveSetup(const Dewesoft::Utils::Serialization::NodePtr& node) const;
+        void loadSetup(const Dewesoft::Utils::Serialization::NodePtr& node);
 
-    void clear();
+        void clear();
 
-    std::string triggerChannel;
-    double triggerLevel;
-    std::string edgeType;
-    std::string templateFile;
-    std::string reportDirectory;
-    std::string reportName;
+        std::string triggerChannel;
+        IChannelPtr triggerChannelPtr;
+        double triggerLevel;
+        std::string edgeType;
+        std::string templateFile;
+        std::string reportDirectory;
+        std::string reportName;
 
-    std::vector<AdditionalOptions> additionalOptionsList;
-    std::vector<SelectedChannel> selectedChannelList;
-    std::vector<std::string> specialChannelsList;
+        float prevTriggerSample;
 
-    InputManagerImpl& inputManager;
-};
+        std::vector<AdditionalOptions> additionalOptionsList;
+        std::vector<SelectedChannel> selectedChannelList;
+        std::vector<std::string> specialChannelsList;
+
+        InputManagerImpl& inputManager;
+        IAppPtr app;
+
+    };
+}  // namespace HTTP_Requests

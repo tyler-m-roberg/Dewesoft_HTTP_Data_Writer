@@ -1,6 +1,7 @@
 #include "AdditionalOptions.h"
 
 using namespace Dewesoft::Utils::Serialization;
+using namespace HTTP_Requests;
 
 AdditionalOptions::AdditionalOptions(std::string optionName, bool enabled)
     : optionName(optionName)
@@ -17,4 +18,20 @@ void AdditionalOptions::saveSetup(const NodePtr& node) const
 void AdditionalOptions::loadSetup(const NodePtr& node)
 {
 }
+
+json AdditionalOptions::toJson()
+{
+    return json
+    {
+        
+        {
+            "Option_Name", this->optionName
+        },
+        {
+            "Enabled", this->enabled
+        }
+        
+    };
+}
+
 
