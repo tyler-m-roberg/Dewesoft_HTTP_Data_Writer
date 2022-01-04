@@ -100,12 +100,12 @@ void DewesoftBridge::onSaveSetup(NodePtr node, bool dataFile)
 
 void DewesoftBridge::onPreInitiate()
 {
+    int i = 0;
 }
 
 void DewesoftBridge::onStartData()
 {
-    app->Data->BuildChannelList();
-    requestObj.preData();
+
 }
 
 void DewesoftBridge::onGetData(const AcquiredDataInfo& acquiredDataInfo)
@@ -113,10 +113,9 @@ void DewesoftBridge::onGetData(const AcquiredDataInfo& acquiredDataInfo)
     const double sampleRate = inputManager.getCurrentSampleRate();
     const double startTime = acquiredDataInfo.beginPos / sampleRate;
     const size_t numSamples = acquiredDataInfo.endPos - acquiredDataInfo.beginPos;
-
+    
     requestObj.getData(acquiredDataInfo);
 
-    textChannelVector.clear();
 }
 
 void DewesoftBridge::onStopData()
@@ -125,6 +124,12 @@ void DewesoftBridge::onStopData()
 
 void DewesoftBridge::onStartStoring()
 {
+    for (auto& selectedChannel : requestObj.selectedChannelList)
+    {
+        selectedChannel.channelPtr = getIChannelPtrFromChannelName(selectedChannel.channelName);
+    }
+
+    requestObj.triggerChannelPtr = getIChannelPtrFromChannelName(requestObj.triggerChannel);
 }
 
 void DewesoftBridge::onStopStoring()
@@ -217,20 +222,8 @@ std::string DewesoftBridge::getStringChannelValue(long index)
     return std::string(app->Data->GetUsedChannels()->GetItem(index)->Text);
 }
 
+
 IChannelPtr DewesoftBridge::getIChannelPtrFromChannelName(std::string chanName)
 {
-    app->Data->BuildChannelList();
-    IChannelListPtr channelListPtr = app->Data->GetUsedChannels();
-
-    for (int x = 0; x < channelListPtr->Count; x++)
-    {
-        BSTR bstrChanName = channelListPtr->GetItem(x)->GetName().GetBSTR();
-        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-        std::string chanNameCompare = converter.to_bytes(bstrChanName);
-
-        if (!chanName.compare(chanNameCompare))
-        {
-            return channelListPtr->GetItem(x);
-        }
-    }
+    return app->Data->FindChannel(chanName.c_str());
 }

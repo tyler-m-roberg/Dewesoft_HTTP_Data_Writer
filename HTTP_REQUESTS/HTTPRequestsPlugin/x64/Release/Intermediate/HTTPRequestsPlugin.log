@@ -2,8 +2,7 @@
   Embedding MUI resources.
      Creating library x64\Release\Intermediate\HTTPRequestsPlugin64.lib and object x64\Release\Intermediate\HTTPRequestsPlugin64.exp
   Generating code
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestsplugin\dewesoft_bridge.cpp(236): warning C4715: 'DewesoftBridge::getIChannelPtrFromChannelName': not all control paths return a value
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(84): warning C4756: overflow in constant arithmetic
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(88): warning C4756: overflow in constant arithmetic
+c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(85): warning C4756: overflow in constant arithmetic
+c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(89): warning C4756: overflow in constant arithmetic
   Finished generating code
   HTTPRequestsPlugin.vcxproj -> C:\Program Files\DewesoftX\Bin64\Addons64\HTTPRequestsPlugin64.dll

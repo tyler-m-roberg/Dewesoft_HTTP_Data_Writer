@@ -10,6 +10,7 @@
 #include <limits>
 #include <functional>
 
+
 using namespace Dewesoft::Utils::Serialization;
 using namespace Dewesoft::Utils::Dcom::InputChannel;
 using namespace Dewesoft::Utils::Dcom::Utils;
@@ -33,7 +34,7 @@ void curlThread(std::string data)
         struct curl_slist* hs = NULL;
         hs = curl_slist_append(hs, "Content-Type: application/json");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, hs);
-        curl_easy_setopt(curl, CURLOPT_URL, "https://webhook.site/842ede6d-8439-4a05-b2d3-ae3977b70692");
+        curl_easy_setopt(curl, CURLOPT_URL, "https://webhook.site/a70a95de-a23a-4b46-8ffe-bd5d47f01e49");
         /* Now specify the POST data */
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
 
@@ -94,6 +95,8 @@ Request::Request(InputManagerImpl& inputManager,
 
 void Request::getData(const AcquiredDataInfo& acquiredDataInfo)
 {
+     int64_t numSamples = acquiredDataInfo.endPos - acquiredDataInfo.beginPos;
+
      nlohmann::json postData; //JSON Data object for post request
 
      //Convert setting strings to JSON entries
@@ -109,35 +112,25 @@ void Request::getData(const AcquiredDataInfo& acquiredDataInfo)
          additionalOptionsJSON.push_back(option.toJson());
      }
 
+
      postData["Options_Opt"] = additionalOptionsJSON; //Add additional options JSON object to post data object
-
-    InputListPtr inputList = inputManager.getInputList();
-
-    int64_t numSamples = acquiredDataInfo.endPos - acquiredDataInfo.beginPos;
 
     if (triggerChannelPtr != nullptr)
     {
         //Need to test db buff reading vs input channel reading
-        InputChannel* inputChan = new InputChannelImpl(app, triggerChannelPtr);
 
-        if (inputChan != nullptr)
+        for (int i = acquiredDataInfo.beginPos; i < acquiredDataInfo.endPos; i++)
         {
-            for (int64_t x = acquiredDataInfo.beginPos; x <= acquiredDataInfo.endPos; x++)
+            //Use example buffer reading to get data values
+
+            if (currentTriggerSample > prevTriggerSample && currentTriggerSample > triggerLevel)
             {
-                float currentTriggerSample = inputChan->getValueAtPos<float>(x, nullptr, true);
-
-                if (prevTriggerSample < triggerLevel && currentTriggerSample >= triggerLevel)
-                {
-                    InputChannel* dataChan = new InputChannelImpl(app, selectedChannelList[0].channelPtr);
-
-                    postData["Data"] = dataChan->getValueAtPos<float>(x, nullptr);
-
-                    std::thread threadObj(curlThread, postData.dump());  // Create new thread of curlThread with JSON postData as string
-                    threadObj.detach(); // Detatch thread to allow unblocking execution
-                }
-
-                prevTriggerSample = currentTriggerSample;
+                std::thread threadObj(curlThread, postData.dump());  // Create new thread of curlThread with JSON postData as string
+                threadObj.detach();                                  // Detatch thread to allow unblocking execution
             }
+
+            prevTriggerSample = currentTriggerSample;
+
         }
     }
 }
@@ -262,25 +255,4 @@ bool Request::checkTrigger(const AcquiredDataInfo& acquiredDataInfo)
     }
 
     return true;
-}
-
-void Request::preData()
-{
-    app->Data->BuildChannelList();
-    IChannelListPtr channelListPtr = app->Data->GetUsedChannels();
-    for (auto& selectedChannel : selectedChannelList)
-    {
-        for (int x = 0; x < channelListPtr->Count; x++)
-        {
-            BSTR bstrChanName = channelListPtr->GetItem(x)->GetName().GetBSTR();
-            std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-            std::string chanNameCompare = converter.to_bytes(bstrChanName);
-
-            if (!selectedChannel.channelName.compare(chanNameCompare))
-            {
-                selectedChannel.channelPtr = channelListPtr->GetItem(x);
-            }
-        }
-    }
-    
 }

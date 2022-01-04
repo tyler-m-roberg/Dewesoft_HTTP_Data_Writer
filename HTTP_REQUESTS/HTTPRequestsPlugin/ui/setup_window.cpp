@@ -193,8 +193,6 @@ void SetupWindow::addChannelTypeToCBox(Dewesoft::MUI::ComboBox& comboBox)
 void SetupWindow::onAddChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::EventArgs& args)
 {
 
-    
-    
     std::string dataEntryType = dataEntryTypeCBox.getSelectedItem().toStdString();
     std::string channelType = channelTypeCBox.getSelectedItem().toStdString();
     std::string selectedChannel = channelSelectionCBox.getSelectedItem().toStdString();
@@ -202,8 +200,6 @@ void SetupWindow::onAddChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::E
     std::string cellRef = cellRefTextBox.getText().toStdString();
 
     bridge.requestObj.selectedChannelList.emplace_back(dataEntryType, channelType, selectedChannel, pageNum, cellRef);
-    bridge.requestObj.selectedChannelList.back().channelPtr = bridge.getIChannelPtrFromChannelName(selectedChannel);
-
     channelListBox.addItem(SelectedChannel::stringifyChannel(&bridge.requestObj.selectedChannelList.back()));
 
 }

@@ -7,6 +7,8 @@
 #include "TextualChannel.h"
 #include <vector>
 
+class DewesoftBridge;
+
 namespace HTTP_Requests
 {
 
@@ -26,7 +28,7 @@ namespace HTTP_Requests
                          std::string templateFile,
                          std::string reportDirectory,
                          std::string reportName);
-        void preData();
+
         void getData(const AcquiredDataInfo& acquiredDataInfo);
         bool checkTrigger(const AcquiredDataInfo& acquiredDataInfo);
 
@@ -44,6 +46,7 @@ namespace HTTP_Requests
         std::string reportName;
 
         float prevTriggerSample;
+        float currentTriggerSample;
 
         std::vector<AdditionalOptions> additionalOptionsList;
         std::vector<SelectedChannel> selectedChannelList;
