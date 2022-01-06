@@ -34,7 +34,7 @@ void curlThread(std::string data)
         struct curl_slist* hs = NULL;
         hs = curl_slist_append(hs, "Content-Type: application/json");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, hs);
-        curl_easy_setopt(curl, CURLOPT_URL, "https://webhook.site/a70a95de-a23a-4b46-8ffe-bd5d47f01e49");
+        curl_easy_setopt(curl, CURLOPT_URL, "https://webhook.site/2bddab4c-a498-4049-a9a8-c27e08207de7");
         /* Now specify the POST data */
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
 
@@ -266,14 +266,16 @@ bool Request::checkTrigger(std::string edgeType, float currentSample, float next
 
 int Request::minBlockSize()
 {
-    int minBlockSize;
+    int minBlockSizeRtn = std::numeric_limits<int>::lowest();
 
-    minBlockSize = getBlockSize(triggerChannelPtr);
+    minBlockSizeRtn = getBlockSize(triggerChannelPtr);
 
     for (auto& selectedChannel : selectedChannelList)
     {
-        minBlockSize = (std::min)(minBlockSize, getBlockSize(selectedChannel.channelPtr));
+        minBlockSizeRtn = (std::min)(minBlockSizeRtn, getBlockSize(selectedChannel.channelPtr));
     }
+
+    return minBlockSizeRtn;
 }
 
 int Request::getBlockSize(IChannelPtr channel)
