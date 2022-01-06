@@ -117,9 +117,20 @@ void Request::getData(const AcquiredDataInfo& acquiredDataInfo)
     {
         // Need to test db buff reading vs input channel reading
 
-        int minBlockSizeInt = minBlockSize();
 
-        for (int i = 0; i < minBlockSizeInt - 1; i++)
+        //Todo move back to own function
+        int minBlockSizeRtn = (std::numeric_limits<int>::max)();
+
+        minBlockSizeRtn = getBlockSize(triggerChannelPtr);
+
+        for (auto& selectedChannel : selectedChannelList)
+        {
+            minBlockSizeRtn = (std::min)(minBlockSizeRtn, getBlockSize(selectedChannel.channelPtr));
+        }
+
+        int minBlockSizeValue = minBlockSizeRtn;
+
+        for (int i = 0; i < minBlockSizeValue - 1; i++)
         {
             // Use example buffer reading to get data values
 
@@ -132,9 +143,21 @@ void Request::getData(const AcquiredDataInfo& acquiredDataInfo)
 
                 for (auto& selectedChannel : selectedChannelList)
                 {
-                    selectedChannel.text = selectedChannel.channelPtr->Text;
-                    selectedChannel.channelValue = selectedChannel.channelPtr->DBValues[(lastPosChecked + 1) % selectedChannel.channelPtr->DBBufSize];
-                    selectedChannel.dataType = selectedChannel.channelPtr->DataType;
+                    if (!selectedChannel.channelType.compare("Standard Channel"))
+                    {
+                    
+                        selectedChannel.dataType = selectedChannel.channelPtr->DataType;
+
+                        if (selectedChannel.dataType == 11)
+                            selectedChannel.text = selectedChannel.channelPtr->Text;
+                        else
+                            selectedChannel.channelValue = selectedChannel.channelPtr->DBValues[(lastPosChecked + 1) % selectedChannel.channelPtr->DBBufSize];
+                    }
+                    else
+                    {
+                        std::wstring* filenameWide = new std::wstring(app->UsedDatafile.GetBSTR());
+                        //Todo Add code to convert wstring to string
+                    }
                     selectedChannelsJSON.push_back(selectedChannel.toJson());
                 }
 
@@ -143,6 +166,7 @@ void Request::getData(const AcquiredDataInfo& acquiredDataInfo)
                 std::thread threadObj(curlThread, postData.dump());  // Create new thread of curlThread with JSON postData as string
                 threadObj.detach();                                  // Detatch thread to allow unblocking execution
             }
+            lastPosChecked++;
         }
     }
 }
@@ -266,7 +290,7 @@ bool Request::checkTrigger(std::string edgeType, float currentSample, float next
 
 int Request::minBlockSize()
 {
-    int minBlockSizeRtn = std::numeric_limits<int>::lowest();
+    int minBlockSizeRtn = (std::numeric_limits<int>::max)();
 
     minBlockSizeRtn = getBlockSize(triggerChannelPtr);
 
@@ -280,5 +304,7 @@ int Request::minBlockSize()
 
 int Request::getBlockSize(IChannelPtr channel)
 {
-    return (channel->DBPos - (lastPosChecked % channel->DBBufSize) + channel->DBBufSize) % channel->DBBufSize;
+    int blockSize = (channel->DBPos - (lastPosChecked % channel->DBBufSize) + channel->DBBufSize) % channel->DBBufSize;
+
+    return blockSize;
 }
