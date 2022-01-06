@@ -9,7 +9,7 @@
 #include <iostream>
 #include <limits>
 #include <functional>
-
+#include <algorithm>
 
 using namespace Dewesoft::Utils::Serialization;
 using namespace Dewesoft::Utils::Dcom::InputChannel;
@@ -88,49 +88,66 @@ Request::Request(InputManagerImpl& inputManager,
     {
         this->prevTriggerSample = (std::numeric_limits<double>::lowest)();
     }
-
-
-
 }
 
 void Request::getData(const AcquiredDataInfo& acquiredDataInfo)
 {
-     int64_t numSamples = acquiredDataInfo.endPos - acquiredDataInfo.beginPos;
+    // Verify channel pointers are set
+    for (auto& selectedChannel : selectedChannelList)
+    {
+        if (selectedChannel.channelPtr == nullptr)
+            return;
+    }
 
-     nlohmann::json postData; //JSON Data object for post request
+    if (triggerChannelPtr == nullptr)
+        return;
 
-     //Convert setting strings to JSON entries
-     postData["Template_File_Opt"] = this->templateFile;
-     postData["Report_Directory_Opt"] = this->reportDirectory;
-     postData["Report_Name_Opt"] = this->reportName;
+    int64_t numSamples = acquiredDataInfo.endPos - acquiredDataInfo.beginPos;
 
-     nlohmann::json additionalOptionsJSON; //JSON Data object to hold additional options
+    nlohmann::json postData;  // JSON Data object for post request
 
-     //Loop through additional options and add each to additionalOptions JSON object
-     for (auto& option : additionalOptionsList)
-     {
-         additionalOptionsJSON.push_back(option.toJson());
-     }
+    // Convert setting strings to JSON entries
+    postData["Template_File_Opt"] = this->templateFile;
+    postData["Report_Directory_Opt"] = this->reportDirectory;
+    postData["Report_Name_Opt"] = this->reportName;
 
+    nlohmann::json additionalOptionsJSON;  // JSON Data object to hold additional options
 
-     postData["Options_Opt"] = additionalOptionsJSON; //Add additional options JSON object to post data object
+    // Loop through additional options and add each to additionalOptions JSON object
+    for (auto& option : additionalOptionsList)
+    {
+        additionalOptionsJSON.push_back(option.toJson());
+    }
+
+    postData["Options_Opt"] = additionalOptionsJSON;  // Add additional options JSON object to post data object
 
     if (triggerChannelPtr != nullptr)
     {
-        //Need to test db buff reading vs input channel reading
+        // Need to test db buff reading vs input channel reading
 
-        for (int i = acquiredDataInfo.beginPos; i < acquiredDataInfo.endPos; i++)
+        int minBlockSizeInt = minBlockSize();
+
+        for (int i = 0; i < minBlockSizeInt - 1; i++)
         {
-            //Use example buffer reading to get data values
+            // Use example buffer reading to get data values
 
-            if (currentTriggerSample > prevTriggerSample && currentTriggerSample > triggerLevel)
+            float currentSampleTriggerChannel = triggerChannelPtr->DBValues[lastPosChecked % triggerChannelPtr->DBBufSize];
+            float nextSampleTriggerChannel = triggerChannelPtr->DBValues[(lastPosChecked + 1) % triggerChannelPtr->DBBufSize];
+
+            if (checkTrigger(edgeType, currentSampleTriggerChannel, nextSampleTriggerChannel))
             {
+                nlohmann::json selectedChannelJSON;
+
+                for (auto& selectedChannel : selectedChannelList)
+                {
+                    selectedChannelJSON.push_back(selectedChannel.toJson());
+                }
+
+
+
                 std::thread threadObj(curlThread, postData.dump());  // Create new thread of curlThread with JSON postData as string
                 threadObj.detach();                                  // Detatch thread to allow unblocking execution
             }
-
-            prevTriggerSample = currentTriggerSample;
-
         }
     }
 }
@@ -174,7 +191,7 @@ void Request::loadSetup(const NodePtr& node)
     const auto selectedChannelsNode = node->findChildNode(u8"SelectedChannels");
     if (!selectedChannelsNode)
     {
-        //Do nothing
+        // Do nothing
     }
     else
     {
@@ -189,7 +206,7 @@ void Request::loadSetup(const NodePtr& node)
     const auto additionalOptionsNode = node->findChildNode(u8"AdditionalOptions");
     if (!additionalOptionsNode)
     {
-        //Do Nothing
+        // Do Nothing
     }
     else
     {
@@ -240,19 +257,31 @@ void Request::clear()
     }
 }
 
-bool Request::checkTrigger(const AcquiredDataInfo& acquiredDataInfo)
+bool Request::checkTrigger(std::string edgeType, float currentSample, float nextSample)
 {
-    int64_t numSamples = acquiredDataInfo.endPos - acquiredDataInfo.beginPos;
-
-    InputChannel* inputChan = new InputChannelImpl(app, triggerChannelPtr);
-
-    for (int64_t x = 0; x < numSamples; x++)
+    if (!edgeType.compare("Rising"))
     {
-        float currentTriggerSample = inputChan->getScaledValueAtPos<float>(x, nullptr, true);
-
-        prevTriggerSample = currentTriggerSample;
-        
+        return currentSample <= triggerLevel && nextSample >= triggerLevel;
     }
+    else
+    {
+        return currentSample >= triggerLevel&& nextSample <= triggerLevel;
+    }
+}
 
-    return true;
+int Request::minBlockSize()
+{
+    int minBlockSize;
+
+    minBlockSize = getBlockSize(triggerChannelPtr);
+
+    for (auto& selectedChannel : selectedChannelList)
+    {
+        minBlockSize = (std::min)(minBlockSize, getBlockSize(selectedChannel.channelPtr));
+    }
+}
+
+int Request::getBlockSize(IChannelPtr channel)
+{
+    return (channel->DBPos - (lastPosChecked % channel->DBBufSize) + channel->DBBufSize) % channel->DBBufSize;
 }

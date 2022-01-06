@@ -124,6 +124,7 @@ void DewesoftBridge::onStopData()
 
 void DewesoftBridge::onStartStoring()
 {
+    requestObj.lastPosChecked = 0;
     for (auto& selectedChannel : requestObj.selectedChannelList)
     {
         selectedChannel.channelPtr = getIChannelPtrFromChannelName(selectedChannel.channelName);
@@ -134,6 +135,12 @@ void DewesoftBridge::onStartStoring()
 
 void DewesoftBridge::onStopStoring()
 {
+    for (auto& selectedChannel : requestObj.selectedChannelList)
+    {
+        selectedChannel.channelPtr = nullptr;
+    }
+
+    requestObj.triggerChannelPtr = nullptr;
 }
 
 void DewesoftBridge::onPrepareAnalysis()

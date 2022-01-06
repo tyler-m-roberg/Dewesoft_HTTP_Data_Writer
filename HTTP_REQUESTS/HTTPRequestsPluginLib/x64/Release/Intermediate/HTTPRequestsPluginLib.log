@@ -4,6 +4,6 @@ c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests
 c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(85): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(89): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(122): warning C4244: 'initializing': conversion from 'const int64_t' to 'int', possible loss of data
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(229): warning C4834: discarding return value of function with 'nodiscard' attribute
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(230): warning C4553: '==': result of expression not used; did you intend '='?
+c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(228): warning C4834: discarding return value of function with 'nodiscard' attribute
+c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(229): warning C4553: '==': result of expression not used; did you intend '='?
   HTTPRequestsPluginLib.vcxproj -> C:\Users\theoz\OneDrive\Documents\GitHub\Dewesoft_HTTP_Data_Writer\x64\Release\HTTPRequestsPluginLib.lib

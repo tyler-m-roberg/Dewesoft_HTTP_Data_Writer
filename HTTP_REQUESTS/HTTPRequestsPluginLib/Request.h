@@ -30,7 +30,9 @@ namespace HTTP_Requests
                          std::string reportName);
 
         void getData(const AcquiredDataInfo& acquiredDataInfo);
-        bool checkTrigger(const AcquiredDataInfo& acquiredDataInfo);
+        int minBlockSize();
+        int getBlockSize(IChannelPtr channel);
+        bool checkTrigger(std::string edgeType, float currentSample, float nextSample);
 
         void saveSetup(const Dewesoft::Utils::Serialization::NodePtr& node) const;
         void loadSetup(const Dewesoft::Utils::Serialization::NodePtr& node);
@@ -45,8 +47,8 @@ namespace HTTP_Requests
         std::string reportDirectory;
         std::string reportName;
 
-        float prevTriggerSample;
-        float currentTriggerSample;
+
+        int64_t lastPosChecked;
 
         std::vector<AdditionalOptions> additionalOptionsList;
         std::vector<SelectedChannel> selectedChannelList;
