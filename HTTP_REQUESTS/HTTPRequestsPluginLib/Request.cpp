@@ -80,14 +80,6 @@ Request::Request(InputManagerImpl& inputManager,
     specialChannelsList.emplace_back("Filename");
     specialChannelsList.emplace_back("Date");
 
-    if (!edgeType.compare("Rising"))
-    {
-        this->prevTriggerSample = (std::numeric_limits<double>::max)();
-    }
-    else
-    {
-        this->prevTriggerSample = (std::numeric_limits<double>::lowest)();
-    }
 }
 
 void Request::getData(const AcquiredDataInfo& acquiredDataInfo)
@@ -136,14 +128,17 @@ void Request::getData(const AcquiredDataInfo& acquiredDataInfo)
 
             if (checkTrigger(edgeType, currentSampleTriggerChannel, nextSampleTriggerChannel))
             {
-                nlohmann::json selectedChannelJSON;
+                nlohmann::json selectedChannelsJSON;
 
                 for (auto& selectedChannel : selectedChannelList)
                 {
-                    selectedChannelJSON.push_back(selectedChannel.toJson());
+                    selectedChannel.text = selectedChannel.channelPtr->Text;
+                    selectedChannel.channelValue = selectedChannel.channelPtr->DBValues[(lastPosChecked + 1) % selectedChannel.channelPtr->DBBufSize];
+                    selectedChannel.dataType = selectedChannel.channelPtr->DataType;
+                    selectedChannelsJSON.push_back(selectedChannel.toJson());
                 }
 
-
+                postData["SelectedChannels_Opt"] = selectedChannelsJSON;
 
                 std::thread threadObj(curlThread, postData.dump());  // Create new thread of curlThread with JSON postData as string
                 threadObj.detach();                                  // Detatch thread to allow unblocking execution
