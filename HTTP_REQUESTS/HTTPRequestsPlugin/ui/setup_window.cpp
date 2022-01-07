@@ -237,6 +237,9 @@ void SetupWindow::onDeleteChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI
 
     channelListBox.deleteSelected();
 
+    delete values;
+    delete comparisonChannel;
+
 }
 
 void SetupWindow::onTriggerLevelTextChanged(Dewesoft::MUI::TextBox& txtBox, Dewesoft::MUI::EventArgs& args)

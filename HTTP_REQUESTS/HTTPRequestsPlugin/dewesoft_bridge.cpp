@@ -113,8 +113,10 @@ void DewesoftBridge::onGetData(const AcquiredDataInfo& acquiredDataInfo)
     const double sampleRate = inputManager.getCurrentSampleRate();
     const double startTime = acquiredDataInfo.beginPos / sampleRate;
     const size_t numSamples = acquiredDataInfo.endPos - acquiredDataInfo.beginPos;
-    
-    requestObj.getData(acquiredDataInfo);
+
+    _bstr_t dataFile = app->GetUsedDatafile();
+
+    requestObj.getData(acquiredDataInfo, dataFile);
 
 }
 

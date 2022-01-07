@@ -34,7 +34,7 @@ void curlThread(std::string data)
         struct curl_slist* hs = NULL;
         hs = curl_slist_append(hs, "Content-Type: application/json");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, hs);
-        curl_easy_setopt(curl, CURLOPT_URL, "https://webhook.site/2bddab4c-a498-4049-a9a8-c27e08207de7");
+        curl_easy_setopt(curl, CURLOPT_URL, "https://webhook.site/b23cd49a-59a3-43e3-9878-5b892690a2e7");
         /* Now specify the POST data */
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
 
@@ -82,13 +82,15 @@ Request::Request(InputManagerImpl& inputManager,
 
 }
 
-void Request::getData(const AcquiredDataInfo& acquiredDataInfo)
+void Request::getData(const AcquiredDataInfo& acquiredDataInfo, _bstr_t usedDataFile)
 {
+
     // Verify channel pointers are set
     for (auto& selectedChannel : selectedChannelList)
     {
-        if (selectedChannel.channelPtr == nullptr)
+        if (selectedChannel.channelPtr == nullptr && !selectedChannel.channelType.compare("Standard Channel"))
             return;
+        selectedChannel.dataType = selectedChannel.channelPtr->DataType;
     }
 
     if (triggerChannelPtr == nullptr)
@@ -125,7 +127,8 @@ void Request::getData(const AcquiredDataInfo& acquiredDataInfo)
 
         for (auto& selectedChannel : selectedChannelList)
         {
-            minBlockSizeRtn = (std::min)(minBlockSizeRtn, getBlockSize(selectedChannel.channelPtr));
+            if (!selectedChannel.channelType.compare("Standard Channel") && !selectedChannel.channelPtr->IsSingleValue)
+                minBlockSizeRtn = (std::min)(minBlockSizeRtn, getBlockSize(selectedChannel.channelPtr));
         }
 
         int minBlockSizeValue = minBlockSizeRtn;
@@ -150,22 +153,33 @@ void Request::getData(const AcquiredDataInfo& acquiredDataInfo)
 
                         if (selectedChannel.dataType == 11)
                             selectedChannel.text = selectedChannel.channelPtr->Text;
+                        else if (selectedChannel.channelPtr->IsSingleValue)
+                            selectedChannel.channelValue = selectedChannel.channelPtr->SingleValue;
                         else
+                            //Todo issue with async int and text global variable
                             selectedChannel.channelValue = selectedChannel.channelPtr->DBValues[(lastPosChecked + 1) % selectedChannel.channelPtr->DBBufSize];
                     }
                     else
                     {
-                        std::wstring* filenameWide = new std::wstring(app->UsedDatafile.GetBSTR());
-                        //Todo Add code to convert wstring to string
+                        if (!selectedChannel.channelName.compare("Filename"))
+                        {
+                            
+                            std::string filename = std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(usedDataFile);
+
+                            selectedChannel.text = filename;
+                            selectedChannel.dataType = 11;
+                        }
                     }
                     selectedChannelsJSON.push_back(selectedChannel.toJson());
                 }
 
-                postData["SelectedChannels_Opt"] = selectedChannelsJSON;
+                postData["SelectedChannels"] = selectedChannelsJSON;
 
                 std::thread threadObj(curlThread, postData.dump());  // Create new thread of curlThread with JSON postData as string
                 threadObj.detach();                                  // Detatch thread to allow unblocking execution
+
             }
+
             lastPosChecked++;
         }
     }
