@@ -2,6 +2,7 @@
 #pragma comment(lib, "crypt32.lib")
 #pragma comment(lib, "Ws2_32.lib")
 #define CURL_STATICLIB
+#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 #include "StdAfx.h"
 #include "dewesoft_bridge.h"
 #include <curl\curl.h>
@@ -9,6 +10,7 @@
 #include <iostream>
 #include <chrono>
 #include <nlohmann/json.hpp>
+#include <codecvt>
 
 #define _USE_MATH_DEFINES
 
@@ -17,6 +19,7 @@
 using namespace Dewesoft::Utils::Dcom::InputChannel;
 using namespace Dewesoft::Utils::Dcom::OutputChannel;
 using namespace Dewesoft::Utils::Dcom::Utils;
+using namespace HTTP_Requests;
 
 DewesoftBridge::DewesoftBridge(InputManagerImpl& inputManager, OutputFactoryImpl& outputFactory, const IAppPtr app)
     : inputManager(inputManager)
@@ -24,7 +27,7 @@ DewesoftBridge::DewesoftBridge(InputManagerImpl& inputManager, OutputFactoryImpl
     , app(app)
     , pluginGroup(nullptr)
     , sineGenerator(outputFactory)
-    , requestObj()
+    , requestObj(inputManager, app)
 {
 }
 
@@ -97,10 +100,12 @@ void DewesoftBridge::onSaveSetup(NodePtr node, bool dataFile)
 
 void DewesoftBridge::onPreInitiate()
 {
+    int i = 0;
 }
 
 void DewesoftBridge::onStartData()
 {
+
 }
 
 void DewesoftBridge::onGetData(const AcquiredDataInfo& acquiredDataInfo)
@@ -109,7 +114,10 @@ void DewesoftBridge::onGetData(const AcquiredDataInfo& acquiredDataInfo)
     const double startTime = acquiredDataInfo.beginPos / sampleRate;
     const size_t numSamples = acquiredDataInfo.endPos - acquiredDataInfo.beginPos;
 
-    requestObj.getData(startTime, sampleRate, numSamples, acquiredDataInfo.beginPos, acquiredDataInfo.endPos);
+    _bstr_t dataFile = app->GetUsedDatafile();
+
+    requestObj.getData(acquiredDataInfo, dataFile);
+
 }
 
 void DewesoftBridge::onStopData()
@@ -118,10 +126,23 @@ void DewesoftBridge::onStopData()
 
 void DewesoftBridge::onStartStoring()
 {
+    requestObj.lastPosChecked = 0;
+    for (auto& selectedChannel : requestObj.selectedChannelList)
+    {
+        selectedChannel.channelPtr = getIChannelPtrFromChannelName(selectedChannel.channelName);
+    }
+
+    requestObj.triggerChannelPtr = getIChannelPtrFromChannelName(requestObj.triggerChannel);
 }
 
 void DewesoftBridge::onStopStoring()
 {
+    for (auto& selectedChannel : requestObj.selectedChannelList)
+    {
+        selectedChannel.channelPtr = nullptr;
+    }
+
+    requestObj.triggerChannelPtr = nullptr;
 }
 
 void DewesoftBridge::onPrepareAnalysis()
@@ -205,7 +226,13 @@ std::vector<IGHObjectPtr> DewesoftBridge::getHeaderChannelsForUI()
     return headerPtrs;
 }
 
-std::vector<AdditionalOptions> DewesoftBridge::getAdditionalOptionsFromRequest()
+std::string DewesoftBridge::getStringChannelValue(long index)
 {
-    return requestObj.additionalOptionsList;
+    return std::string(app->Data->GetUsedChannels()->GetItem(index)->Text);
+}
+
+
+IChannelPtr DewesoftBridge::getIChannelPtrFromChannelName(std::string chanName)
+{
+    return app->Data->FindChannel(chanName.c_str());
 }

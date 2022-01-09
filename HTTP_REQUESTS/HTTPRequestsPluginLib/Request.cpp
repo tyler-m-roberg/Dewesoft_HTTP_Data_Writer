@@ -1,13 +1,20 @@
+#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 #include "Request.h"
-#include <curl\curl.h>
+#include <codecvt>
 #include <thread>
-#include <iostream>
 #include <chrono>
+#include <curl\curl.h>
 #include <nlohmann/json.hpp>
-
+#include <iomanip>
+#include <iostream>
+#include <limits>
+#include <functional>
+#include <algorithm>
 
 using namespace Dewesoft::Utils::Serialization;
+using namespace Dewesoft::Utils::Dcom::InputChannel;
 using namespace Dewesoft::Utils::Dcom::Utils;
+using namespace HTTP_Requests;
 
 void curlThread(std::string data)
 {
@@ -27,7 +34,7 @@ void curlThread(std::string data)
         struct curl_slist* hs = NULL;
         hs = curl_slist_append(hs, "Content-Type: application/json");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, hs);
-        curl_easy_setopt(curl, CURLOPT_URL, "https://webhook.site/7b6c7f77-2d4c-4d56-bc1c-ad9c4ae9bf66");
+        curl_easy_setopt(curl, CURLOPT_URL, "https://webhook.site/e5a9115f-1fdf-40c3-8c3c-fb6106ad549d");
         /* Now specify the POST data */
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
 
@@ -41,79 +48,235 @@ void curlThread(std::string data)
     curl_global_cleanup();
 }
 
-Request::Request()
-    : Request("", 1.0, "Rising", "", "", "")
+Request::Request(InputManagerImpl& inputManager, IAppPtr app)
+    : Request(inputManager, app, "", 1.0, "Rising", "", "", "")
 {
-    
 }
 
-Request::Request(std::string triggerChannel,
+Request::Request(InputManagerImpl& inputManager,
+                 IAppPtr app,
+                 std::string triggerChannel,
                  double triggerLevel,
                  std::string edgeType,
                  std::string templateFile,
                  std::string reportDirectory,
                  std::string reportName)
 
-    : triggerChannel(triggerChannel)
+    : inputManager(std::move(inputManager))
+    , app(std::move(app))
+    , triggerChannel(triggerChannel)
     , triggerLevel(triggerLevel)
     , edgeType(edgeType)
     , templateFile(templateFile)
     , reportDirectory(reportDirectory)
     , reportName(reportName)
 {
+
+    //Add additional options to object
     additionalOptionsList.emplace_back("Append Date To Report Filename", false);
     additionalOptionsList.emplace_back("Open Excel On New Data", false);
     additionalOptionsList.emplace_back("Force Close Excel On New Data", false);
     additionalOptionsList.emplace_back("Create New File On Write Error", false);
     additionalOptionsList.emplace_back("Use Relative Report Directories", false);
 
+    //Define special channels
     specialChannelsList.emplace_back("Filename");
     specialChannelsList.emplace_back("Date");
 }
 
-void Request::getData(
-    const double& startTime, const double& sampleRate, const size_t& numSamples, const int64_t beginPos, const int64_t endPos)
+void Request::getData(const AcquiredDataInfo& acquiredDataInfo, const _bstr_t& usedDataFile)
 {
-    // nlohmann::json postData;
+    // Verify channel pointers are set
+    if (triggerChannelPtr == nullptr)
+        return;
 
-    // InputListPtr inputList = inputManager.getInputList();
-    // postData["Input List Size"] = inputList->size();
+    //Verify channel pointers are set for 
+    for (auto& selectedChannel : selectedChannelList)
+    {
+        if (selectedChannel.channelPtr == nullptr && !selectedChannel.channelType.compare("Standard Channel"))
+            return;
+    }
 
-    // postData["Begin Pos"] = beginPos;
-    // postData["End Pos"] = endPos;
+    nlohmann::json postData;  // JSON Data object for post request
 
-    // for (auto it = inputList->begin(); it != inputList->end(); ++it)
-    //{
-    //    postData[it->getName()] = it->getValueAtPos<float>(0, nullptr, true);
-    //}
+    // Convert setting strings to JSON entries
+    postData["Template_File_Opt"] = this->templateFile;
+    postData["Report_Directory_Opt"] = this->reportDirectory;
+    postData["Report_Name_Opt"] = this->reportName;
 
-    // std::thread threadObj(curlThread, postData.dump());
-    // threadObj.detach();
+    nlohmann::json additionalOptionsJSON;  // JSON Data object to hold additional options
+
+    // Loop through additional options and add each to additionalOptions JSON object
+    for (auto& option : additionalOptionsList)
+    {
+        additionalOptionsJSON.push_back(option.toJson());
+    }
+
+    postData["Options_Opt"] = additionalOptionsJSON;  // Add additional options JSON object to post data object
+
+    //Get min blocksize to read
+    int minBlockSizeValue = minBlockSize();
+
+    //Loop through samples up to the minimum block size to not read outside of channel memory of smaller channels
+    for (int i = 0; i < minBlockSizeValue - 1; i++)
+    {
+        //Get current and next sample of trigger channel for trigger logic. Logic allows loop back of sample buffer
+        float currentSampleTriggerChannel = triggerChannelPtr->DBValues[lastPosChecked % triggerChannelPtr->DBBufSize];
+        float nextSampleTriggerChannel = triggerChannelPtr->DBValues[(lastPosChecked + 1) % triggerChannelPtr->DBBufSize];
+
+        //Check trigger based on edge type and samples
+        if (checkTrigger(edgeType, currentSampleTriggerChannel, nextSampleTriggerChannel))
+        {
+            nlohmann::json selectedChannelsJSON; //Create JSON object to hold channel informaiton
+
+            //Loop through selected channel list to build JSON object
+            for (auto& selectedChannel : selectedChannelList)
+            {
+                //Run if channel is standard channel
+                if (!selectedChannel.channelType.compare("Standard Channel"))
+                {
+    
+                    selectedChannel.dataType = selectedChannel.channelPtr->DataType;
+
+                    //If selected type is text update text value
+                    if (selectedChannel.dataType == 11)
+                        selectedChannel.text = selectedChannel.channelPtr->Text;
+
+                    // If is single value use single value accessor
+                    else if (selectedChannel.channelPtr->IsSingleValue) 
+                        selectedChannel.channelValue = selectedChannel.channelPtr->SingleValue;
+
+                    //Channel is async use get value at abs position to read in seek nearest async value
+                    else if (selectedChannel.channelPtr->Async)
+                    {
+                        long* seekPos = new long;
+                        selectedChannel.channelValue =
+                            selectedChannel.channelPtr->GetValueAtAbsPosDouble((long) lastPosChecked, seekPos, false);
+                    }
+
+                    //If value is normal numeric channel get numeric value of channel
+                    else
+                        selectedChannel.channelValue = selectedChannel.channelPtr->DBValues[(lastPosChecked + 1) % selectedChannel.channelPtr->DBBufSize];
+                }
+
+                //Handle speical channel cases
+                else
+                {
+                    //Handle special channel used file name
+                    if (!selectedChannel.channelName.compare("Filename"))
+                    {
+                        //Use codevect to convert file name to std string from _bstr_t
+                        //Warning codevect is depricated, no suitable alternatives replace when available
+                        std::string filename = std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(usedDataFile);
+
+                        //Set text to file name and data type to text
+                        selectedChannel.text = filename;
+                        selectedChannel.dataType = 11;
+                    }
+                }
+
+                //Add channel to JSON object
+                selectedChannelsJSON.push_back(selectedChannel.toJson());
+            }
+
+            postData["SelectedChannels"] = selectedChannelsJSON; //Add selected channels to main request JSON Object
+
+            std::thread threadObj(curlThread, postData.dump());  // Create new thread of curlThread with JSON postData as string
+            threadObj.detach();                                  // Detatch thread to allow unblocking execution
+        }
+
+        //Increment position in data buffer to check for data
+        lastPosChecked++;
+    }
+    
 }
 
 void Request::saveSetup(const NodePtr& node) const
 {
-    /* node->write(u8"OutputChannelName", outputChannelName);
-     node->write(u8"RelayID", relayID);
-     node->write(u8"IPAddress", ipAddress);
-     node->write(u8"RelayNum", relayNum);
-     node->write(u8"TriggerChannel", triggerChannel);
-     node->write(u8"EdgeType", (edgeType == RisingEdge) ? 0 : 1);
-     node->write(u8"TriggerLevel", triggerLevel);*/
+    // Save main settings
+    node->write(u8"TriggerChannel", triggerChannel);
+    node->write(u8"TriggerLevel", triggerLevel);
+    node->write(u8"EdgeType", edgeType);
+    node->write(u8"TemplateFile", templateFile);
+    node->write(u8"ReportDirectory", reportDirectory);
+    node->write(u8"ReportName", reportName);
+
+    // Create subnode for additional options and add child each option
+    const NodePtr additionalOptionsNode = node->addChild(u8"AdditionalOptions");
+    for (const AdditionalOptions& item : additionalOptionsList)
+    {
+        const NodePtr additionalOptionNode = additionalOptionsNode->addChild(u8"AdditionalOption");
+        item.saveSetup(additionalOptionNode);
+    }
+
+    // Create subnode for selected channels and add each selected channel
+    const auto selectedChannelsNode = node->addChild(u8"SelectedChannels");
+    for (const auto& item : selectedChannelList)
+    {
+        const auto selectedChannelNode = selectedChannelsNode->addChild(u8"SelectedChannel");
+        item.saveSetup(selectedChannelNode);
+    }
 }
 
 void Request::loadSetup(const NodePtr& node)
 {
-    // node->read(u8"OutputChannelName", outputChannelName, 1);
-    // node->read(u8"RelayID", relayID, 1);
-    // node->read(u8"IPAddress", ipAddress, 1);
-    // node->read(u8"relayNum", relayNum, 1);
-    // node->read(u8"TriggerChannel", triggerChannel, 1);
+    node->read(u8"TriggerChannel", triggerChannel, 1);
+    node->read(u8"TriggerLevel", triggerLevel, 1);
+    node->read(u8"EdgeType", edgeType, 1);
+    node->read(u8"TemplateFile", templateFile, 1);
+    node->read(u8"ReportDirectory", reportDirectory, 1);
+    node->read(u8"ReportName", reportName, 1);
 
-    // int tempEdgeType;
-    // node->read(u8"EdgeType", tempEdgeType, 1);
-    // edgeType = (tempEdgeType == 0) ? RisingEdge : FallingEdge;
-    // node->read(u8"TriggerLevel", triggerLevel, 1);
+    const auto selectedChannelsNode = node->findChildNode(u8"SelectedChannels");
+    if (!selectedChannelsNode)
+    {
+        // Do nothing
+    }
+    else
+    {
+        for (size_t i = 0; i < selectedChannelsNode->getChildCount(); ++i)
+        {
+            const auto selectedChannelNode = selectedChannelsNode->getChild(i);
+            selectedChannelList.emplace_back();
+            selectedChannelList.back().loadSetup(selectedChannelNode);
+        }
+    }
+
+    const auto additionalOptionsNode = node->findChildNode(u8"AdditionalOptions");
+    if (!additionalOptionsNode)
+    {
+        // Do Nothing
+    }
+    else
+    {
+        for (size_t i = 0; i < additionalOptionsNode->getChildCount(); ++i)
+        {
+            const auto additionalOptionNode = additionalOptionsNode->getChild(i);
+
+            // Need code to check existing options and only load settings from options
+            // that match option listbox
+            std::string optionName;
+            bool enabled;
+
+            additionalOptionNode->read(u8"OptionName", optionName, "");
+            additionalOptionNode->read(u8"Enabled", enabled, false);
+
+            for (auto& additionalOptionsListItem : additionalOptionsList)
+            {
+                if (!additionalOptionsListItem.optionName.compare(optionName))
+                {
+                    if (enabled)
+                    {
+                        additionalOptionsListItem.enabled = true;
+                    }
+                    else
+                    {
+                        additionalOptionsListItem.enabled = false;
+                    }
+                }
+            }
+        }
+    }
 }
 
 void Request::clear()
@@ -126,5 +289,50 @@ void Request::clear()
     reportName = "";
 
     selectedChannelList.clear();
+
+    for (auto& option : additionalOptionsList)
+    {
+        option.enabled = false;
+    }
 }
 
+
+bool Request::checkTrigger(std::string edgeType, float currentSample, float nextSample)
+{
+    if (!edgeType.compare("Rising"))
+    {
+        return currentSample <= triggerLevel && nextSample >= triggerLevel;
+    }
+    else
+    {
+        return currentSample >= triggerLevel && nextSample <= triggerLevel;
+    }
+}
+
+int Request::minBlockSize()
+{
+    int minBlockSizeRtn = (std::numeric_limits<int>::max)();
+
+    minBlockSizeRtn = getBlockSize(triggerChannelPtr);
+
+    for (auto& selectedChannel : selectedChannelList)
+    {
+        if (!selectedChannel.channelType.compare("Standard Channel"))
+        {
+            bool checkIfNotSingleValueChannel = !selectedChannel.channelPtr->IsSingleValue;
+            bool checkIfNotAsync = !selectedChannel.channelPtr->GetAsync();
+
+            if (checkIfNotSingleValueChannel && checkIfNotAsync)
+                minBlockSizeRtn = (std::min)(minBlockSizeRtn, getBlockSize(selectedChannel.channelPtr));
+        }
+    }
+
+    return minBlockSizeRtn;
+}
+
+int Request::getBlockSize(IChannelPtr channel)
+{
+    int blockSize = (channel->DBPos - (lastPosChecked % channel->DBBufSize) + channel->DBBufSize) % channel->DBBufSize;
+
+    return blockSize;
+}

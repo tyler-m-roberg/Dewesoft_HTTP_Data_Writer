@@ -61,8 +61,9 @@
                 <Label Grid.Row="10" Grid.Column="1"  Text="Report Name" Name="reportNameLabel" Align="Fill" TextAlign="Center" Grid.ColumnSpan="5" FontWeight="Bold"/>
                 <TextBox Grid.Row="11" Grid.Column="1" Placeholder="" Name="reportNameTextBox" Grid.ColumnSpan="5"/>
 
-                <Label Grid.Row="1" Grid.Column="7" Text="Additional Options" Name="optionsLabel" TextAlign="Center" FontWeight="Bold"/>
-                <CheckListBox Grid.Row="2" Grid.Column="7" Name="optionsListBox" Grid.RowSpan="10"/>
+                <CaptionPanel Grid.Row="1" Grid.Column="7" Name="optionsListPanel" Grid.RowSpan="11" Title="Options List">
+                    <StackPanel Name="optionsListStackPanel" MarginTop="5" PaddingTop="5"/>
+                </CaptionPanel>
 
 
 
