@@ -10,7 +10,12 @@ class SettingsWindow : public BaseSettingsWindow
 {
 public:
     SettingsWindow(Dewesoft::MUI::WindowPtr ui, DewesoftBridge& bridge);
+    void settingsEnter();
+    void settingsLeave();
+
+
 
 private:
-    
+    DewesoftBridge& bridge;
+
 };
