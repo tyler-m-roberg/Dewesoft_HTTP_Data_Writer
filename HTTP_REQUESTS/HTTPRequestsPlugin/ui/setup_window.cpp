@@ -96,7 +96,7 @@ void SetupWindow::addChannelsToTriggerChannelCBox(Dewesoft::MUI::ComboBox& combo
 
     for (int x = 0; x < channelPtrs.size(); x++)
     {
-        if (channelPtrs[x]->DataType != 9 && channelPtrs[x]->DataType != 10 && channelPtrs[x]->DataType != 11 && (channelPtrs[x]->GetIsSingleValue() || channelPtrs[x]->Async))
+        if (channelPtrs[x]->DataType != 9 && channelPtrs[x]->DataType != 10 && channelPtrs[x]->DataType != 11 && !channelPtrs[x]->GetIsSingleValue())
         {
             std::string channelName = channelPtrs[x]->GetName();
             comboBox.addItem(channelName);

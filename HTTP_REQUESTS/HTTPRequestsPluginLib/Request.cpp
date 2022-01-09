@@ -34,7 +34,7 @@ void curlThread(std::string data)
         struct curl_slist* hs = NULL;
         hs = curl_slist_append(hs, "Content-Type: application/json");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, hs);
-        curl_easy_setopt(curl, CURLOPT_URL, "https://webhook.site/b23cd49a-59a3-43e3-9878-5b892690a2e7");
+        curl_easy_setopt(curl, CURLOPT_URL, "https://webhook.site/e5a9115f-1fdf-40c3-8c3c-fb6106ad549d");
         /* Now specify the POST data */
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
 
@@ -71,32 +71,31 @@ Request::Request(InputManagerImpl& inputManager,
     , reportDirectory(reportDirectory)
     , reportName(reportName)
 {
+
+    //Add additional options to object
     additionalOptionsList.emplace_back("Append Date To Report Filename", false);
     additionalOptionsList.emplace_back("Open Excel On New Data", false);
     additionalOptionsList.emplace_back("Force Close Excel On New Data", false);
     additionalOptionsList.emplace_back("Create New File On Write Error", false);
     additionalOptionsList.emplace_back("Use Relative Report Directories", false);
 
+    //Define special channels
     specialChannelsList.emplace_back("Filename");
     specialChannelsList.emplace_back("Date");
-
 }
 
-void Request::getData(const AcquiredDataInfo& acquiredDataInfo, _bstr_t usedDataFile)
+void Request::getData(const AcquiredDataInfo& acquiredDataInfo, const _bstr_t& usedDataFile)
 {
-
     // Verify channel pointers are set
+    if (triggerChannelPtr == nullptr)
+        return;
+
+    //Verify channel pointers are set for 
     for (auto& selectedChannel : selectedChannelList)
     {
         if (selectedChannel.channelPtr == nullptr && !selectedChannel.channelType.compare("Standard Channel"))
             return;
-        selectedChannel.dataType = selectedChannel.channelPtr->DataType;
     }
-
-    if (triggerChannelPtr == nullptr)
-        return;
-
-    int64_t numSamples = acquiredDataInfo.endPos - acquiredDataInfo.beginPos;
 
     nlohmann::json postData;  // JSON Data object for post request
 
@@ -115,74 +114,81 @@ void Request::getData(const AcquiredDataInfo& acquiredDataInfo, _bstr_t usedData
 
     postData["Options_Opt"] = additionalOptionsJSON;  // Add additional options JSON object to post data object
 
-    if (triggerChannelPtr != nullptr)
+    //Get min blocksize to read
+    int minBlockSizeValue = minBlockSize();
+
+    //Loop through samples up to the minimum block size to not read outside of channel memory of smaller channels
+    for (int i = 0; i < minBlockSizeValue - 1; i++)
     {
-        // Need to test db buff reading vs input channel reading
+        //Get current and next sample of trigger channel for trigger logic. Logic allows loop back of sample buffer
+        float currentSampleTriggerChannel = triggerChannelPtr->DBValues[lastPosChecked % triggerChannelPtr->DBBufSize];
+        float nextSampleTriggerChannel = triggerChannelPtr->DBValues[(lastPosChecked + 1) % triggerChannelPtr->DBBufSize];
 
-
-        //Todo move back to own function
-        int minBlockSizeRtn = (std::numeric_limits<int>::max)();
-
-        minBlockSizeRtn = getBlockSize(triggerChannelPtr);
-
-        for (auto& selectedChannel : selectedChannelList)
+        //Check trigger based on edge type and samples
+        if (checkTrigger(edgeType, currentSampleTriggerChannel, nextSampleTriggerChannel))
         {
-            if (!selectedChannel.channelType.compare("Standard Channel") && !selectedChannel.channelPtr->IsSingleValue)
-                minBlockSizeRtn = (std::min)(minBlockSizeRtn, getBlockSize(selectedChannel.channelPtr));
-        }
+            nlohmann::json selectedChannelsJSON; //Create JSON object to hold channel informaiton
 
-        int minBlockSizeValue = minBlockSizeRtn;
-
-        for (int i = 0; i < minBlockSizeValue - 1; i++)
-        {
-            // Use example buffer reading to get data values
-
-            float currentSampleTriggerChannel = triggerChannelPtr->DBValues[lastPosChecked % triggerChannelPtr->DBBufSize];
-            float nextSampleTriggerChannel = triggerChannelPtr->DBValues[(lastPosChecked + 1) % triggerChannelPtr->DBBufSize];
-
-            if (checkTrigger(edgeType, currentSampleTriggerChannel, nextSampleTriggerChannel))
+            //Loop through selected channel list to build JSON object
+            for (auto& selectedChannel : selectedChannelList)
             {
-                nlohmann::json selectedChannelsJSON;
-
-                for (auto& selectedChannel : selectedChannelList)
+                //Run if channel is standard channel
+                if (!selectedChannel.channelType.compare("Standard Channel"))
                 {
-                    if (!selectedChannel.channelType.compare("Standard Channel"))
-                    {
-                    
-                        selectedChannel.dataType = selectedChannel.channelPtr->DataType;
+    
+                    selectedChannel.dataType = selectedChannel.channelPtr->DataType;
 
-                        if (selectedChannel.dataType == 11)
-                            selectedChannel.text = selectedChannel.channelPtr->Text;
-                        else if (selectedChannel.channelPtr->IsSingleValue)
-                            selectedChannel.channelValue = selectedChannel.channelPtr->SingleValue;
-                        else
-                            //Todo issue with async int and text global variable
-                            selectedChannel.channelValue = selectedChannel.channelPtr->DBValues[(lastPosChecked + 1) % selectedChannel.channelPtr->DBBufSize];
+                    //If selected type is text update text value
+                    if (selectedChannel.dataType == 11)
+                        selectedChannel.text = selectedChannel.channelPtr->Text;
+
+                    // If is single value use single value accessor
+                    else if (selectedChannel.channelPtr->IsSingleValue) 
+                        selectedChannel.channelValue = selectedChannel.channelPtr->SingleValue;
+
+                    //Channel is async use get value at abs position to read in seek nearest async value
+                    else if (selectedChannel.channelPtr->Async)
+                    {
+                        long* seekPos = new long;
+                        selectedChannel.channelValue =
+                            selectedChannel.channelPtr->GetValueAtAbsPosDouble((long) lastPosChecked, seekPos, false);
                     }
+
+                    //If value is normal numeric channel get numeric value of channel
                     else
-                    {
-                        if (!selectedChannel.channelName.compare("Filename"))
-                        {
-                            
-                            std::string filename = std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(usedDataFile);
-
-                            selectedChannel.text = filename;
-                            selectedChannel.dataType = 11;
-                        }
-                    }
-                    selectedChannelsJSON.push_back(selectedChannel.toJson());
+                        selectedChannel.channelValue = selectedChannel.channelPtr->DBValues[(lastPosChecked + 1) % selectedChannel.channelPtr->DBBufSize];
                 }
 
-                postData["SelectedChannels"] = selectedChannelsJSON;
+                //Handle speical channel cases
+                else
+                {
+                    //Handle special channel used file name
+                    if (!selectedChannel.channelName.compare("Filename"))
+                    {
+                        //Use codevect to convert file name to std string from _bstr_t
+                        //Warning codevect is depricated, no suitable alternatives replace when available
+                        std::string filename = std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(usedDataFile);
 
-                std::thread threadObj(curlThread, postData.dump());  // Create new thread of curlThread with JSON postData as string
-                threadObj.detach();                                  // Detatch thread to allow unblocking execution
+                        //Set text to file name and data type to text
+                        selectedChannel.text = filename;
+                        selectedChannel.dataType = 11;
+                    }
+                }
 
+                //Add channel to JSON object
+                selectedChannelsJSON.push_back(selectedChannel.toJson());
             }
 
-            lastPosChecked++;
+            postData["SelectedChannels"] = selectedChannelsJSON; //Add selected channels to main request JSON Object
+
+            std::thread threadObj(curlThread, postData.dump());  // Create new thread of curlThread with JSON postData as string
+            threadObj.detach();                                  // Detatch thread to allow unblocking execution
         }
+
+        //Increment position in data buffer to check for data
+        lastPosChecked++;
     }
+    
 }
 
 void Request::saveSetup(const NodePtr& node) const
@@ -290,6 +296,7 @@ void Request::clear()
     }
 }
 
+
 bool Request::checkTrigger(std::string edgeType, float currentSample, float nextSample)
 {
     if (!edgeType.compare("Rising"))
@@ -298,7 +305,7 @@ bool Request::checkTrigger(std::string edgeType, float currentSample, float next
     }
     else
     {
-        return currentSample >= triggerLevel&& nextSample <= triggerLevel;
+        return currentSample >= triggerLevel && nextSample <= triggerLevel;
     }
 }
 
@@ -310,7 +317,14 @@ int Request::minBlockSize()
 
     for (auto& selectedChannel : selectedChannelList)
     {
-        minBlockSizeRtn = (std::min)(minBlockSizeRtn, getBlockSize(selectedChannel.channelPtr));
+        if (!selectedChannel.channelType.compare("Standard Channel"))
+        {
+            bool checkIfNotSingleValueChannel = !selectedChannel.channelPtr->IsSingleValue;
+            bool checkIfNotAsync = !selectedChannel.channelPtr->GetAsync();
+
+            if (checkIfNotSingleValueChannel && checkIfNotAsync)
+                minBlockSizeRtn = (std::min)(minBlockSizeRtn, getBlockSize(selectedChannel.channelPtr));
+        }
     }
 
     return minBlockSizeRtn;

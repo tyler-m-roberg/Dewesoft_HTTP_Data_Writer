@@ -29,7 +29,7 @@ namespace HTTP_Requests
                          std::string reportDirectory,
                          std::string reportName);
 
-        void getData(const AcquiredDataInfo& acquiredDataInfo, _bstr_t usedFile);
+        void getData(const AcquiredDataInfo& acquiredDataInfo,const _bstr_t& usedFile);
         int minBlockSize();
         int getBlockSize(IChannelPtr channel);
         bool checkTrigger(std::string edgeType, float currentSample, float nextSample);
