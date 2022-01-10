@@ -57,11 +57,11 @@ void DewesoftBridge::onUpdateSettings(NodePtr node)
 {
     if (node->isWrite())
     {
-        // requestObj.saveSettings(node);
+        requestObj.saveSettings(node);
     }
     else
     {
-        // requestObj.loadSettings(node);
+        requestObj.loadSettings(node);
     }
 }
 

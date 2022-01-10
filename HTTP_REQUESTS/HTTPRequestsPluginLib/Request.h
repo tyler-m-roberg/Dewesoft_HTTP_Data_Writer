@@ -35,7 +35,10 @@ namespace HTTP_Requests
         bool checkTrigger(std::string edgeType, float currentSample, float nextSample);
 
         void saveSetup(const Dewesoft::Utils::Serialization::NodePtr& node) const;
+        void saveSettings(const Dewesoft::Utils::Serialization::NodePtr& node) const;
+
         void loadSetup(const Dewesoft::Utils::Serialization::NodePtr& node);
+        void loadSettings(const Dewesoft::Utils::Serialization::NodePtr& node);
 
         void clear();
 
@@ -56,6 +59,14 @@ namespace HTTP_Requests
 
         InputManagerImpl& inputManager;
         IAppPtr app;
+
+        std::string getDefaultRequestEndpoint();
+        std::string requestEndpoint;
+
+        bool useDefaultRequestEndpoint;
+
+     private:
+        std::string defaultRequestEndpoint = "";
 
     };
 }  // namespace HTTP_Requests

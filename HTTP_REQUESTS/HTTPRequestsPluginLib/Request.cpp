@@ -218,6 +218,12 @@ void Request::saveSetup(const NodePtr& node) const
     }
 }
 
+void Request::saveSettings(const Dewesoft::Utils::Serialization::NodePtr& node) const
+{
+    node->write(u8"RequestEndpoint", requestEndpoint);
+    node->write(u8"UseDefaultRequestEndpoint", useDefaultRequestEndpoint);
+}
+
 void Request::loadSetup(const NodePtr& node)
 {
     node->read(u8"TriggerChannel", triggerChannel, 1);
@@ -279,6 +285,15 @@ void Request::loadSetup(const NodePtr& node)
     }
 }
 
+void Request::loadSettings(const Dewesoft::Utils::Serialization::NodePtr& node)
+{
+    node->read(u8"RequestEndpoint", requestEndpoint, defaultRequestEndpoint);
+    node->read(u8"UseDefaultRequestEndpoint", useDefaultRequestEndpoint, 1);
+
+    if (useDefaultRequestEndpoint)
+        requestEndpoint = defaultRequestEndpoint;
+}
+
 void Request::clear()
 {
     triggerChannel == "";
@@ -335,4 +350,9 @@ int Request::getBlockSize(IChannelPtr channel)
     int blockSize = (channel->DBPos - (lastPosChecked % channel->DBBufSize) + channel->DBBufSize) % channel->DBBufSize;
 
     return blockSize;
+}
+
+std::string Request::getDefaultRequestEndpoint()
+{
+    return defaultRequestEndpoint;
 }

@@ -18,4 +18,11 @@ public:
 private:
     DewesoftBridge& bridge;
 
+    //Event handlers for settings change
+    void onEndpointTextChanged(Dewesoft::MUI::TextBox& txtBox, Dewesoft::MUI::EventArgs& args);
+    void onUseDefaultEndPointChanged(Dewesoft::MUI::CheckBox& checkBox, Dewesoft::MUI::EventArgs& args);
+
+    Dewesoft::MUI::TextBox endpointTextBox;
+    Dewesoft::MUI::CheckBox useDefaultEndpointCheckBox;
+
 };
