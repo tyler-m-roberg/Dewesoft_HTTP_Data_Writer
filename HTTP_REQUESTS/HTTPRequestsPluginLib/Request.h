@@ -66,7 +66,7 @@ namespace HTTP_Requests
         bool useDefaultRequestEndpoint;
 
      private:
-        std::string defaultRequestEndpoint = "";
+        std::string defaultRequestEndpoint = "localhost/dewesoft/realtime_excel/";
 
     };
 }  // namespace HTTP_Requests
