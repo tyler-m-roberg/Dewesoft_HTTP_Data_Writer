@@ -11,10 +11,179 @@ using namespace Dewesoft::MUI;
 using namespace Dewesoft::RT::Core;
 using namespace HTTP_Requests;
 
+    ///* Set default column types (can be overriden in OnCellGetProps event)
+// *
+// * Arguments are:
+// *     zero based index,
+// *     header name,
+// *     type,
+// *     default visibility,
+// *     width,
+// *     key/property
+// */
+// channelGrid.setColumn(ctNum, "#", ctNumber, RtTrue, 40, "Num");
+// channelGrid.setColumn(ctUsed, "Used", ctUdButton, RtTrue, 60, "Used");
+// channelGrid.setColumn(ctStore, "Store", ctUdButton, RtFalse, 50, "Store");
+// channelGrid.setColumn(Cols::ctColor, "Color", DrawGridCellType::ctColor, RtTrue, 30, "Color");
+// channelGrid.setColumn(ctName, "Name", ctEditText, RtTrue, 140, "Name");
+// channelGrid.setColumn(ctDesc, "Description", ctEditText, RtTrue, 140, "Desc");
+// channelGrid.setColumn(ctTimebase, "Timebase", ctCombobox, RtTrue, 100, "Timebase");
+// channelGrid.setColumn(ctMin, "Min", ctEditNumber, RtTrue, 80, "Min");
+// channelGrid.setColumn(otLivePreview, "Values", ctLiveValue, RtTrue, 130, "Value");
+// channelGrid.setColumn(ctMax, "Max", ctEditNumber, RtTrue, 80, "Max");
+// channelGrid.setColumn(ctValue, "Value", ctNumber, RtTrue, 80, "Value");
+// channelGrid.setColumn(ctStartVal, "Default value", ctEditNumber, RtTrue, 80, "InitVal");
+// channelGrid.setColumn(ctResetVal, "Value reset", ctCombobox, RtTrue, 140, "ValueRes");
+// channelGrid.setColumn(otUnit, "Unit", ctEditText, RtTrue, 40, "Unit");
+// channelGrid.setColumn(ctReset, "Reset value", ctButton, RtTrue, 80, "ResetVal");
+
+//// Set default number fromat for "ctNum" (row number) to not have decimals
+// channelGrid.getColumn(ctNum).setNumberFormat(cfInteger);
+
+//// we're done setting column info
+// channelGrid.applyColumns();
+
+// void SetupWindow::setupEnter()
+//{
+//    uiRefreshTimer.setEnabled(true);
+//}
+//
+// void SetupWindow::setupLeave()
+//{
+//    uiRefreshTimer.setEnabled(false);
+//}
+//
+// void SetupWindow::onUiRefreshTimer(Timer& ctrl, Dewesoft::MUI::EventArgs& args)
+//{
+//    if (channelGrid.assigned())
+//        channelGrid.invalidate();
+//}
+//
+// void SetupWindow::onTabChanged(TabControl& ctrl, Dewesoft::MUI::EventArgs& args)
+//{
+//
+//}
+//
+// void SetupWindow::testGridComboItems(DSDrawGrid& grid, DrawGridComboItemsArgs& args)
+//{
+//    Int col = args.getColumn();
+//
+//    Int index;
+//    switch (col)
+//    {
+//        case ctTimebase:
+//            index = args.add("Async");
+//            index = args.add("Single value");
+//            break;
+//        case ctResetVal:
+//            index = args.add("On start measurement");
+//            index = args.add("On load setup");
+//            index = args.add("Always keep last value");
+//            break;
+//        default:
+//            break;
+//    }
+//}
+//
+// void SetupWindow::testGridLiveValues(DSDrawGrid& grid, DrawGridLiveValueArgs& args)
+//{
+//    args.setLimitMaximum(500);
+//    args.setLimitMinimum(0);
+//
+//    args.setCurrentMinimum(value);
+//    args.setCurrentMaximum(value);
+//
+//    args.setOverloadMinimum(0);
+//    args.setOverloadMaximum(500);
+//    args.setShowOverloadWarning(true);
+//    args.setUnit("Cpp");
+//    args.setPrecision(3);
+//}
+//
+// void SetupWindow::testGridGetProps(DSDrawGrid& grid, DrawGridCellPropsArgs& args)
+//{
+//    Int row = args.getRow();
+//    Int col = args.getColumn();
+//
+//    switch (col)
+//    {
+//        case ctNum:
+//            args.setNumber(static_cast<Float>(row));
+//            break;
+//        case ctUsed:
+//            args.setText("Used");
+//            args.setIsButtonDown(RtTrue);
+//            break;
+//        case ctStore:
+//            args.setText("Store");
+//            args.setIsButtonDown(RtTrue);
+//            break;
+//        case Cols::ctColor:
+//            args.setCellColor(0xff0000);
+//            break;
+//        case ctName:
+//            args.setText("Channel name C++");
+//            break;
+//        case ctDesc:
+//            args.setText("Channel description C++");
+//            break;
+//        case ctTimebase:
+//            args.setText("Async C++");
+//            break;
+//        case ctMin:
+//            args.setNumber(0.0);
+//            break;
+//        case ctMax:
+//            args.setNumber(100.0);
+//            break;
+//        case ctValue:
+//            if (value > 600)
+//            {
+//                decrement = true;
+//            }
+//            else if (value < -100)
+//            {
+//                decrement = false;
+//            }
+//
+//            if (decrement)
+//            {
+//                value--;
+//            }
+//            else
+//            {
+//                value++;
+//            }
+//
+//            args.setNumber(value);
+//            break;
+//        case ctStartVal:
+//            args.setNumber(0.0);
+//            break;
+//        case ctResetVal:
+//        {
+//            args.setText("On start measurement C++");
+//            break;
+//        }
+//        case otUnit:
+//            args.setText("");
+//            break;
+//        case ctReset:
+//            args.setText("Reset");
+//            break;
+//        default:
+//            args.setText("");
+//            break;
+//    }
+//}
+
 SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
     : BaseSetupWindow(ui, bridge, "ui/setup_window.xml")
     , bridge(bridge)
 {
+    uiRefreshTimer = Timer::Create(ui);
+    uiRefreshTimer.setInterval(100);
+
     // Connect to UI componenets*****************************************
     triggerLevelTextBox = TextBox::Connect(ui, "triggerLevelTextBox");
     templateFileTextBox = TextBox::Connect(ui, "templateFileTextBox");
@@ -59,6 +228,32 @@ SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
 
     uiPtr = ui;
 
+    selectedChannelsGrid = DSDrawGrid::Connect(ui, "selectedChannelsGrid");
+    selectedChannelsGrid.setGridSize(2, 15);
+
+     /* Set default column types (can be overriden in OnCellGetProps event)
+     *
+     * Arguments are:
+     *     zero based index,
+     *     header name,
+     *     type,
+     *     default visibility,
+     *     width,
+     *     key/property
+     */
+    selectedChannelsGrid.setColumn(0, "Data Entry Type", ctCombobox, RtTrue, 200, "dataEntryTypeDSGrid");
+    selectedChannelsGrid.setColumn(1, "Channel Type", ctCombobox, RtTrue, 200, "channelTypeDSGrid");
+    selectedChannelsGrid.setColumn(2, "Channel", ctCombobox, RtTrue, 360, "channelDSGrid");
+    selectedChannelsGrid.setColumn(3, "Page #", ctEditNumber, RtTrue, 100, "pageNumDSGrid");
+    selectedChannelsGrid.setColumn(4, "Cell / Starting Cell", ctEditText, RtTrue, 100, "cellRefDSGrid");
+
+    //// Set default number fromat for "ctNum" (row number) to not have decimals
+    selectedChannelsGrid.getColumn(3).setNumberFormat(cfInteger);
+
+    //// we're done setting column info
+    selectedChannelsGrid.applyColumns();
+
+    selectedChannelsGrid.OnCellInput += event(&SetupWindow::testGridCellInput);
 }
 
 SetupWindow::~SetupWindow()
@@ -210,7 +405,7 @@ void SetupWindow::onDeleteChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI
 
     //**Removed due to issue with removing white space in channel names
     //Remove white space from string
-    //selectedItem.erase(std::remove_if(selectedItem.begin(), selectedItem.end(), isspace), selectedItem.end());
+    selectedItem.erase(std::remove_if(selectedItem.begin(), selectedItem.end(), isspace), selectedItem.end());
 
     //Use string stream to tokenize string off delimiter and then take substring delimited by colon and store in vector
     std::stringstream ss(selectedItem);
@@ -301,4 +496,11 @@ void SetupWindow::onOptionsSelectionChanged(Dewesoft::MUI::CheckBox& checkBox, D
             }
         }
     }
+}
+
+void SetupWindow::testGridCellInput(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridCellInputArgs& args)
+{
+    Dewesoft::RT::Core::CharPtr* toString;
+    args->toString(toString);
+    
 }

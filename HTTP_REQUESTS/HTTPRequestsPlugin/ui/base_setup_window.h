@@ -50,6 +50,8 @@ protected:
     Dewesoft::MUI::CaptionPanel currentChannelsPanel;
     Dewesoft::MUI::Button deleteChannelBtn;
     Dewesoft::MUI::ListBox channelListBox;
+    Dewesoft::MUI::CaptionPanel dsGridPanel;
+    Dewesoft::MUI::DSDrawGrid selectedChannelsGrid;
 
     BaseSetupWindow(Dewesoft::MUI::WindowPtr& ui, DewesoftBridge& bridge, std::string pathToXmlFile) : DSWindow (ui, pathToXmlFile), bridge(bridge)
     {
@@ -83,5 +85,7 @@ protected:
         currentChannelsPanel = Dewesoft::MUI::CaptionPanel::Connect(ui, "currentChannelsPanel");
         deleteChannelBtn = Dewesoft::MUI::Button::Connect(ui, "deleteChannelBtn");
         channelListBox = Dewesoft::MUI::ListBox::Connect(ui, "channelListBox");
+        dsGridPanel = Dewesoft::MUI::CaptionPanel::Connect(ui, "dsGridPanel");
+        selectedChannelsGrid = Dewesoft::MUI::DSDrawGrid::Connect(ui, "selectedChannelsGrid");
     }
 };

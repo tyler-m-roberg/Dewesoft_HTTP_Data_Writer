@@ -31,6 +31,7 @@ public:
     void addChannelTypeToCBox(Dewesoft::MUI::ComboBox& comboBox);
 
 private:
+    Dewesoft::MUI::Timer uiRefreshTimer;
     DewesoftBridge& bridge;
 
     void onAddChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::EventArgs& args);
@@ -45,6 +46,9 @@ private:
     void onEdgeTypeChanged(Dewesoft::MUI::ComboBox& comboBox, Dewesoft::MUI::EventArgs& args);
     void onOptionsSelectionChanged(Dewesoft::MUI::CheckBox& checkBox, Dewesoft::MUI::EventArgs& args);
     void onChannelTypeChanged(Dewesoft::MUI::ComboBox& comboBox, Dewesoft::MUI::EventArgs& args);
+    void onUiRefreshTimer(Dewesoft::MUI::Timer& ctrl, Dewesoft::MUI::EventArgs& args);
+    void testGridComboItems(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridComboItemsArgs& args);
+    void testGridCellInput(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridCellInputArgs& args);
 
     Dewesoft::MUI::TextBox triggerLevelTextBox;
     Dewesoft::MUI::TextBox templateFileTextBox;
@@ -67,5 +71,7 @@ private:
     Dewesoft::MUI::StackPanel optionsStackPanel;
 
     Dewesoft::MUI::WindowPtr uiPtr;
+
+    Dewesoft::MUI::DSDrawGrid selectedChannelsGrid;
     
 };
