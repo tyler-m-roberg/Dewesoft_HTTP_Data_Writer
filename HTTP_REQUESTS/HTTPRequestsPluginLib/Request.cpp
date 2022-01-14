@@ -16,7 +16,7 @@ using namespace Dewesoft::Utils::Dcom::InputChannel;
 using namespace Dewesoft::Utils::Dcom::Utils;
 using namespace HTTP_Requests;
 
-void curlThread(std::string data)
+void curlThread(std::string data, std::string endpoint)
 {
     CURL* curl;
     CURLcode res;
@@ -34,7 +34,7 @@ void curlThread(std::string data)
         struct curl_slist* hs = NULL;
         hs = curl_slist_append(hs, "Content-Type: application/json");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, hs);
-        curl_easy_setopt(curl, CURLOPT_URL, "https://webhook.site/e5a9115f-1fdf-40c3-8c3c-fb6106ad549d");
+        curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
         /* Now specify the POST data */
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
 
@@ -181,7 +181,7 @@ void Request::getData(const AcquiredDataInfo& acquiredDataInfo, const _bstr_t& u
 
             postData["SelectedChannels"] = selectedChannelsJSON; //Add selected channels to main request JSON Object
 
-            std::thread threadObj(curlThread, postData.dump());  // Create new thread of curlThread with JSON postData as string
+            std::thread threadObj(curlThread, postData.dump(), requestEndpoint);  // Create new thread of curlThread with JSON postData as string
             threadObj.detach();                                  // Detatch thread to allow unblocking execution
         }
 
@@ -216,6 +216,12 @@ void Request::saveSetup(const NodePtr& node) const
         const auto selectedChannelNode = selectedChannelsNode->addChild(u8"SelectedChannel");
         item.saveSetup(selectedChannelNode);
     }
+}
+
+void Request::saveSettings(const Dewesoft::Utils::Serialization::NodePtr& node) const
+{
+    node->write(u8"RequestEndpoint", requestEndpoint);
+    node->write(u8"UseDefaultRequestEndpoint", useDefaultRequestEndpoint);
 }
 
 void Request::loadSetup(const NodePtr& node)
@@ -279,6 +285,15 @@ void Request::loadSetup(const NodePtr& node)
     }
 }
 
+void Request::loadSettings(const Dewesoft::Utils::Serialization::NodePtr& node)
+{
+    node->read(u8"RequestEndpoint", requestEndpoint, defaultRequestEndpoint);
+    node->read(u8"UseDefaultRequestEndpoint", useDefaultRequestEndpoint, 1);
+
+    if (useDefaultRequestEndpoint)
+        requestEndpoint = defaultRequestEndpoint;
+}
+
 void Request::clear()
 {
     triggerChannel == "";
@@ -335,4 +350,9 @@ int Request::getBlockSize(IChannelPtr channel)
     int blockSize = (channel->DBPos - (lastPosChecked % channel->DBBufSize) + channel->DBBufSize) % channel->DBBufSize;
 
     return blockSize;
+}
+
+std::string Request::getDefaultRequestEndpoint()
+{
+    return defaultRequestEndpoint;
 }

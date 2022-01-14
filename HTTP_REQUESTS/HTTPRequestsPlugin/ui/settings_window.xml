@@ -1,6 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window xmlns="https://mui.dewesoft.com/schema/1.1" Name="settingsWindow" Background="white">
-    <StackPanel>
-		<Label Text="Settings"/>
-	</StackPanel>	
+    <CaptionPanel Title="Settings">
+      
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="400"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="120"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="25"/>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="25"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Column="1" Grid.Row="1" Text="HTTP API Endpoint:" Align="Right" FontWeight="Bold"/>
+            <TextBox Grid.Column="2" Grid.Row="1" Name="httpEndPointTxtBox"/>
+
+            <CheckBox Grid.Column="4" Grid.Row="1" Name="useDefaultChkBox" Label="Use Default Endpoint"/>
+        </Grid>
+
+    </CaptionPanel>
+    
 </Window>

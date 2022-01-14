@@ -57,11 +57,11 @@ void DewesoftBridge::onUpdateSettings(NodePtr node)
 {
     if (node->isWrite())
     {
-        // requestObj.saveSettings(node);
+        requestObj.saveSettings(node);
     }
     else
     {
-        // requestObj.loadSettings(node);
+        requestObj.loadSettings(node);
     }
 }
 
@@ -163,6 +163,7 @@ bool DewesoftBridge::showSettings(Dewesoft::MUI::IWindow* window)
     try
     {
         settingsWindow = std::make_unique<SettingsWindow>(window, *this);
+        settingsWindow->settingsEnter();
     }
     catch (const std::exception& e)
     {

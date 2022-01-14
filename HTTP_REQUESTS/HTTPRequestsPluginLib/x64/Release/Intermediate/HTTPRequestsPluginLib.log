@@ -1,11 +1,6 @@
-﻿  AdditionalOptions.cpp
-  Request.cpp
+﻿  Request.cpp
 c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\x64\release\intermediate\dewesoft.tlh(12488): warning C4002: too many arguments for function-like macro invocation 'GetCurrentTime'
 c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\x64\release\intermediate\dewesoft.tlh(15430): warning C4002: too many arguments for function-like macro invocation 'GetCurrentTime'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(284): warning C4834: discarding return value of function with 'nodiscard' attribute
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(285): warning C4553: '==': result of expression not used; did you intend '='?
-  SelectedChannel.cpp
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\x64\release\intermediate\dewesoft.tlh(12488): warning C4002: too many arguments for function-like macro invocation 'GetCurrentTime'
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\x64\release\intermediate\dewesoft.tlh(15430): warning C4002: too many arguments for function-like macro invocation 'GetCurrentTime'
-  TextualChannel.cpp
+c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(299): warning C4834: discarding return value of function with 'nodiscard' attribute
+c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(300): warning C4553: '==': result of expression not used; did you intend '='?
   HTTPRequestsPluginLib.vcxproj -> C:\Users\theoz\OneDrive\Documents\GitHub\Dewesoft_HTTP_Data_Writer\x64\Release\HTTPRequestsPluginLib.lib

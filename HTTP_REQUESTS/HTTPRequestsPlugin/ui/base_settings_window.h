@@ -21,7 +21,13 @@ public:
 protected:
     DewesoftBridge& bridge;
 
+    Dewesoft::MUI::TextBox httpEndPointTxtBox;
+    Dewesoft::MUI::CheckBox useDefaultChkBox;
+
     BaseSettingsWindow(Dewesoft::MUI::WindowPtr& ui, DewesoftBridge& bridge, std::string pathToXmlFile) : DSWindow (ui, pathToXmlFile), bridge(bridge)
     {
+        // connect class to UI controls
+        httpEndPointTxtBox = Dewesoft::MUI::TextBox::Connect(ui, "httpEndPointTxtBox");
+        useDefaultChkBox = Dewesoft::MUI::CheckBox::Connect(ui, "useDefaultChkBox");
     }
 };
