@@ -6,12 +6,18 @@
 #include <regex>
 #include <iostream>
 #include <sstream>
+#include <windows.h>
+#include <string>
+#include <shlobj.h>
+#include <iostream>
+#include <sstream>
+constexpr int CHANNEL_GRID_COLUMN_WIDTH = 5;
 
 using namespace Dewesoft::MUI;
 using namespace Dewesoft::RT::Core;
 using namespace HTTP_Requests;
 
-    ///* Set default column types (can be overriden in OnCellGetProps event)
+///* Set default column types (can be overriden in OnCellGetProps event)
 // *
 // * Arguments are:
 // *     zero based index,
@@ -198,6 +204,9 @@ SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
     channelSelectionCBox = ComboBox::Connect(ui, "channelSelectionCBox");
     channelTypeCBox = ComboBox::Connect(ui, "channelTypeCBox");
 
+    templateBtn = Button::Connect(ui, "templateBtn");
+    reportDirBtn = Button::Connect(ui, "reportDirBtn");
+
     deleteChannelBtn = Button::Connect(ui, "deleteChannelBtn");
     addChannelBtn = Button::Connect(ui, "addChannelBtn");
 
@@ -225,13 +234,16 @@ SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
     triggerChanCBox.OnSelectedIndexChanged += event(&SetupWindow::onTriggerChanChanged);
     edgeTypeCBox.OnSelectedIndexChanged += event(&SetupWindow::onEdgeTypeChanged);
     channelTypeCBox.OnSelectedIndexChanged += event(&SetupWindow::onChannelTypeChanged);
+    templateBtn.OnClick += event(&SetupWindow::templateSelectClick);
+    reportDirBtn.OnClick += event(&SetupWindow::reportDirSelectClick);
+    uiRefreshTimer.OnTimer += event(&SetupWindow::onUiRefreshTimer);
 
     uiPtr = ui;
 
     selectedChannelsGrid = DSDrawGrid::Connect(ui, "selectedChannelsGrid");
-    selectedChannelsGrid.setGridSize(2, 15);
+    selectedChannelsGrid.setGridSize(2, CHANNEL_GRID_COLUMN_WIDTH);
 
-     /* Set default column types (can be overriden in OnCellGetProps event)
+    /* Set default column types (can be overriden in OnCellGetProps event)
      *
      * Arguments are:
      *     zero based index,
@@ -243,7 +255,7 @@ SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
      */
     selectedChannelsGrid.setColumn(0, "Data Entry Type", ctCombobox, RtTrue, 200, "dataEntryTypeDSGrid");
     selectedChannelsGrid.setColumn(1, "Channel Type", ctCombobox, RtTrue, 200, "channelTypeDSGrid");
-    selectedChannelsGrid.setColumn(2, "Channel", ctCombobox, RtTrue, 360, "channelDSGrid");
+    selectedChannelsGrid.setColumn(2, "Channel", ctText, RtTrue, 360, "channelDSGrid");
     selectedChannelsGrid.setColumn(3, "Page #", ctEditNumber, RtTrue, 100, "pageNumDSGrid");
     selectedChannelsGrid.setColumn(4, "Cell / Starting Cell", ctEditText, RtTrue, 100, "cellRefDSGrid");
 
@@ -254,11 +266,15 @@ SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
     selectedChannelsGrid.applyColumns();
 
     selectedChannelsGrid.OnCellInput += event(&SetupWindow::testGridCellInput);
+    selectedChannelsGrid.OnCellGetProps += event(&SetupWindow::gridGetProps);
+    selectedChannelsGrid.OnCellActionStartStop += event(&SetupWindow::gridActionStartStop);
 }
 
 SetupWindow::~SetupWindow()
 {
+
 }
+
 void SetupWindow::setupEnter()
 {
     // Fill comboboxes for channels
@@ -268,7 +284,6 @@ void SetupWindow::setupEnter()
     // Add saved items to list box
     addItemsToChannelListBox(channelListBox);
 
-    
     addItemsToOptionsListBox(uiPtr, optionsStackPanel);
 
     templateFileTextBox.setText(bridge.requestObj.templateFile);
@@ -277,10 +292,15 @@ void SetupWindow::setupEnter()
     triggerChanCBox.setSelectedIndex(triggerChanCBox.getIndexOf(bridge.requestObj.triggerChannel));
     triggerLevelTextBox.setText(std::to_string(bridge.requestObj.triggerLevel));
     edgeTypeCBox.setSelectedIndex(edgeTypeCBox.getIndexOf(bridge.requestObj.edgeType));
+
+    selectedChannelsGrid.setGridSize(bridge.requestObj.selectedChannelList.size() + 1, CHANNEL_GRID_COLUMN_WIDTH);
+
+    uiRefreshTimer.setEnabled(true);
 }
 
 void SetupWindow::setupLeave()
 {
+    uiRefreshTimer.setEnabled(false);
 }
 
 void SetupWindow::addChannelsToTriggerChannelCBox(Dewesoft::MUI::ComboBox& comboBox)
@@ -291,7 +311,8 @@ void SetupWindow::addChannelsToTriggerChannelCBox(Dewesoft::MUI::ComboBox& combo
 
     for (int x = 0; x < channelPtrs.size(); x++)
     {
-        if (channelPtrs[x]->DataType != 9 && channelPtrs[x]->DataType != 10 && channelPtrs[x]->DataType != 11 && !channelPtrs[x]->GetIsSingleValue())
+        if (channelPtrs[x]->DataType != 9 && channelPtrs[x]->DataType != 10 && channelPtrs[x]->DataType != 11 &&
+            !channelPtrs[x]->GetIsSingleValue())
         {
             std::string channelName = channelPtrs[x]->GetName();
             comboBox.addItem(channelName);
@@ -307,40 +328,37 @@ void SetupWindow::addItemsToChannelListBox(Dewesoft::MUI::ListBox& listBox)
     {
         listBox.addItem(SelectedChannel::stringifyChannel(&selectedChannel));
     }
-
 }
 
 void SetupWindow::addItemsToOptionsListBox(WindowPtr ui, Dewesoft::MUI::StackPanel& stackPanel)
 {
-    //Clear all check box controls from stack panel on open
+    // Clear all check box controls from stack panel on open
     for (auto& control : stackPanel.getChildControls())
     {
         stackPanel.removeControl(control);
     }
 
-    //Loop through options in request object from bridge and add check box for each option
-    //Set check status based on status saved in request obejct
+    // Loop through options in request object from bridge and add check box for each option
+    // Set check status based on status saved in request obejct
     for (auto& option : bridge.requestObj.additionalOptionsList)
     {
-        //Create control and link to ui
+        // Create control and link to ui
         Dewesoft::MUI::CheckBox checkBox;
         checkBox = CheckBox::Create(ui);
 
-        //Set checkbox options
+        // Set checkbox options
         checkBox.setLabel(option.optionName);
         checkBox.setIsChecked(option.enabled);
 
-        //Add to stack panel
+        // Add to stack panel
         stackPanel.addControl(checkBox);
 
-        //Add on selection change to checkbox
+        // Add on selection change to checkbox
         checkBox.OnCheckedChanged += event(&SetupWindow::onOptionsSelectionChanged);
-        
     }
 
-
-    //Issue with stack panel where last control gets overlayed on top of first control.
-    //The below code adds a hidden button of zero size to the stack panel last to
+    // Issue with stack panel where last control gets overlayed on top of first control.
+    // The below code adds a hidden button of zero size to the stack panel last to
     // work around this issue;
     Dewesoft::MUI::Button blankLabel;
     blankLabel = Button::Create(ui);
@@ -383,11 +401,9 @@ void SetupWindow::addChannelTypeToCBox(Dewesoft::MUI::ComboBox& comboBox)
     comboBox.addItem("Special Channel");
 }
 
-
 // Get information from UI and add to listbox and create a relay using bridge function
 void SetupWindow::onAddChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::EventArgs& args)
 {
-
     std::string dataEntryType = dataEntryTypeCBox.getSelectedItem().toStdString();
     std::string channelType = channelTypeCBox.getSelectedItem().toStdString();
     std::string selectedChannel = channelSelectionCBox.getSelectedItem().toStdString();
@@ -396,7 +412,6 @@ void SetupWindow::onAddChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::E
 
     bridge.requestObj.selectedChannelList.emplace_back(dataEntryType, channelType, selectedChannel, pageNum, cellRef);
     channelListBox.addItem(SelectedChannel::stringifyChannel(&bridge.requestObj.selectedChannelList.back()));
-
 }
 
 void SetupWindow::onDeleteChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::EventArgs& args)
@@ -404,10 +419,10 @@ void SetupWindow::onDeleteChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI
     std::string selectedItem = channelListBox.getSelectedItem().toStdString();
 
     //**Removed due to issue with removing white space in channel names
-    //Remove white space from string
+    // Remove white space from string
     selectedItem.erase(std::remove_if(selectedItem.begin(), selectedItem.end(), isspace), selectedItem.end());
 
-    //Use string stream to tokenize string off delimiter and then take substring delimited by colon and store in vector
+    // Use string stream to tokenize string off delimiter and then take substring delimited by colon and store in vector
     std::stringstream ss(selectedItem);
     std::string token;
     std::vector<std::string>* values = new std::vector<std::string>();
@@ -416,7 +431,8 @@ void SetupWindow::onDeleteChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI
         values->emplace_back(token.substr(token.find(':') + 1, std::string::npos));
     }
 
-    SelectedChannel* comparisonChannel = new SelectedChannel(values->at(0), values->at(1), values->at(2), std::stoi (values->at(3)), values->at(4));
+    SelectedChannel* comparisonChannel =
+        new SelectedChannel(values->at(0), values->at(1), values->at(2), std::stoi(values->at(3)), values->at(4));
 
     int index = 0;
     for (auto& channel : bridge.requestObj.selectedChannelList)
@@ -429,12 +445,10 @@ void SetupWindow::onDeleteChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI
         index++;
     }
 
-
     channelListBox.deleteSelected();
 
     delete values;
     delete comparisonChannel;
-
 }
 
 void SetupWindow::onTriggerLevelTextChanged(Dewesoft::MUI::TextBox& txtBox, Dewesoft::MUI::EventArgs& args)
@@ -462,7 +476,6 @@ void SetupWindow::onEdgeTypeChanged(Dewesoft::MUI::ComboBox& comboBox, Dewesoft:
 {
     bridge.requestObj.edgeType = comboBox.getSelectedItem();
 }
-
 
 void SetupWindow::onChannelTypeChanged(Dewesoft::MUI::ComboBox& comboBox, Dewesoft::MUI::EventArgs& args)
 {
@@ -498,9 +511,65 @@ void SetupWindow::onOptionsSelectionChanged(Dewesoft::MUI::CheckBox& checkBox, D
     }
 }
 
+// Use dewesoft UI components to generate file selection dialog
+void SetupWindow::templateSelectClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::EventArgs& args)
+{
+    // Create unique ptr to window for file selection dialog
+    std::unique_ptr<OpenFileDialog> templateSelectWindow = std::make_unique<OpenFileDialog>(OpenFileDialog::Create(uiPtr));
+
+    templateSelectWindow->setIsMultiselect(false);
+    templateSelectWindow->showDialog();
+
+    // Do nothing if a file was not selected
+    if (!templateSelectWindow->getFileName().toStdString().compare(""))
+    {
+        return;
+    }
+
+    // Set template text box to file.
+    templateFileTextBox.setText(templateSelectWindow->getFileName());
+}
+
+// Use windows api to generate folder selection dialog.
+void SetupWindow::reportDirSelectClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::EventArgs& args)
+{
+    // Winows api object to hold returned file info
+    BROWSEINFO bi = {0};
+
+    bi.lpszTitle = _T("Select directory to store report..");
+
+    // Create list to hold returned folder list
+    LPITEMIDLIST pidl = SHBrowseForFolder(&bi);
+
+    // Execute if returned list is not empty
+    if (pidl != NULL)
+    {
+        // TCHAR to hold returned file path
+        TCHAR tszPath[MAX_PATH] = _T("\0");
+
+        // If path exists in returned list set text box to path
+        if (SHGetPathFromIDList(pidl, tszPath) == TRUE)
+        {
+            reportDirTextBox.setText(tszPath);
+        }
+
+        // — Free pidl memory
+        CoTaskMemFree(pidl);
+    }
+}
+
+void SetupWindow::onUiRefreshTimer(Timer& ctrl, Dewesoft::MUI::EventArgs& args)
+{
+}
+
+void SetupWindow::gridGetProps(Dewesoft::MUI::DSDrawGrid& grid, DrawGridCellPropsArgs& args)
+{
+}
+
 void SetupWindow::testGridCellInput(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridCellInputArgs& args)
 {
-    Dewesoft::RT::Core::CharPtr* toString;
-    args->toString(toString);
-    
+}
+
+void SetupWindow::gridActionStartStop(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridCellActionStartStopEventArgs& args)
+{
 }

@@ -30,8 +30,10 @@ protected:
     Dewesoft::MUI::ComboBox edgeTypeCBox;
     Dewesoft::MUI::Label templateFileLabel;
     Dewesoft::MUI::TextBox templateFileTextBox;
+    Dewesoft::MUI::Button templateBtn;
     Dewesoft::MUI::Label reportDirLabel;
     Dewesoft::MUI::TextBox reportDirTextBox;
+    Dewesoft::MUI::Button reportDirBtn;
     Dewesoft::MUI::Label reportNameLabel;
     Dewesoft::MUI::TextBox reportNameTextBox;
     Dewesoft::MUI::CaptionPanel optionsListPanel;
@@ -65,8 +67,10 @@ protected:
         edgeTypeCBox = Dewesoft::MUI::ComboBox::Connect(ui, "edgeTypeCBox");
         templateFileLabel = Dewesoft::MUI::Label::Connect(ui, "templateFileLabel");
         templateFileTextBox = Dewesoft::MUI::TextBox::Connect(ui, "templateFileTextBox");
+        templateBtn = Dewesoft::MUI::Button::Connect(ui, "templateBtn");
         reportDirLabel = Dewesoft::MUI::Label::Connect(ui, "reportDirLabel");
         reportDirTextBox = Dewesoft::MUI::TextBox::Connect(ui, "reportDirTextBox");
+        reportDirBtn = Dewesoft::MUI::Button::Connect(ui, "reportDirBtn");
         reportNameLabel = Dewesoft::MUI::Label::Connect(ui, "reportNameLabel");
         reportNameTextBox = Dewesoft::MUI::TextBox::Connect(ui, "reportNameTextBox");
         optionsListPanel = Dewesoft::MUI::CaptionPanel::Connect(ui, "optionsListPanel");

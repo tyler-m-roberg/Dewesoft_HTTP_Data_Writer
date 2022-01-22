@@ -39,6 +39,8 @@
                     <ColumnDefinition Width="120"/>
                     <ColumnDefinition Width="10"/>
                     <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="50"/>
                     <ColumnDefinition Width="40"/>
                     <ColumnDefinition Width="440"/>
                     <ColumnDefinition Width="10"/>
@@ -55,14 +57,17 @@
 
                 <Label Grid.Row="4" Grid.Column="1"  Text="Template File (.xlsx)" Name="templateFileLabel" Align="Fill" TextAlign="Center" Grid.ColumnSpan="5" FontWeight="Bold"/>
                 <TextBox Grid.Row="5" Grid.Column="1" Placeholder="" Name="templateFileTextBox" Grid.ColumnSpan="5"/>
+                <Button Grid.Row="5" Grid.Column="7" Label="..." Name="templateBtn"/>
+                
 
                 <Label Grid.Row="7" Grid.Column="1"  Text="Report Directory (Absolute or Relative)" Name="reportDirLabel" Align="Fill" TextAlign="Center" Grid.ColumnSpan="5" FontWeight="Bold"/>
                 <TextBox Grid.Row="8" Grid.Column="1" Placeholder="" Name="reportDirTextBox" Grid.ColumnSpan="5"/>
+                <Button Grid.Row="8" Grid.Column="7" Label="..." Name="reportDirBtn"/>
 
                 <Label Grid.Row="10" Grid.Column="1"  Text="Report Name" Name="reportNameLabel" Align="Fill" TextAlign="Center" Grid.ColumnSpan="5" FontWeight="Bold"/>
                 <TextBox Grid.Row="11" Grid.Column="1" Placeholder="" Name="reportNameTextBox" Grid.ColumnSpan="5"/>
 
-                <CaptionPanel Grid.Row="1" Grid.Column="7" Name="optionsListPanel" Grid.RowSpan="11" Title="Options List">
+                <CaptionPanel Grid.Row="1" Grid.Column="9" Name="optionsListPanel" Grid.RowSpan="11" Title="Options List">
                     <StackPanel Name="optionsListStackPanel" MarginTop="5" PaddingTop="5"/>
                 </CaptionPanel>
 

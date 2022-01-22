@@ -6,6 +6,8 @@
 #include "AdditionalOptions.h"
 #include "TextualChannel.h"
 #include <vector>
+#include <unordered_set>
+#include <algorithm>
 
 class DewesoftBridge;
 
@@ -56,6 +58,9 @@ namespace HTTP_Requests
         std::vector<AdditionalOptions> additionalOptionsList;
         std::vector<SelectedChannel> selectedChannelList;
         std::vector<std::string> specialChannelsList;
+
+        struct selectedChannelHasher;
+        std::unordered_set<SelectedChannel, selectedChannelHasher> selectedChannelSet;
 
         InputManagerImpl& inputManager;
         IAppPtr app;

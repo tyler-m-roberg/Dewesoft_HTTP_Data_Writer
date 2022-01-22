@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <memory>
 #include <vector>
 #include <mui/ds_window.h>
 #include <mui/controls.h>
@@ -49,6 +50,10 @@ private:
     void onUiRefreshTimer(Dewesoft::MUI::Timer& ctrl, Dewesoft::MUI::EventArgs& args);
     void testGridComboItems(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridComboItemsArgs& args);
     void testGridCellInput(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridCellInputArgs& args);
+    void templateSelectClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::EventArgs& args);
+    void reportDirSelectClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::EventArgs& args);
+    void gridGetProps(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridCellPropsArgs& args);
+    void gridActionStartStop(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridCellActionStartStopEventArgs& args);
 
     Dewesoft::MUI::TextBox triggerLevelTextBox;
     Dewesoft::MUI::TextBox templateFileTextBox;
@@ -63,6 +68,9 @@ private:
     Dewesoft::MUI::ComboBox channelSelectionCBox;
     Dewesoft::MUI::ComboBox channelTypeCBox;
 
+    Dewesoft::MUI::Button templateBtn;
+    Dewesoft::MUI::Button reportDirBtn;
+
     Dewesoft::MUI::Button deleteChannelBtn;
     Dewesoft::MUI::Button addChannelBtn;
 
@@ -73,5 +81,9 @@ private:
     Dewesoft::MUI::WindowPtr uiPtr;
 
     Dewesoft::MUI::DSDrawGrid selectedChannelsGrid;
-    
+
+    bool acceptsInput;
+    Dewesoft::MUI::DrawGridCellState cellState;
+    std::string editText;
+    std::string textItem;
 };

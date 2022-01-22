@@ -356,3 +356,12 @@ std::string Request::getDefaultRequestEndpoint()
 {
     return defaultRequestEndpoint;
 }
+
+struct selectedChannelHasher{
+public:
+    size_t operator()(const SelectedChannel& channel) const
+    {
+        return ((std::hash<std::string>()(channel.dataEntryType) ^ (std::hash<std::string>()(channel.channelType) << 1) ^  (std::hash<std::string>()(channel.channelName) << 1) ^ (std::hash<std::string>()(channel.cellRef) << 1)) >> 1) ^ (std::hash<int>()(channel.pageNum) << 1);
+    }
+};
+
