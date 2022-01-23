@@ -489,17 +489,26 @@ void SetupWindow::onGridComboItems(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MU
             index = args.add("Standard Channel");
             index = args.add("Special Channel");
             break;
-        case 3:
-            index = args.add("maybe");
+        case 2:
             if (row != 0)
             {
                 if (!grid.getCell(col - 1, row).toStdString().compare("Standard Channel"))
                 {
-                    index = args.add("yes");
+                    std::vector<IChannelPtr> channelPtrs = bridge.getUsedChannelsForUI();
+
+                    for (int x = 0; x < channelPtrs.size(); x++)
+                    {
+                        std::string channelName = channelPtrs[x]->GetName();
+
+                        args.add(channelName);
+                    }
                 }
                 else
                 {
-                    index = args.add("no");
+                    for (auto& specialChan : bridge.requestObj.specialChannelsList)
+                    {
+                       args.add(specialChan);
+                    }
                 }
             }
 

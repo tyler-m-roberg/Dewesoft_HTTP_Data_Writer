@@ -31,12 +31,8 @@ c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests
 c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestsplugin\ui\setup_window.cpp(486): warning C4244: '=': conversion from 'Dewesoft::RT::Core::Int' to 'int', possible loss of data
 c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestsplugin\ui\setup_window.cpp(489): warning C4244: '=': conversion from 'Dewesoft::RT::Core::Int' to 'int', possible loss of data
 c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestsplugin\ui\setup_window.cpp(490): warning C4244: '=': conversion from 'Dewesoft::RT::Core::Int' to 'int', possible loss of data
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestsplugin\ui\setup_window.cpp(493): warning C4244: '=': conversion from 'Dewesoft::RT::Core::Int' to 'int', possible loss of data
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestsplugin\ui\setup_window.cpp(498): warning C4244: '=': conversion from 'Dewesoft::RT::Core::Int' to 'int', possible loss of data
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestsplugin\ui\setup_window.cpp(502): warning C4244: '=': conversion from 'Dewesoft::RT::Core::Int' to 'int', possible loss of data
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestsplugin\ui\setup_window.cpp(514): warning C4244: 'initializing': conversion from 'Dewesoft::RT::Core::Int' to 'int', possible loss of data
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestsplugin\ui\setup_window.cpp(515): warning C4244: 'initializing': conversion from 'Dewesoft::RT::Core::Int' to 'int', possible loss of data
-cl : Command line warning D9028: minimal rebuild failure, reverting to normal build
+c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestsplugin\ui\setup_window.cpp(523): warning C4244: 'initializing': conversion from 'Dewesoft::RT::Core::Int' to 'int', possible loss of data
+c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestsplugin\ui\setup_window.cpp(524): warning C4244: 'initializing': conversion from 'Dewesoft::RT::Core::Int' to 'int', possible loss of data
   Embedding MUI resources.
      Creating library x64\Release\Intermediate\HTTPRequestsPlugin64.lib and object x64\Release\Intermediate\HTTPRequestsPlugin64.exp
   Generating code
