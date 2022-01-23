@@ -1,5 +1,4 @@
 #include "SelectedChannel.h"
-#include "SelectedChannelProperties.h"
 
 using namespace Dewesoft::Utils::Serialization;
 using namespace HTTP_Requests;

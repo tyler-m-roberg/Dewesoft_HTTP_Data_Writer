@@ -271,9 +271,6 @@ void SetupWindow::onDeleteChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI
         values->emplace_back(token.substr(token.find(':') + 1, std::string::npos));
     }
 
-    bridge.requestObj.selectedChannelSet->erase(
-        SelectedChannel(values->at(0), values->at(1), values->at(2), std::stoi(values->at(3)), values->at(4)));
-
     channelListBox.deleteSelected();
 
     delete values;
@@ -397,7 +394,7 @@ void SetupWindow::onGridGetProps(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI:
     int row = args.getRow();
     int col = args.getColumn();
 
-    if (bridge.requestObj.selectedChannelList.size() > 0)
+    if (bridge.requestObj.selectedChannelList.size() > 0 && row != 0)
     {
         switch (col)
         {
@@ -422,7 +419,7 @@ void SetupWindow::onGridGetProps(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI:
             default:
                 break;
         }
-     }
+    }
 }
 
 void SetupWindow::onCellInputEventHandler(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridCellInputArgs& args)
@@ -430,25 +427,28 @@ void SetupWindow::onCellInputEventHandler(Dewesoft::MUI::DSDrawGrid& grid, Dewes
     int row = args.getRow();
     int col = args.getColumn();
 
-    switch (col)
+    if (row != 0)
     {
-        case 0:
-            bridge.requestObj.selectedChannelList[row - 1].setColItem(col, args.getText());
-            break;
-        case 1:
-            bridge.requestObj.selectedChannelList[row - 1].setColItem(col, args.getText());
-            break;
-        case 2:
-            bridge.requestObj.selectedChannelList[row - 1].setColItem(col, args.getText());
-            break;
-        case 3:
-            bridge.requestObj.selectedChannelList[row - 1].setColItem(col, args.getText());
-            break;
-        case 4:
-            bridge.requestObj.selectedChannelList[row - 1].setColItem(col, args.getText());
-            break;
-        default:
-            break;
+        switch (col)
+        {
+            case 0:
+                bridge.requestObj.selectedChannelList[row - 1].setColItem(col, args.getText());
+                break;
+            case 1:
+                bridge.requestObj.selectedChannelList[row - 1].setColItem(col, args.getText());
+                break;
+            case 2:
+                bridge.requestObj.selectedChannelList[row - 1].setColItem(col, args.getText());
+                break;
+            case 3:
+                bridge.requestObj.selectedChannelList[row - 1].setColItem(col, args.getText());
+                break;
+            case 4:
+                bridge.requestObj.selectedChannelList[row - 1].setColItem(col, args.getText());
+                break;
+            default:
+                break;
+        }
     }
 }
 
@@ -457,11 +457,10 @@ void SetupWindow::onCellActionEventHandler(Dewesoft::MUI::DSDrawGrid& grid, Dewe
     int row = args.getRow();
     int col = args.getColumn();
 
-    switch(col)
+    switch (col)
     {
-
         case 5:
-            if (args.getButtonDownState())
+            if (args.getButtonDownState() && row != 0)
             {
                 bridge.requestObj.selectedChannelList.erase(bridge.requestObj.selectedChannelList.begin() + (row - 1));
 
@@ -471,13 +470,13 @@ void SetupWindow::onCellActionEventHandler(Dewesoft::MUI::DSDrawGrid& grid, Dewe
                     grid.invalidate();
             }
             break;
-
     }
 }
 
 void SetupWindow::onGridComboItems(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridComboItemsArgs& args)
 {
     int col = args.getColumn();
+    int row = args.getRow();
 
     int index;
     switch (col)
@@ -490,7 +489,21 @@ void SetupWindow::onGridComboItems(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MU
             index = args.add("Standard Channel");
             index = args.add("Special Channel");
             break;
+        case 3:
+            index = args.add("maybe");
+            if (row != 0)
+            {
+                if (!grid.getCell(col - 1, row).toStdString().compare("Standard Channel"))
+                {
+                    index = args.add("yes");
+                }
+                else
+                {
+                    index = args.add("no");
+                }
+            }
 
+            break;
         default:
             break;
     }
@@ -500,5 +513,4 @@ void SetupWindow::onGridPopup(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::Dr
 {
     int row = args.getRow();
     int col = args.getColumn();
-
 }

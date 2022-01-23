@@ -247,7 +247,6 @@ void Request::loadSetup(const NodePtr& node)
         for (size_t i = 0; i < selectedChannelsNode->getChildCount(); ++i)
         {
             const auto selectedChannelNode = selectedChannelsNode->getChild(i);
-
             selectedChannelList.emplace_back();
             selectedChannelList.back().loadSetup(selectedChannelNode);
         }
@@ -307,8 +306,6 @@ void Request::clear()
     templateFile = "";
     reportDirectory = "";
     reportName = "";
-
-    selectedChannelSet->clear();
 
     for (auto& option : additionalOptionsList)
     {

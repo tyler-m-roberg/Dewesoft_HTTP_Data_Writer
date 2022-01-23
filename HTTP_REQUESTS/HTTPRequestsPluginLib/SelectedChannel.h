@@ -1,5 +1,4 @@
 #pragma once
-#include "SelectedChannelProperties.h"
 #include <string>
 #include <nlohmann/json.hpp>
 #include <nlohmann/adl_serializer.hpp>
