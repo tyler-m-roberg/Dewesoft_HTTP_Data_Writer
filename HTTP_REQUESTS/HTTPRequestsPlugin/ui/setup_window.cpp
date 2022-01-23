@@ -11,177 +11,11 @@
 #include <shlobj.h>
 #include <iostream>
 #include <sstream>
-constexpr int CHANNEL_GRID_COLUMN_WIDTH = 5;
+constexpr int CHANNEL_GRID_COLUMN_WIDTH = 6;
 
 using namespace Dewesoft::MUI;
 using namespace Dewesoft::RT::Core;
 using namespace HTTP_Requests;
-
-///* Set default column types (can be overriden in OnCellGetProps event)
-// *
-// * Arguments are:
-// *     zero based index,
-// *     header name,
-// *     type,
-// *     default visibility,
-// *     width,
-// *     key/property
-// */
-// channelGrid.setColumn(ctNum, "#", ctNumber, RtTrue, 40, "Num");
-// channelGrid.setColumn(ctUsed, "Used", ctUdButton, RtTrue, 60, "Used");
-// channelGrid.setColumn(ctStore, "Store", ctUdButton, RtFalse, 50, "Store");
-// channelGrid.setColumn(Cols::ctColor, "Color", DrawGridCellType::ctColor, RtTrue, 30, "Color");
-// channelGrid.setColumn(ctName, "Name", ctEditText, RtTrue, 140, "Name");
-// channelGrid.setColumn(ctDesc, "Description", ctEditText, RtTrue, 140, "Desc");
-// channelGrid.setColumn(ctTimebase, "Timebase", ctCombobox, RtTrue, 100, "Timebase");
-// channelGrid.setColumn(ctMin, "Min", ctEditNumber, RtTrue, 80, "Min");
-// channelGrid.setColumn(otLivePreview, "Values", ctLiveValue, RtTrue, 130, "Value");
-// channelGrid.setColumn(ctMax, "Max", ctEditNumber, RtTrue, 80, "Max");
-// channelGrid.setColumn(ctValue, "Value", ctNumber, RtTrue, 80, "Value");
-// channelGrid.setColumn(ctStartVal, "Default value", ctEditNumber, RtTrue, 80, "InitVal");
-// channelGrid.setColumn(ctResetVal, "Value reset", ctCombobox, RtTrue, 140, "ValueRes");
-// channelGrid.setColumn(otUnit, "Unit", ctEditText, RtTrue, 40, "Unit");
-// channelGrid.setColumn(ctReset, "Reset value", ctButton, RtTrue, 80, "ResetVal");
-
-//// Set default number fromat for "ctNum" (row number) to not have decimals
-// channelGrid.getColumn(ctNum).setNumberFormat(cfInteger);
-
-//// we're done setting column info
-// channelGrid.applyColumns();
-
-// void SetupWindow::setupEnter()
-//{
-//    uiRefreshTimer.setEnabled(true);
-//}
-//
-// void SetupWindow::setupLeave()
-//{
-//    uiRefreshTimer.setEnabled(false);
-//}
-//
-// void SetupWindow::onUiRefreshTimer(Timer& ctrl, Dewesoft::MUI::EventArgs& args)
-//{
-//    if (channelGrid.assigned())
-//        channelGrid.invalidate();
-//}
-//
-// void SetupWindow::onTabChanged(TabControl& ctrl, Dewesoft::MUI::EventArgs& args)
-//{
-//
-//}
-//
-// void SetupWindow::testGridComboItems(DSDrawGrid& grid, DrawGridComboItemsArgs& args)
-//{
-//    Int col = args.getColumn();
-//
-//    Int index;
-//    switch (col)
-//    {
-//        case ctTimebase:
-//            index = args.add("Async");
-//            index = args.add("Single value");
-//            break;
-//        case ctResetVal:
-//            index = args.add("On start measurement");
-//            index = args.add("On load setup");
-//            index = args.add("Always keep last value");
-//            break;
-//        default:
-//            break;
-//    }
-//}
-//
-// void SetupWindow::testGridLiveValues(DSDrawGrid& grid, DrawGridLiveValueArgs& args)
-//{
-//    args.setLimitMaximum(500);
-//    args.setLimitMinimum(0);
-//
-//    args.setCurrentMinimum(value);
-//    args.setCurrentMaximum(value);
-//
-//    args.setOverloadMinimum(0);
-//    args.setOverloadMaximum(500);
-//    args.setShowOverloadWarning(true);
-//    args.setUnit("Cpp");
-//    args.setPrecision(3);
-//}
-//
-// void SetupWindow::testGridGetProps(DSDrawGrid& grid, DrawGridCellPropsArgs& args)
-//{
-//    Int row = args.getRow();
-//    Int col = args.getColumn();
-//
-//    switch (col)
-//    {
-//        case ctNum:
-//            args.setNumber(static_cast<Float>(row));
-//            break;
-//        case ctUsed:
-//            args.setText("Used");
-//            args.setIsButtonDown(RtTrue);
-//            break;
-//        case ctStore:
-//            args.setText("Store");
-//            args.setIsButtonDown(RtTrue);
-//            break;
-//        case Cols::ctColor:
-//            args.setCellColor(0xff0000);
-//            break;
-//        case ctName:
-//            args.setText("Channel name C++");
-//            break;
-//        case ctDesc:
-//            args.setText("Channel description C++");
-//            break;
-//        case ctTimebase:
-//            args.setText("Async C++");
-//            break;
-//        case ctMin:
-//            args.setNumber(0.0);
-//            break;
-//        case ctMax:
-//            args.setNumber(100.0);
-//            break;
-//        case ctValue:
-//            if (value > 600)
-//            {
-//                decrement = true;
-//            }
-//            else if (value < -100)
-//            {
-//                decrement = false;
-//            }
-//
-//            if (decrement)
-//            {
-//                value--;
-//            }
-//            else
-//            {
-//                value++;
-//            }
-//
-//            args.setNumber(value);
-//            break;
-//        case ctStartVal:
-//            args.setNumber(0.0);
-//            break;
-//        case ctResetVal:
-//        {
-//            args.setText("On start measurement C++");
-//            break;
-//        }
-//        case otUnit:
-//            args.setText("");
-//            break;
-//        case ctReset:
-//            args.setText("Reset");
-//            break;
-//        default:
-//            args.setText("");
-//            break;
-//    }
-//}
 
 SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
     : BaseSetupWindow(ui, bridge, "ui/setup_window.xml")
@@ -255,9 +89,10 @@ SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
      */
     selectedChannelsGrid.setColumn(0, "Data Entry Type", ctCombobox, RtTrue, 200, "dataEntryTypeDSGrid");
     selectedChannelsGrid.setColumn(1, "Channel Type", ctCombobox, RtTrue, 200, "channelTypeDSGrid");
-    selectedChannelsGrid.setColumn(2, "Channel", ctText, RtTrue, 360, "channelDSGrid");
+    selectedChannelsGrid.setColumn(2, "Channel", ctCombobox, RtTrue, 360, "channelDSGrid");
     selectedChannelsGrid.setColumn(3, "Page #", ctEditNumber, RtTrue, 100, "pageNumDSGrid");
     selectedChannelsGrid.setColumn(4, "Cell / Starting Cell", ctEditText, RtTrue, 100, "cellRefDSGrid");
+    selectedChannelsGrid.setColumn(5, "Delete", ctButton, RtTrue, 100, "deleteDSGrid");
 
     //// Set default number fromat for "ctNum" (row number) to not have decimals
     selectedChannelsGrid.getColumn(3).setNumberFormat(cfInteger);
@@ -265,14 +100,15 @@ SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
     //// we're done setting column info
     selectedChannelsGrid.applyColumns();
 
-    selectedChannelsGrid.OnCellInput += event(&SetupWindow::testGridCellInput);
-    selectedChannelsGrid.OnCellGetProps += event(&SetupWindow::gridGetProps);
-    selectedChannelsGrid.OnCellActionStartStop += event(&SetupWindow::gridActionStartStop);
+    selectedChannelsGrid.OnCellGetProps += event(&SetupWindow::onGridGetProps);
+    selectedChannelsGrid.OnCellInput += event(&SetupWindow::onCellInputEventHandler);
+    selectedChannelsGrid.OnCellAction += event(&SetupWindow::onCellActionEventHandler);
+    selectedChannelsGrid.OnCellGetComboItems += event(&SetupWindow::onGridComboItems);
+    selectedChannelsGrid.OnCellPopupMenu += event(&SetupWindow::onGridPopup);
 }
 
 SetupWindow::~SetupWindow()
 {
-
 }
 
 void SetupWindow::setupEnter()
@@ -292,8 +128,6 @@ void SetupWindow::setupEnter()
     triggerChanCBox.setSelectedIndex(triggerChanCBox.getIndexOf(bridge.requestObj.triggerChannel));
     triggerLevelTextBox.setText(std::to_string(bridge.requestObj.triggerLevel));
     edgeTypeCBox.setSelectedIndex(edgeTypeCBox.getIndexOf(bridge.requestObj.edgeType));
-
-    selectedChannelsGrid.setGridSize(bridge.requestObj.selectedChannelList.size() + 1, CHANNEL_GRID_COLUMN_WIDTH);
 
     uiRefreshTimer.setEnabled(true);
 }
@@ -323,11 +157,14 @@ void SetupWindow::addChannelsToTriggerChannelCBox(Dewesoft::MUI::ComboBox& combo
 void SetupWindow::addItemsToChannelListBox(Dewesoft::MUI::ListBox& listBox)
 {
     listBox.clear();
-    std::unordered_map<SelectedChannel, SelectedChannelProperties>::iterator it;
-    for (it = bridge.requestObj.selectedChannelSet->begin(); it != bridge.requestObj.selectedChannelSet->end(); ++it)
-    {
-        listBox.addItem(SelectedChannel::stringifyChannel(&it->first));
-    }
+
+    selectedChannelsGrid.setGridSize(bridge.requestObj.selectedChannelList.size() + 1, CHANNEL_GRID_COLUMN_WIDTH);
+
+    //// we're done setting column info
+    selectedChannelsGrid.applyColumns();
+
+    if (selectedChannelsGrid.assigned())
+        selectedChannelsGrid.invalidate();
 }
 
 void SetupWindow::addItemsToOptionsListBox(WindowPtr ui, Dewesoft::MUI::StackPanel& stackPanel)
@@ -410,9 +247,11 @@ void SetupWindow::onAddChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::E
     int pageNum = std::stoi(pageNumTextBox.getText().toStdString());
     std::string cellRef = cellRefTextBox.getText().toStdString();
 
-
-    bridge.requestObj.selectedChannelSet->emplace(std::piecewise_construct, std::forward_as_tuple(dataEntryType, channelType, selectedChannel, pageNum, cellRef),std::forward_as_tuple());
-    channelListBox.addItem(SelectedChannel::stringifyChannel(&SelectedChannel(dataEntryType, channelType, selectedChannel, pageNum, cellRef)));
+    bridge.requestObj.selectedChannelList.emplace_back(dataEntryType, channelType, selectedChannel, pageNum, cellRef);
+    selectedChannelsGrid.setGridSize(bridge.requestObj.selectedChannelList.size() + 1, CHANNEL_GRID_COLUMN_WIDTH);
+    selectedChannelsGrid.applyColumns();
+    if (selectedChannelsGrid.assigned())
+        selectedChannelsGrid.invalidate();
 }
 
 void SetupWindow::onDeleteChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::EventArgs& args)
@@ -421,7 +260,7 @@ void SetupWindow::onDeleteChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI
 
     //**Removed due to issue with removing white space in channel names
     // Remove white space from string
-    //selectedItem.erase(std::remove_if(selectedItem.begin(), selectedItem.end(), isspace), selectedItem.end());
+    // selectedItem.erase(std::remove_if(selectedItem.begin(), selectedItem.end(), isspace), selectedItem.end());
 
     // Use string stream to tokenize string off delimiter and then take substring delimited by colon and store in vector
     std::stringstream ss(selectedItem);
@@ -432,7 +271,8 @@ void SetupWindow::onDeleteChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI
         values->emplace_back(token.substr(token.find(':') + 1, std::string::npos));
     }
 
-    bridge.requestObj.selectedChannelSet->erase(SelectedChannel(values->at(0), values->at(1), values->at(2), std::stoi(values->at(3)), values->at(4)));
+    bridge.requestObj.selectedChannelSet->erase(
+        SelectedChannel(values->at(0), values->at(1), values->at(2), std::stoi(values->at(3)), values->at(4)));
 
     channelListBox.deleteSelected();
 
@@ -548,16 +388,117 @@ void SetupWindow::reportDirSelectClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI
 
 void SetupWindow::onUiRefreshTimer(Timer& ctrl, Dewesoft::MUI::EventArgs& args)
 {
+    if (selectedChannelsGrid.assigned())
+        selectedChannelsGrid.invalidate();
 }
 
-void SetupWindow::gridGetProps(Dewesoft::MUI::DSDrawGrid& grid, DrawGridCellPropsArgs& args)
+void SetupWindow::onGridGetProps(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridCellPropsArgs& args)
 {
+    int row = args.getRow();
+    int col = args.getColumn();
+
+    if (bridge.requestObj.selectedChannelList.size() > 0)
+    {
+        switch (col)
+        {
+            case 0:
+                args.setText(bridge.requestObj.selectedChannelList[row - 1].getColItem(col));
+                break;
+            case 1:
+                args.setText(bridge.requestObj.selectedChannelList[row - 1].getColItem(col));
+                break;
+            case 2:
+                args.setText(bridge.requestObj.selectedChannelList[row - 1].getColItem(col));
+                break;
+            case 3:
+                args.setNumber(std::stoi(bridge.requestObj.selectedChannelList[row - 1].getColItem(col)));
+                break;
+            case 4:
+                args.setText(bridge.requestObj.selectedChannelList[row - 1].getColItem(col));
+                break;
+            case 5:
+                args.setText("-");
+                break;
+            default:
+                break;
+        }
+     }
 }
 
-void SetupWindow::testGridCellInput(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridCellInputArgs& args)
+void SetupWindow::onCellInputEventHandler(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridCellInputArgs& args)
 {
+    int row = args.getRow();
+    int col = args.getColumn();
+
+    switch (col)
+    {
+        case 0:
+            bridge.requestObj.selectedChannelList[row - 1].setColItem(col, args.getText());
+            break;
+        case 1:
+            bridge.requestObj.selectedChannelList[row - 1].setColItem(col, args.getText());
+            break;
+        case 2:
+            bridge.requestObj.selectedChannelList[row - 1].setColItem(col, args.getText());
+            break;
+        case 3:
+            bridge.requestObj.selectedChannelList[row - 1].setColItem(col, args.getText());
+            break;
+        case 4:
+            bridge.requestObj.selectedChannelList[row - 1].setColItem(col, args.getText());
+            break;
+        default:
+            break;
+    }
 }
 
-void SetupWindow::gridActionStartStop(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridCellActionStartStopEventArgs& args)
+void SetupWindow::onCellActionEventHandler(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridCellActionEventArgs& args)
 {
+    int row = args.getRow();
+    int col = args.getColumn();
+
+    switch(col)
+    {
+
+        case 5:
+            if (args.getButtonDownState())
+            {
+                bridge.requestObj.selectedChannelList.erase(bridge.requestObj.selectedChannelList.begin() + (row - 1));
+
+                grid.setGridSize(bridge.requestObj.selectedChannelList.size() + 1, CHANNEL_GRID_COLUMN_WIDTH);
+                selectedChannelsGrid.applyColumns();
+                if (grid.assigned())
+                    grid.invalidate();
+            }
+            break;
+
+    }
+}
+
+void SetupWindow::onGridComboItems(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridComboItemsArgs& args)
+{
+    int col = args.getColumn();
+
+    int index;
+    switch (col)
+    {
+        case 0:
+            index = args.add("Single Value");
+            index = args.add("Multi Value");
+            break;
+        case 1:
+            index = args.add("Standard Channel");
+            index = args.add("Special Channel");
+            break;
+
+        default:
+            break;
+    }
+}
+
+void SetupWindow::onGridPopup(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridCellPopupMenuArgs& args)
+{
+    int row = args.getRow();
+    int col = args.getColumn();
+
 }

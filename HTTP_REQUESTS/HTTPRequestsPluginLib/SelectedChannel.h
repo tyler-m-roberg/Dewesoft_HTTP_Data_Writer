@@ -25,17 +25,24 @@ namespace HTTP_Requests
 
         static std::string stringifyChannel(const SelectedChannel* channel);
 
+        std::string getColItem(const int& colNum) const;
+        void setColItem(const int& colNum, const std::string& val);
+
         bool operator==(const SelectedChannel& selectedChannel) const;
         bool operator==(const SelectedChannel* selectedChannel) const;
-
         bool operator!=(const SelectedChannel& requestObj) const;
 
-        json toJson(const SelectedChannelProperties& channelProps) const;
+        json toJson() const;
 
         std::string dataEntryType;
+        std::string channelType;
         std::string channelName;
         int pageNum;
         std::string cellRef;
-        std::string channelType;
+        
+        long dataType;
+        std::string text;
+        double channelValue;
+        IChannelPtr channelPtr;
     };
 }

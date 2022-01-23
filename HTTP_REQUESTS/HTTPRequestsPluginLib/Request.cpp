@@ -83,7 +83,6 @@ Request::Request(InputManagerImpl& inputManager,
     specialChannelsList.emplace_back("Filename");
     specialChannelsList.emplace_back("Date");
 
-    selectedChannelSet = std::make_unique<std::unordered_map<SelectedChannel, SelectedChannelProperties, selectedChannelHasher>>();
 }
 
 void Request::getData(const AcquiredDataInfo& acquiredDataInfo, const _bstr_t& usedDataFile)
@@ -93,10 +92,10 @@ void Request::getData(const AcquiredDataInfo& acquiredDataInfo, const _bstr_t& u
         return;
 
     //Verify channel pointers are set and return if not
-    std::unordered_map<SelectedChannel, SelectedChannelProperties>::iterator it;
-    for (it = selectedChannelSet->begin(); it != selectedChannelSet->end(); ++it)
+    
+    for (auto& selectedChannel : selectedChannelList)
     {
-        if (it->second.channelPtr == nullptr && !it->first.channelType.compare("Standard Channel"))
+        if (selectedChannel.channelPtr == nullptr && !selectedChannel.channelType.compare("Standard Channel"))
             return;
     }
 
@@ -133,54 +132,55 @@ void Request::getData(const AcquiredDataInfo& acquiredDataInfo, const _bstr_t& u
             nlohmann::json selectedChannelsJSON; //Create JSON object to hold channel informaiton
 
             //Loop through selected channel list to build JSON object
-            std::unordered_map<SelectedChannel, SelectedChannelProperties>::iterator it;
-            for (it = selectedChannelSet->begin(); it != selectedChannelSet->end(); ++it)
+            for (auto& selectedChannel : selectedChannelList)
             {
                 // Run if channel is standard channel
-                if (!it->first.channelType.compare("Standard Channel"))
+                if (!selectedChannel.channelType.compare("Standard Channel"))
                 {
-                    it->second.dataType = it->second.channelPtr->DataType;
+                    selectedChannel.dataType = selectedChannel.channelPtr->DataType;
 
                     // If selected type is text update text value
-                    if (it->second.dataType == 11)
-                        it->second.text = it->second.channelPtr->Text;
+                    if (selectedChannel.dataType == 11)
+                        selectedChannel.text = selectedChannel.channelPtr->Text;
 
                     // If is single value use single value accessor
-                    else if (it->second.channelPtr->IsSingleValue)
-                        it->second.channelValue = it->second.channelPtr->SingleValue;
+                    else if (selectedChannel.channelPtr->IsSingleValue)
+                        selectedChannel.channelValue = selectedChannel.channelPtr->SingleValue;
 
                     // Channel is async use get value at abs position to read in seek nearest async value
-                    else if (it->second.channelPtr->Async)
+                    else if (selectedChannel.channelPtr->Async)
                     {
                         long* seekPos = new long;
-                        it->second.channelValue =
-                            it->second.channelPtr->GetValueAtAbsPosDouble((long) lastPosChecked, seekPos, false);
+                        selectedChannel.channelValue =
+                            selectedChannel.channelPtr->GetValueAtAbsPosDouble((long) lastPosChecked, seekPos, false);
+
+                        delete seekPos;
                     }
 
                     // If value is normal numeric channel get numeric value of channel
                     else
-                        it->second.channelValue =
-                            it->second.channelPtr->DBValues[(lastPosChecked + 1) % it->second.channelPtr->DBBufSize];
+                        selectedChannel.channelValue =
+                            selectedChannel.channelPtr->DBValues[(lastPosChecked + 1) % selectedChannel.channelPtr->DBBufSize];
                 }
 
                 // Handle speical channel cases
                 else
                 {
                     // Handle special channel used file name
-                    if (!it->first.channelName.compare("Filename"))
+                    if (!selectedChannel.channelName.compare("Filename"))
                     {
                         // Use codevect to convert file name to std string from _bstr_t
                         // Warning codevect is depricated, no suitable alternatives replace when available
                         std::string filename = std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(usedDataFile);
 
                         // Set text to file name and data type to text
-                        it->second.text = filename;
-                        it->second.dataType = 11;
+                        selectedChannel.text = filename;
+                        selectedChannel.dataType = 11;
                     }
                 }
 
                 // Add channel to JSON object
-                selectedChannelsJSON.push_back(it->first.toJson(it->second));
+                selectedChannelsJSON.push_back(selectedChannel.toJson());
             }
 
             postData["SelectedChannels"] = selectedChannelsJSON; //Add selected channels to main request JSON Object
@@ -215,11 +215,10 @@ void Request::saveSetup(const NodePtr& node) const
 
     // Create subnode for selected channels and add each selected channel
     const auto selectedChannelsNode = node->addChild(u8"SelectedChannels");
-    std::unordered_map<SelectedChannel, SelectedChannelProperties>::iterator it;
-    for (it = selectedChannelSet->begin(); it != selectedChannelSet->end(); ++it)
+    for (auto& selectedChannel : selectedChannelList)
     {
         const auto selectedChannelNode = selectedChannelsNode->addChild(u8"SelectedChannel");
-        it->first.saveSetup(selectedChannelNode);
+        selectedChannel.saveSetup(selectedChannelNode);
     }
 }
 
@@ -249,10 +248,8 @@ void Request::loadSetup(const NodePtr& node)
         {
             const auto selectedChannelNode = selectedChannelsNode->getChild(i);
 
-            SelectedChannel tempSelectedChannel;
-            tempSelectedChannel.loadSetup(selectedChannelNode);
-
-            selectedChannelSet->insert(std::make_pair(tempSelectedChannel, SelectedChannelProperties()));
+            selectedChannelList.emplace_back();
+            selectedChannelList.back().loadSetup(selectedChannelNode);
         }
     }
 
@@ -337,17 +334,15 @@ int Request::minBlockSize()
     int minBlockSizeRtn = (std::numeric_limits<int>::max)();
 
     minBlockSizeRtn = getBlockSize(triggerChannelPtr);
-
-    std::unordered_map<SelectedChannel, SelectedChannelProperties>::iterator it;
-    for (it = selectedChannelSet->begin(); it != selectedChannelSet->end(); ++it)
+    for (auto& selectedChannel : selectedChannelList)
     {
-        if (!it->first.channelType.compare("Standard Channel"))
+        if (!selectedChannel.channelType.compare("Standard Channel"))
         {
-            bool checkIfNotSingleValueChannel = !it->second.channelPtr->IsSingleValue;
-            bool checkIfNotAsync = !it->second.channelPtr->GetAsync();
+            bool checkIfNotSingleValueChannel = !selectedChannel.channelPtr->IsSingleValue;
+            bool checkIfNotAsync = !selectedChannel.channelPtr->GetAsync();
 
             if (checkIfNotSingleValueChannel && checkIfNotAsync)
-                minBlockSizeRtn = (std::min)(minBlockSizeRtn, getBlockSize(it->second.channelPtr));
+                minBlockSizeRtn = (std::min)(minBlockSizeRtn, getBlockSize(selectedChannel.channelPtr));
         }
     }
 

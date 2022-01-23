@@ -124,10 +124,9 @@ void DewesoftBridge::onStopData()
 
 void DewesoftBridge::onStartStoring()
 {
-    std::unordered_map<SelectedChannel, SelectedChannelProperties>::iterator it;
-    for (it = requestObj.selectedChannelSet->begin(); it != requestObj.selectedChannelSet->end(); ++it)
+    for (auto& selectedChannel : requestObj.selectedChannelList)
     {
-        it->second.channelPtr = getIChannelPtrFromChannelName(it->first.channelName);
+        selectedChannel.channelPtr = getIChannelPtrFromChannelName(selectedChannel.channelName);
     }
 
     requestObj.triggerChannelPtr = getIChannelPtrFromChannelName(requestObj.triggerChannel);
@@ -135,10 +134,9 @@ void DewesoftBridge::onStartStoring()
 
 void DewesoftBridge::onStopStoring()
 {
-    std::unordered_map<SelectedChannel, SelectedChannelProperties>::iterator it;
-    for (it = requestObj.selectedChannelSet->begin(); it != requestObj.selectedChannelSet->end(); ++it)
+    for (auto& selectedChannel : requestObj.selectedChannelList)
     {
-        it->second.channelPtr = nullptr;
+        selectedChannel.channelPtr = nullptr;
     }
 
     requestObj.triggerChannelPtr = nullptr;

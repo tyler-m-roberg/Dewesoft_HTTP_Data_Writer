@@ -20,6 +20,8 @@ SelectedChannel::SelectedChannel(std::string dataEntryType,
     , pageNum(pageNum)
     , cellRef(cellRef)
 {
+    channelValue = 0.0;
+    text = "";
 }
 
 void SelectedChannel::saveSetup(const NodePtr& node) const
@@ -68,7 +70,7 @@ bool SelectedChannel::operator!=(const SelectedChannel& selectedChannel) const
     return !(*this == selectedChannel);
 }
 
-json SelectedChannel::toJson(const SelectedChannelProperties& channelProps) const
+json SelectedChannel::toJson() const
 {
     return json{
 
@@ -88,14 +90,66 @@ json SelectedChannel::toJson(const SelectedChannelProperties& channelProps) cons
             "ChannelType", this->channelType
         },
         {
-            "DataType", channelProps.dataType
+            "DataType", dataType
         },
         {
-            "Text", channelProps.text
+            "Text", text
         },
         {
-            "ChannelValue", channelProps.channelValue
+            "ChannelValue", channelValue
         }
-
     };
+}
+
+std::string SelectedChannel::getColItem(const int& colNum) const
+{
+    switch (colNum)
+    {
+        case 0:
+            return dataEntryType;
+            break;
+
+        case 1:
+            return channelType;
+            break;
+
+        case 2:
+            return channelName;
+            break;
+
+        case 3:
+            return std::to_string(pageNum);
+            break;
+
+        case 4:
+            return cellRef;
+            break;
+    }
+}
+
+
+void SelectedChannel::setColItem(const int& colNum, const std::string& val)
+{
+    switch (colNum)
+    {
+        case 0:
+            dataEntryType = val;
+            break;
+
+        case 1:
+            channelType = val;
+            break;
+
+        case 2:
+            channelName = val;
+            break;
+
+        case 3:
+            pageNum = std::stoi(val);
+            break;
+
+        case 4:
+            cellRef = val;
+            break;
+    }
 }

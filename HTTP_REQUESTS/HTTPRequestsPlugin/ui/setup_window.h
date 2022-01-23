@@ -48,12 +48,13 @@ private:
     void onOptionsSelectionChanged(Dewesoft::MUI::CheckBox& checkBox, Dewesoft::MUI::EventArgs& args);
     void onChannelTypeChanged(Dewesoft::MUI::ComboBox& comboBox, Dewesoft::MUI::EventArgs& args);
     void onUiRefreshTimer(Dewesoft::MUI::Timer& ctrl, Dewesoft::MUI::EventArgs& args);
-    void testGridComboItems(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridComboItemsArgs& args);
-    void testGridCellInput(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridCellInputArgs& args);
     void templateSelectClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::EventArgs& args);
     void reportDirSelectClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::EventArgs& args);
-    void gridGetProps(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridCellPropsArgs& args);
-    void gridActionStartStop(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridCellActionStartStopEventArgs& args);
+    void onGridGetProps(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridCellPropsArgs& args);
+    void onCellInputEventHandler(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridCellInputArgs& args);
+    void onCellActionEventHandler(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridCellActionEventArgs& args);
+    void onGridComboItems(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridComboItemsArgs& args);
+    void onGridPopup(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridCellPopupMenuArgs& args);
 
     Dewesoft::MUI::TextBox triggerLevelTextBox;
     Dewesoft::MUI::TextBox templateFileTextBox;
