@@ -49,9 +49,6 @@ protected:
     Dewesoft::MUI::Label cellRefLabel;
     Dewesoft::MUI::TextBox cellRefTextBox;
     Dewesoft::MUI::Button addChannelBtn;
-    Dewesoft::MUI::CaptionPanel currentChannelsPanel;
-    Dewesoft::MUI::Button deleteChannelBtn;
-    Dewesoft::MUI::ListBox channelListBox;
     Dewesoft::MUI::CaptionPanel dsGridPanel;
     Dewesoft::MUI::DSDrawGrid selectedChannelsGrid;
 
@@ -86,9 +83,6 @@ protected:
         cellRefLabel = Dewesoft::MUI::Label::Connect(ui, "cellRefLabel");
         cellRefTextBox = Dewesoft::MUI::TextBox::Connect(ui, "cellRefTextBox");
         addChannelBtn = Dewesoft::MUI::Button::Connect(ui, "addChannelBtn");
-        currentChannelsPanel = Dewesoft::MUI::CaptionPanel::Connect(ui, "currentChannelsPanel");
-        deleteChannelBtn = Dewesoft::MUI::Button::Connect(ui, "deleteChannelBtn");
-        channelListBox = Dewesoft::MUI::ListBox::Connect(ui, "channelListBox");
         dsGridPanel = Dewesoft::MUI::CaptionPanel::Connect(ui, "dsGridPanel");
         selectedChannelsGrid = Dewesoft::MUI::DSDrawGrid::Connect(ui, "selectedChannelsGrid");
     }

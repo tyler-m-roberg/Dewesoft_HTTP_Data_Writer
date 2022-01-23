@@ -41,10 +41,8 @@ SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
     templateBtn = Button::Connect(ui, "templateBtn");
     reportDirBtn = Button::Connect(ui, "reportDirBtn");
 
-    deleteChannelBtn = Button::Connect(ui, "deleteChannelBtn");
     addChannelBtn = Button::Connect(ui, "addChannelBtn");
 
-    channelListBox = ListBox::Connect(ui, "channelListBox");
     optionsStackPanel = StackPanel::Connect(ui, "optionsListStackPanel");
     //********************************************************************
 
@@ -56,9 +54,6 @@ SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
 
     // Add submit event to addChannelBtn
     addChannelBtn.OnClick += event(&SetupWindow::onAddChannelClick);
-
-    // Add delete event to delete button
-    deleteChannelBtn.OnClick += event(&SetupWindow::onDeleteChannelClick);
 
     // Add handlers for on updates for settings drop downs and text boxes
     triggerLevelTextBox.OnTextChanged += event(&SetupWindow::onTriggerLevelTextChanged);
@@ -118,7 +113,7 @@ void SetupWindow::setupEnter()
     addChannelsToChannelSelectionCBox(channelSelectionCBox);
 
     // Add saved items to list box
-    addItemsToChannelListBox(channelListBox);
+    addItemsToChannelListBox();
 
     addItemsToOptionsListBox(uiPtr, optionsStackPanel);
 
@@ -154,9 +149,8 @@ void SetupWindow::addChannelsToTriggerChannelCBox(Dewesoft::MUI::ComboBox& combo
     }
 }
 
-void SetupWindow::addItemsToChannelListBox(Dewesoft::MUI::ListBox& listBox)
+void SetupWindow::addItemsToChannelListBox()
 {
-    listBox.clear();
 
     selectedChannelsGrid.setGridSize(bridge.requestObj.selectedChannelList.size() + 1, CHANNEL_GRID_COLUMN_WIDTH);
 
@@ -252,28 +246,6 @@ void SetupWindow::onAddChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::E
     selectedChannelsGrid.applyColumns();
     if (selectedChannelsGrid.assigned())
         selectedChannelsGrid.invalidate();
-}
-
-void SetupWindow::onDeleteChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::EventArgs& args)
-{
-    std::string selectedItem = channelListBox.getSelectedItem().toStdString();
-
-    //**Removed due to issue with removing white space in channel names
-    // Remove white space from string
-    // selectedItem.erase(std::remove_if(selectedItem.begin(), selectedItem.end(), isspace), selectedItem.end());
-
-    // Use string stream to tokenize string off delimiter and then take substring delimited by colon and store in vector
-    std::stringstream ss(selectedItem);
-    std::string token;
-    std::vector<std::string>* values = new std::vector<std::string>();
-    while (std::getline(ss, token, ','))
-    {
-        values->emplace_back(token.substr(token.find(':') + 1, std::string::npos));
-    }
-
-    channelListBox.deleteSelected();
-
-    delete values;
 }
 
 void SetupWindow::onTriggerLevelTextChanged(Dewesoft::MUI::TextBox& txtBox, Dewesoft::MUI::EventArgs& args)
@@ -435,7 +407,27 @@ void SetupWindow::onCellInputEventHandler(Dewesoft::MUI::DSDrawGrid& grid, Dewes
                 bridge.requestObj.selectedChannelList[row - 1].setColItem(col, args.getText());
                 break;
             case 1:
+
                 bridge.requestObj.selectedChannelList[row - 1].setColItem(col, args.getText());
+
+                if (!args.getText().toStdString().compare("Standard Channel"))
+                {
+
+                    if (bridge.getUsedChannelsForUI().size() > 0)
+                    {
+                        std::string channelName = bridge.getUsedChannelsForUI()[0]->GetName();
+                        bridge.requestObj.selectedChannelList[row - 1].setColItem((col + 1), channelName);
+                    }
+                 }
+                else
+                {
+                    if(bridge.requestObj.specialChannelsList.size() > 0)
+                        bridge.requestObj.selectedChannelList[row - 1].setColItem((col + 1), bridge.requestObj.specialChannelsList[0]);
+                }
+
+                if (grid.assigned())
+                    grid.invalidate();
+
                 break;
             case 2:
                 bridge.requestObj.selectedChannelList[row - 1].setColItem(col, args.getText());

@@ -24,7 +24,7 @@ public:
     void addChannelsToTriggerChannelCBox(Dewesoft::MUI::ComboBox& comboBox);
     void addChannelsToChannelSelectionCBox(Dewesoft::MUI::ComboBox& comboBox);
 
-    void addItemsToChannelListBox(Dewesoft::MUI::ListBox& listBox);
+    void addItemsToChannelListBox();
     void addItemsToOptionsListBox(Dewesoft::MUI::WindowPtr ui, Dewesoft::MUI::StackPanel& stackPanel);
 
     void addDataEntryTypeToCBox(Dewesoft::MUI::ComboBox& comboBox);
@@ -36,7 +36,6 @@ private:
     DewesoftBridge& bridge;
 
     void onAddChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::EventArgs& args);
-    void onDeleteChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::EventArgs& args);
 
     // Event handlers for settings changes
     void onTriggerLevelTextChanged(Dewesoft::MUI::TextBox& txtBox, Dewesoft::MUI::EventArgs& args);
@@ -72,10 +71,7 @@ private:
     Dewesoft::MUI::Button templateBtn;
     Dewesoft::MUI::Button reportDirBtn;
 
-    Dewesoft::MUI::Button deleteChannelBtn;
     Dewesoft::MUI::Button addChannelBtn;
-
-    Dewesoft::MUI::ListBox channelListBox;
 
     Dewesoft::MUI::StackPanel optionsStackPanel;
 
