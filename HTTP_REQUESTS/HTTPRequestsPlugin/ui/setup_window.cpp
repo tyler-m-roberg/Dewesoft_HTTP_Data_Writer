@@ -326,7 +326,7 @@ void SetupWindow::addItemsToChannelListBox(Dewesoft::MUI::ListBox& listBox)
     std::unordered_map<SelectedChannel, SelectedChannelProperties>::iterator it;
     for (it = bridge.requestObj.selectedChannelSet->begin(); it != bridge.requestObj.selectedChannelSet->end(); ++it)
     {
-        listBox.addItem(SelectedChannel::stringifyChannel(it->first.stringifyChannel));
+        listBox.addItem(SelectedChannel::stringifyChannel(&it->first));
     }
 }
 
