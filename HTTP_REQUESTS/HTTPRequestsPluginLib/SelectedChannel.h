@@ -1,4 +1,5 @@
 #pragma once
+#include "SelectedChannelProperties.h"
 #include <string>
 #include <nlohmann/json.hpp>
 #include <nlohmann/adl_serializer.hpp>
@@ -22,23 +23,19 @@ namespace HTTP_Requests
         void saveSetup(const Dewesoft::Utils::Serialization::NodePtr& node) const;
         void loadSetup(const Dewesoft::Utils::Serialization::NodePtr& node);
 
-        static std::string stringifyChannel(SelectedChannel* channel);
+        static std::string stringifyChannel(const SelectedChannel* channel);
 
         bool operator==(const SelectedChannel& selectedChannel) const;
         bool operator==(const SelectedChannel* selectedChannel) const;
 
         bool operator!=(const SelectedChannel& requestObj) const;
 
-        json toJson();
+        json toJson(const SelectedChannelProperties& channelProps) const;
 
         std::string dataEntryType;
         std::string channelName;
         int pageNum;
         std::string cellRef;
         std::string channelType;
-        long dataType;
-        std::string text;
-        double channelValue;
-        IChannelPtr channelPtr;
     };
 }

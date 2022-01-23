@@ -1,4 +1,5 @@
 #include "SelectedChannel.h"
+#include "SelectedChannelProperties.h"
 
 using namespace Dewesoft::Utils::Serialization;
 using namespace HTTP_Requests;
@@ -18,10 +19,6 @@ SelectedChannel::SelectedChannel(std::string dataEntryType,
     , channelName(channelName)
     , pageNum(pageNum)
     , cellRef(cellRef)
-    , text("")
-    , channelValue(0)
-    
-
 {
 }
 
@@ -45,7 +42,7 @@ void SelectedChannel::loadSetup(const NodePtr& node)
 
 }
 
-std::string SelectedChannel::stringifyChannel(SelectedChannel* channel)
+std::string SelectedChannel::stringifyChannel(const SelectedChannel* channel)
 {
     return std::string("Data Entry Type:") + channel->dataEntryType + ",Channel Type:" + channel->channelType +
                                 ",Channel:" + channel->channelName + ",Page #:" + std::to_string(channel->pageNum) +
@@ -71,7 +68,7 @@ bool SelectedChannel::operator!=(const SelectedChannel& selectedChannel) const
     return !(*this == selectedChannel);
 }
 
-json SelectedChannel::toJson()
+json SelectedChannel::toJson(const SelectedChannelProperties& channelProps) const
 {
     return json{
 
@@ -91,13 +88,13 @@ json SelectedChannel::toJson()
             "ChannelType", this->channelType
         },
         {
-            "DataType", this->dataType
+            "DataType", channelProps.dataType
         },
         {
-            "Text", this->text
+            "Text", channelProps.text
         },
         {
-            "ChannelValue", this->channelValue
+            "ChannelValue", channelProps.channelValue
         }
 
     };

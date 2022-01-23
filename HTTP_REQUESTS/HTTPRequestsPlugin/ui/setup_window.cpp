@@ -323,10 +323,10 @@ void SetupWindow::addChannelsToTriggerChannelCBox(Dewesoft::MUI::ComboBox& combo
 void SetupWindow::addItemsToChannelListBox(Dewesoft::MUI::ListBox& listBox)
 {
     listBox.clear();
-
-    for (auto& selectedChannel : bridge.requestObj.selectedChannelList)
+    std::unordered_map<SelectedChannel, SelectedChannelProperties>::iterator it;
+    for (it = bridge.requestObj.selectedChannelSet->begin(); it != bridge.requestObj.selectedChannelSet->end(); ++it)
     {
-        listBox.addItem(SelectedChannel::stringifyChannel(&selectedChannel));
+        listBox.addItem(SelectedChannel::stringifyChannel(it->first.stringifyChannel));
     }
 }
 
@@ -410,8 +410,9 @@ void SetupWindow::onAddChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::E
     int pageNum = std::stoi(pageNumTextBox.getText().toStdString());
     std::string cellRef = cellRefTextBox.getText().toStdString();
 
-    bridge.requestObj.selectedChannelList.emplace_back(dataEntryType, channelType, selectedChannel, pageNum, cellRef);
-    channelListBox.addItem(SelectedChannel::stringifyChannel(&bridge.requestObj.selectedChannelList.back()));
+
+    bridge.requestObj.selectedChannelSet->emplace(std::piecewise_construct, std::forward_as_tuple(dataEntryType, channelType, selectedChannel, pageNum, cellRef),std::forward_as_tuple());
+    channelListBox.addItem(SelectedChannel::stringifyChannel(&SelectedChannel(dataEntryType, channelType, selectedChannel, pageNum, cellRef)));
 }
 
 void SetupWindow::onDeleteChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::EventArgs& args)
@@ -420,7 +421,7 @@ void SetupWindow::onDeleteChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI
 
     //**Removed due to issue with removing white space in channel names
     // Remove white space from string
-    selectedItem.erase(std::remove_if(selectedItem.begin(), selectedItem.end(), isspace), selectedItem.end());
+    //selectedItem.erase(std::remove_if(selectedItem.begin(), selectedItem.end(), isspace), selectedItem.end());
 
     // Use string stream to tokenize string off delimiter and then take substring delimited by colon and store in vector
     std::stringstream ss(selectedItem);
@@ -431,24 +432,11 @@ void SetupWindow::onDeleteChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI
         values->emplace_back(token.substr(token.find(':') + 1, std::string::npos));
     }
 
-    SelectedChannel* comparisonChannel =
-        new SelectedChannel(values->at(0), values->at(1), values->at(2), std::stoi(values->at(3)), values->at(4));
-
-    int index = 0;
-    for (auto& channel : bridge.requestObj.selectedChannelList)
-    {
-        if (channel == comparisonChannel)
-        {
-            bridge.requestObj.selectedChannelList.erase(bridge.requestObj.selectedChannelList.begin() + index);
-            break;
-        }
-        index++;
-    }
+    bridge.requestObj.selectedChannelSet->erase(SelectedChannel(values->at(0), values->at(1), values->at(2), std::stoi(values->at(3)), values->at(4)));
 
     channelListBox.deleteSelected();
 
     delete values;
-    delete comparisonChannel;
 }
 
 void SetupWindow::onTriggerLevelTextChanged(Dewesoft::MUI::TextBox& txtBox, Dewesoft::MUI::EventArgs& args)
