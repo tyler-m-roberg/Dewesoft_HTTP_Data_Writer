@@ -21,15 +21,14 @@ public:
     void setupEnter();
     void setupLeave();
 
-    void addChannelsToTriggerChannelCBox(Dewesoft::MUI::ComboBox& comboBox);
-    void addChannelsToChannelSelectionCBox(Dewesoft::MUI::ComboBox& comboBox);
 
-    void addItemsToChannelListBox();
+    void addChannelsToTriggerChannelCBox(Dewesoft::MUI::ComboBox& comboBox);
+
+    void addItemsToChannelGrid();
     void addItemsToOptionsListBox(Dewesoft::MUI::WindowPtr ui, Dewesoft::MUI::StackPanel& stackPanel);
 
-    void addDataEntryTypeToCBox(Dewesoft::MUI::ComboBox& comboBox);
+
     void addEdgeCondToCBox(Dewesoft::MUI::ComboBox& comboBox);
-    void addChannelTypeToCBox(Dewesoft::MUI::ComboBox& comboBox);
 
 private:
     Dewesoft::MUI::Timer uiRefreshTimer;
@@ -45,7 +44,6 @@ private:
     void onTriggerChanChanged(Dewesoft::MUI::ComboBox& comboBox, Dewesoft::MUI::EventArgs& args);
     void onEdgeTypeChanged(Dewesoft::MUI::ComboBox& comboBox, Dewesoft::MUI::EventArgs& args);
     void onOptionsSelectionChanged(Dewesoft::MUI::CheckBox& checkBox, Dewesoft::MUI::EventArgs& args);
-    void onChannelTypeChanged(Dewesoft::MUI::ComboBox& comboBox, Dewesoft::MUI::EventArgs& args);
     void onUiRefreshTimer(Dewesoft::MUI::Timer& ctrl, Dewesoft::MUI::EventArgs& args);
     void templateSelectClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::EventArgs& args);
     void reportDirSelectClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::EventArgs& args);
@@ -53,20 +51,14 @@ private:
     void onCellInputEventHandler(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridCellInputArgs& args);
     void onCellActionEventHandler(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridCellActionEventArgs& args);
     void onGridComboItems(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridComboItemsArgs& args);
-    void onGridPopup(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridCellPopupMenuArgs& args);
 
     Dewesoft::MUI::TextBox triggerLevelTextBox;
     Dewesoft::MUI::TextBox templateFileTextBox;
     Dewesoft::MUI::TextBox reportDirTextBox;
     Dewesoft::MUI::TextBox reportNameTextBox;
-    Dewesoft::MUI::TextBox pageNumTextBox;
-    Dewesoft::MUI::TextBox cellRefTextBox;
 
     Dewesoft::MUI::ComboBox triggerChanCBox;
     Dewesoft::MUI::ComboBox edgeTypeCBox;
-    Dewesoft::MUI::ComboBox dataEntryTypeCBox;
-    Dewesoft::MUI::ComboBox channelSelectionCBox;
-    Dewesoft::MUI::ComboBox channelTypeCBox;
 
     Dewesoft::MUI::Button templateBtn;
     Dewesoft::MUI::Button reportDirBtn;

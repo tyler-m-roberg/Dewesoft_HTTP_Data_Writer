@@ -237,6 +237,8 @@ void Request::loadSetup(const NodePtr& node)
     node->read(u8"ReportDirectory", reportDirectory, 1);
     node->read(u8"ReportName", reportName, 1);
 
+    selectedChannelList.clear();
+
     const auto selectedChannelsNode = node->findChildNode(u8"SelectedChannels");
     if (!selectedChannelsNode)
     {

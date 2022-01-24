@@ -6,7 +6,6 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="290"/>
-            <RowDefinition Height="100"/>
             <RowDefinition Height="100%"/>
         </Grid.RowDefinitions>
 
@@ -74,57 +73,22 @@
 
             </Grid>
         </CaptionPanel>
-
-        <CaptionPanel Grid.Row="1" Grid.Column="0" Title="Add Channel" Name="addChannelPanel">
+        <CaptionPanel Grid.Row="1" Grid.Column="0" Title="Channels" Name="dsGridPanel">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="20"/>
                     <RowDefinition Height="20"/>
-                    <RowDefinition Height="20"/>
-                    <RowDefinition Height="20"/>
-                    <RowDefinition Height="20"/>
-                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="100%"/>
                 </Grid.RowDefinitions>
+
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="20"/>
-                    <ColumnDefinition Width="200"/>
-                    <ColumnDefinition Width="10"/>
-                    <ColumnDefinition Width="200"/>
-                    <ColumnDefinition Width="10"/>
-                    <ColumnDefinition Width="360"/>
-                    <ColumnDefinition Width="10"/>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="10"/>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="10"/>
-                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="5%"/>
+                    <ColumnDefinition Width="90%"/>
+                    <ColumnDefinition Width="5%"/>
                 </Grid.ColumnDefinitions>
-
-                <Label Grid.Row="1" Grid.Column="1"  Text="Data Entry Type" Name="dataEntryTypeLabel" Align="Fill" TextAlign="Center" FontWeight="Bold"/>
-                <ComboBox Grid.Row="2" Grid.Column="1" Name="dataEntryTypeCBox" />
-
-                <Label Grid.Row="1" Grid.Column="3" Text="Channel Type" Align="Fill" TextAlign="Center" FontWeight="Bold"/>
-                <ComboBox Grid.Row="2" Grid.Column="3" Name="channelTypeCBox"/>
-
-                <Label Grid.Row="1" Grid.Column="5" Text="Channel" Name="channelSelectionLabel" Align="Fill" TextAlign="Center" FontWeight="Bold"/>
-                <ComboBox Grid.Row="2" Grid.Column="5" Name="channelSelectionCBox"/>
-
-                <Label Grid.Row="1" Grid.Column="7" Text="Page #" Name ="pageNumLabel" Align="Fill" TextAlign="Center" FontWeight="Bold"/>
-                <TextBox Grid.Row="2" Grid.Column="7" Placeholder="1" Name="pageNumTextBox" ValidateType="Integer"/>
-
-                <Label Grid.Row="1" Grid.Column="9" Text="Cell / Starting Cell" Name="cellRefLabel" Align="Fill" TextAlign="Center" FontWeight="Bold"/>
-                <TextBox Grid.Row="2" Grid.Column="9" Placeholder="A1" Name="cellRefTextBox" TextHint="'A1'" />
-
-                <Button Grid.Row="2" Grid.Column="11" Label="Add Channel" Name="addChannelBtn" FontWeight="Bold" Align="Top"/>
-
-            </Grid>
-        </CaptionPanel>
-        <CaptionPanel Grid.Row="2" Grid.Column="0" Title="DS Grid" Name="dsGridPanel">
-            <Grid>
-
                 
-                <DSDrawGrid Name="selectedChannelsGrid" Align="Fill" MarginTop="5"/>
-                
+                <DSDrawGrid Grid.Row="2" Grid.Column="1" Name="selectedChannelsGrid" Align="Fill"/>
+                <Button Grid.Row="1" Grid.Column="1" Label="Add Channel" Name="addChannelBtn" FontWeight="Bold" Align="Top"/> 
 
             </Grid>
         </CaptionPanel>

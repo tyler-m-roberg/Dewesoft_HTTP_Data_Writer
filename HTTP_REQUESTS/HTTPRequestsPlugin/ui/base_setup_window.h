@@ -38,19 +38,9 @@ protected:
     Dewesoft::MUI::TextBox reportNameTextBox;
     Dewesoft::MUI::CaptionPanel optionsListPanel;
     Dewesoft::MUI::StackPanel optionsListStackPanel;
-    Dewesoft::MUI::CaptionPanel addChannelPanel;
-    Dewesoft::MUI::Label dataEntryTypeLabel;
-    Dewesoft::MUI::ComboBox dataEntryTypeCBox;
-    Dewesoft::MUI::ComboBox channelTypeCBox;
-    Dewesoft::MUI::Label channelSelectionLabel;
-    Dewesoft::MUI::ComboBox channelSelectionCBox;
-    Dewesoft::MUI::Label pageNumLabel;
-    Dewesoft::MUI::TextBox pageNumTextBox;
-    Dewesoft::MUI::Label cellRefLabel;
-    Dewesoft::MUI::TextBox cellRefTextBox;
-    Dewesoft::MUI::Button addChannelBtn;
     Dewesoft::MUI::CaptionPanel dsGridPanel;
     Dewesoft::MUI::DSDrawGrid selectedChannelsGrid;
+    Dewesoft::MUI::Button addChannelBtn;
 
     BaseSetupWindow(Dewesoft::MUI::WindowPtr& ui, DewesoftBridge& bridge, std::string pathToXmlFile) : DSWindow (ui, pathToXmlFile), bridge(bridge)
     {
@@ -72,18 +62,8 @@ protected:
         reportNameTextBox = Dewesoft::MUI::TextBox::Connect(ui, "reportNameTextBox");
         optionsListPanel = Dewesoft::MUI::CaptionPanel::Connect(ui, "optionsListPanel");
         optionsListStackPanel = Dewesoft::MUI::StackPanel::Connect(ui, "optionsListStackPanel");
-        addChannelPanel = Dewesoft::MUI::CaptionPanel::Connect(ui, "addChannelPanel");
-        dataEntryTypeLabel = Dewesoft::MUI::Label::Connect(ui, "dataEntryTypeLabel");
-        dataEntryTypeCBox = Dewesoft::MUI::ComboBox::Connect(ui, "dataEntryTypeCBox");
-        channelTypeCBox = Dewesoft::MUI::ComboBox::Connect(ui, "channelTypeCBox");
-        channelSelectionLabel = Dewesoft::MUI::Label::Connect(ui, "channelSelectionLabel");
-        channelSelectionCBox = Dewesoft::MUI::ComboBox::Connect(ui, "channelSelectionCBox");
-        pageNumLabel = Dewesoft::MUI::Label::Connect(ui, "pageNumLabel");
-        pageNumTextBox = Dewesoft::MUI::TextBox::Connect(ui, "pageNumTextBox");
-        cellRefLabel = Dewesoft::MUI::Label::Connect(ui, "cellRefLabel");
-        cellRefTextBox = Dewesoft::MUI::TextBox::Connect(ui, "cellRefTextBox");
-        addChannelBtn = Dewesoft::MUI::Button::Connect(ui, "addChannelBtn");
         dsGridPanel = Dewesoft::MUI::CaptionPanel::Connect(ui, "dsGridPanel");
         selectedChannelsGrid = Dewesoft::MUI::DSDrawGrid::Connect(ui, "selectedChannelsGrid");
+        addChannelBtn = Dewesoft::MUI::Button::Connect(ui, "addChannelBtn");
     }
 };

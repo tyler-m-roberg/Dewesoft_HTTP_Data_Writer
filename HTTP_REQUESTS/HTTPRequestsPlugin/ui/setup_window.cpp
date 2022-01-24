@@ -29,14 +29,9 @@ SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
     templateFileTextBox = TextBox::Connect(ui, "templateFileTextBox");
     reportDirTextBox = TextBox::Connect(ui, "reportDirTextBox");
     reportNameTextBox = TextBox::Connect(ui, "reportNameTextBox");
-    pageNumTextBox = TextBox::Connect(ui, "pageNumTextBox");
-    cellRefTextBox = TextBox::Connect(ui, "cellRefTextBox");
 
     triggerChanCBox = ComboBox::Connect(ui, "triggerChanCBox");
     edgeTypeCBox = ComboBox::Connect(ui, "edgeTypeCBox");
-    dataEntryTypeCBox = ComboBox::Connect(ui, "dataEntryTypeCBox");
-    channelSelectionCBox = ComboBox::Connect(ui, "channelSelectionCBox");
-    channelTypeCBox = ComboBox::Connect(ui, "channelTypeCBox");
 
     templateBtn = Button::Connect(ui, "templateBtn");
     reportDirBtn = Button::Connect(ui, "reportDirBtn");
@@ -45,12 +40,6 @@ SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
 
     optionsStackPanel = StackPanel::Connect(ui, "optionsListStackPanel");
     //********************************************************************
-
-    // Fill CBoxes that only need one write;
-    addDataEntryTypeToCBox(dataEntryTypeCBox);
-    addEdgeCondToCBox(edgeTypeCBox);
-    addChannelTypeToCBox(channelTypeCBox);
-    //*******************************************************************
 
     // Add submit event to addChannelBtn
     addChannelBtn.OnClick += event(&SetupWindow::onAddChannelClick);
@@ -62,7 +51,6 @@ SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
     reportNameTextBox.OnTextChanged += event(&SetupWindow::onReportNameTextChanged);
     triggerChanCBox.OnSelectedIndexChanged += event(&SetupWindow::onTriggerChanChanged);
     edgeTypeCBox.OnSelectedIndexChanged += event(&SetupWindow::onEdgeTypeChanged);
-    channelTypeCBox.OnSelectedIndexChanged += event(&SetupWindow::onChannelTypeChanged);
     templateBtn.OnClick += event(&SetupWindow::templateSelectClick);
     reportDirBtn.OnClick += event(&SetupWindow::reportDirSelectClick);
     uiRefreshTimer.OnTimer += event(&SetupWindow::onUiRefreshTimer);
@@ -82,12 +70,23 @@ SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
      *     width,
      *     key/property
      */
-    selectedChannelsGrid.setColumn(0, "Data Entry Type", ctCombobox, RtTrue, 200, "dataEntryTypeDSGrid");
-    selectedChannelsGrid.setColumn(1, "Channel Type", ctCombobox, RtTrue, 200, "channelTypeDSGrid");
-    selectedChannelsGrid.setColumn(2, "Channel", ctCombobox, RtTrue, 360, "channelDSGrid");
-    selectedChannelsGrid.setColumn(3, "Page #", ctEditNumber, RtTrue, 100, "pageNumDSGrid");
-    selectedChannelsGrid.setColumn(4, "Cell / Starting Cell", ctEditText, RtTrue, 100, "cellRefDSGrid");
-    selectedChannelsGrid.setColumn(5, "Delete", ctButton, RtTrue, 100, "deleteDSGrid");
+
+    int columnWidths[] = {selectedChannelsGrid.getWidth() * 0.2,
+                          selectedChannelsGrid.getWidth() * 0.2,
+                          selectedChannelsGrid.getWidth() * 0.3,
+                          selectedChannelsGrid.getWidth() * 0.1,
+                          selectedChannelsGrid.getWidth() * 0.1,
+                          selectedChannelsGrid.getWidth() * 0.1
+    };
+
+    selectedChannelsGrid.setColumn(0, "Data Entry Type", ctCombobox, RtTrue, columnWidths[0], "dataEntryTypeDSGrid");
+    selectedChannelsGrid.setColumn(1, "Channel Type", ctCombobox, RtTrue, columnWidths[1], "channelTypeDSGrid");
+    selectedChannelsGrid.setColumn(2, "Channel", ctCombobox, RtTrue, columnWidths[2], "channelDSGrid");
+    selectedChannelsGrid.setColumn(3, "Page #", ctEditNumber, RtTrue, columnWidths[3], "pageNumDSGrid");
+    selectedChannelsGrid.setColumn(4, "Cell / Starting Cell", ctEditText, RtTrue, columnWidths[4], "cellRefDSGrid");
+    selectedChannelsGrid.setColumn(5, "Delete", ctButton, RtTrue, columnWidths[5], "deleteDSGrid");
+
+    addChannelBtn.setWidth(selectedChannelsGrid.getWidth());
 
     //// Set default number fromat for "ctNum" (row number) to not have decimals
     selectedChannelsGrid.getColumn(3).setNumberFormat(cfInteger);
@@ -99,7 +98,6 @@ SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
     selectedChannelsGrid.OnCellInput += event(&SetupWindow::onCellInputEventHandler);
     selectedChannelsGrid.OnCellAction += event(&SetupWindow::onCellActionEventHandler);
     selectedChannelsGrid.OnCellGetComboItems += event(&SetupWindow::onGridComboItems);
-    selectedChannelsGrid.OnCellPopupMenu += event(&SetupWindow::onGridPopup);
 }
 
 SetupWindow::~SetupWindow()
@@ -110,10 +108,10 @@ void SetupWindow::setupEnter()
 {
     // Fill comboboxes for channels
     addChannelsToTriggerChannelCBox(triggerChanCBox);
-    addChannelsToChannelSelectionCBox(channelSelectionCBox);
+    addEdgeCondToCBox(edgeTypeCBox);
 
     // Add saved items to list box
-    addItemsToChannelListBox();
+    addItemsToChannelGrid();
 
     addItemsToOptionsListBox(uiPtr, optionsStackPanel);
 
@@ -149,7 +147,13 @@ void SetupWindow::addChannelsToTriggerChannelCBox(Dewesoft::MUI::ComboBox& combo
     }
 }
 
-void SetupWindow::addItemsToChannelListBox()
+void SetupWindow::addEdgeCondToCBox(Dewesoft::MUI::ComboBox& comboBox)
+{
+    comboBox.addItem("Rising");
+    comboBox.addItem("Falling");
+}
+
+void SetupWindow::addItemsToChannelGrid()
 {
 
     selectedChannelsGrid.setGridSize(bridge.requestObj.selectedChannelList.size() + 1, CHANNEL_GRID_COLUMN_WIDTH);
@@ -199,47 +203,14 @@ void SetupWindow::addItemsToOptionsListBox(WindowPtr ui, Dewesoft::MUI::StackPan
     stackPanel.addControl(blankLabel);
 }
 
-void SetupWindow::addChannelsToChannelSelectionCBox(Dewesoft::MUI::ComboBox& comboBox)
-{
-    comboBox.clear();
-
-    std::vector<IChannelPtr> channelPtrs = bridge.getUsedChannelsForUI();
-
-    for (int x = 0; x < channelPtrs.size(); x++)
-    {
-        std::string channelName = channelPtrs[x]->GetName();
-
-        comboBox.addItem(channelName);
-    }
-}
-
-void SetupWindow::addEdgeCondToCBox(Dewesoft::MUI::ComboBox& comboBox)
-{
-    comboBox.clear();
-    comboBox.addItem("Rising");
-    comboBox.addItem("Falling");
-}
-
-void SetupWindow::addDataEntryTypeToCBox(Dewesoft::MUI::ComboBox& comboBox)
-{
-    comboBox.addItem("Single Value");
-    comboBox.addItem("Multi Value");
-}
-
-void SetupWindow::addChannelTypeToCBox(Dewesoft::MUI::ComboBox& comboBox)
-{
-    comboBox.addItem("Standard Channel");
-    comboBox.addItem("Special Channel");
-}
-
 // Get information from UI and add to listbox and create a relay using bridge function
 void SetupWindow::onAddChannelClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI::EventArgs& args)
 {
-    std::string dataEntryType = dataEntryTypeCBox.getSelectedItem().toStdString();
-    std::string channelType = channelTypeCBox.getSelectedItem().toStdString();
-    std::string selectedChannel = channelSelectionCBox.getSelectedItem().toStdString();
-    int pageNum = std::stoi(pageNumTextBox.getText().toStdString());
-    std::string cellRef = cellRefTextBox.getText().toStdString();
+    std::string dataEntryType = "Single Value";
+    std::string channelType = "Standard Channel";
+    std::string selectedChannel = bridge.getUsedChannelsForUI()[0]->GetName();
+    int pageNum = 1;
+    std::string cellRef = "A1";
 
     bridge.requestObj.selectedChannelList.emplace_back(dataEntryType, channelType, selectedChannel, pageNum, cellRef);
     selectedChannelsGrid.setGridSize(bridge.requestObj.selectedChannelList.size() + 1, CHANNEL_GRID_COLUMN_WIDTH);
@@ -272,22 +243,6 @@ void SetupWindow::onTriggerChanChanged(Dewesoft::MUI::ComboBox& comboBox, Deweso
 void SetupWindow::onEdgeTypeChanged(Dewesoft::MUI::ComboBox& comboBox, Dewesoft::MUI::EventArgs& args)
 {
     bridge.requestObj.edgeType = comboBox.getSelectedItem();
-}
-
-void SetupWindow::onChannelTypeChanged(Dewesoft::MUI::ComboBox& comboBox, Dewesoft::MUI::EventArgs& args)
-{
-    channelSelectionCBox.clear();
-    if (!comboBox.getSelectedItem().toStdString().compare("Special Channel"))
-    {
-        for (auto& specialChan : bridge.requestObj.specialChannelsList)
-        {
-            channelSelectionCBox.addItem(specialChan);
-        }
-    }
-    else
-    {
-        addChannelsToChannelSelectionCBox(channelSelectionCBox);
-    }
 }
 
 void SetupWindow::onOptionsSelectionChanged(Dewesoft::MUI::CheckBox& checkBox, Dewesoft::MUI::EventArgs& args)
@@ -386,7 +341,7 @@ void SetupWindow::onGridGetProps(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI:
                 args.setText(bridge.requestObj.selectedChannelList[row - 1].getColItem(col));
                 break;
             case 5:
-                args.setText("-");
+                args.setText("...");
                 break;
             default:
                 break;
@@ -510,8 +465,3 @@ void SetupWindow::onGridComboItems(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MU
     }
 }
 
-void SetupWindow::onGridPopup(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridCellPopupMenuArgs& args)
-{
-    int row = args.getRow();
-    int col = args.getColumn();
-}
