@@ -71,18 +71,16 @@ Request::Request(InputManagerImpl& inputManager,
     , reportDirectory(reportDirectory)
     , reportName(reportName)
 {
-
-    //Add additional options to object
+    // Add additional options to object
     additionalOptionsList.emplace_back("Append Date To Report Filename", false);
     additionalOptionsList.emplace_back("Open Excel On New Data", false);
     additionalOptionsList.emplace_back("Force Close Excel On New Data", false);
     additionalOptionsList.emplace_back("Create New File On Write Error", false);
     additionalOptionsList.emplace_back("Use Relative Report Directories", false);
 
-    //Define special channels
+    // Define special channels
     specialChannelsList.emplace_back("Filename");
     specialChannelsList.emplace_back("Date");
-
 }
 
 void Request::getData(const AcquiredDataInfo& acquiredDataInfo, const _bstr_t& usedDataFile)
@@ -91,8 +89,8 @@ void Request::getData(const AcquiredDataInfo& acquiredDataInfo, const _bstr_t& u
     if (triggerChannelPtr == nullptr)
         return;
 
-    //Verify channel pointers are set and return if not
-    
+    // Verify channel pointers are set and return if not
+
     for (auto& selectedChannel : selectedChannelList)
     {
         if (selectedChannel.channelPtr == nullptr && !selectedChannel.channelType.compare("Standard Channel"))
@@ -116,83 +114,86 @@ void Request::getData(const AcquiredDataInfo& acquiredDataInfo, const _bstr_t& u
 
     postData["Options_Opt"] = additionalOptionsJSON;  // Add additional options JSON object to post data object
 
-    //Get min blocksize to read
+    // Get min blocksize to read
     int minBlockSizeValue = minBlockSize();
 
-    //Loop through samples up to the minimum block size to not read outside of channel memory of smaller channels
+    // Loop through samples up to the minimum block size to not read outside of channel memory of smaller channels
     for (int i = 0; i < minBlockSizeValue - 1; i++)
     {
-        //Get current and next sample of trigger channel for trigger logic. Logic allows loop back of sample buffer
+        // Get current and next sample of trigger channel for trigger logic. Logic allows loop back of sample buffer
         float currentSampleTriggerChannel = triggerChannelPtr->DBValues[lastPosChecked % triggerChannelPtr->DBBufSize];
         float nextSampleTriggerChannel = triggerChannelPtr->DBValues[(lastPosChecked + 1) % triggerChannelPtr->DBBufSize];
 
-        //Check trigger based on edge type and samples
+        // Check trigger based on edge type and samples
         if (checkTrigger(edgeType, currentSampleTriggerChannel, nextSampleTriggerChannel))
         {
-            nlohmann::json selectedChannelsJSON; //Create JSON object to hold channel informaiton
+            nlohmann::json selectedChannelsJSON;  // Create JSON object to hold channel informaiton
 
-            //Loop through selected channel list to build JSON object
-            for (auto& selectedChannel : selectedChannelList)
+            // Loop through selected channel list to build JSON object
+            std::vector<SelectedChannel>::iterator selectedChannel;
+            for (selectedChannel = selectedChannelList.begin(); selectedChannel != selectedChannelList.end(); ++selectedChannel)
             {
                 // Run if channel is standard channel
-                if (!selectedChannel.channelType.compare("Standard Channel"))
+                if (!selectedChannel->channelType.compare("Standard Channel"))
                 {
-                    selectedChannel.dataType = selectedChannel.channelPtr->DataType;
+                    selectedChannel->dataType = selectedChannel->channelPtr->DataType;
 
                     // If selected type is text update text value
-                    if (selectedChannel.dataType == 11)
-                        selectedChannel.text = selectedChannel.channelPtr->Text;
+                    if (selectedChannel->dataType == 11)
+                        selectedChannel->text = selectedChannel->channelPtr->Text;
 
                     // If is single value use single value accessor
-                    else if (selectedChannel.channelPtr->IsSingleValue)
-                        selectedChannel.channelValue = selectedChannel.channelPtr->SingleValue;
+                    else if (selectedChannel->channelPtr->IsSingleValue)
+                        selectedChannel->channelValue = selectedChannel->channelPtr->SingleValue;
 
                     // Channel is async use get value at abs position to read in seek nearest async value
-                    else if (selectedChannel.channelPtr->Async)
+                    else if (selectedChannel->channelPtr->Async)
                     {
                         long* seekPos = new long;
-                        selectedChannel.channelValue =
-                            selectedChannel.channelPtr->GetValueAtAbsPosDouble((long) lastPosChecked, seekPos, false);
+                        selectedChannel->channelValue =
+                            selectedChannel->channelPtr->GetValueAtAbsPosDouble((long) lastPosChecked, seekPos, false);
 
                         delete seekPos;
                     }
 
                     // If value is normal numeric channel get numeric value of channel
                     else
-                        selectedChannel.channelValue =
-                            selectedChannel.channelPtr->DBValues[(lastPosChecked + 1) % selectedChannel.channelPtr->DBBufSize];
+                    {
+                        double value = selectedChannel->channelPtr->DBValues[(lastPosChecked + 1) % selectedChannel->channelPtr->DBBufSize];
+                        selectedChannel->channelValue = value;
+                    }
                 }
 
                 // Handle speical channel cases
                 else
                 {
                     // Handle special channel used file name
-                    if (!selectedChannel.channelName.compare("Filename"))
+                    if (!selectedChannel->channelName.compare("Filename"))
                     {
                         // Use codevect to convert file name to std string from _bstr_t
                         // Warning codevect is depricated, no suitable alternatives replace when available
                         std::string filename = std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(usedDataFile);
 
                         // Set text to file name and data type to text
-                        selectedChannel.text = filename;
-                        selectedChannel.dataType = 11;
+                        selectedChannel->text = filename;
+                        selectedChannel->dataType = 11;
                     }
                 }
 
                 // Add channel to JSON object
-                selectedChannelsJSON.push_back(selectedChannel.toJson());
+                selectedChannelsJSON.push_back(selectedChannel->toJson());
             }
 
-            postData["SelectedChannels"] = selectedChannelsJSON; //Add selected channels to main request JSON Object
+            postData["SelectedChannels"] = selectedChannelsJSON;  // Add selected channels to main request JSON Object
 
-            std::thread threadObj(curlThread, postData.dump(), requestEndpoint);  // Create new thread of curlThread with JSON postData as string
-            threadObj.detach();                                  // Detatch thread to allow unblocking execution
+            std::thread threadObj(
+                curlThread, postData.dump(), requestEndpoint);  // Create new thread of curlThread with JSON postData as string
+            threadObj.detach();                                 // Detatch thread to allow unblocking execution
         }
 
-        //Increment position in data buffer to check for data
+        // Increment position in data buffer to check for data
         lastPosChecked++;
     }
-    
 }
 
 void Request::saveSetup(const NodePtr& node) const
@@ -315,7 +316,6 @@ void Request::clear()
     }
 }
 
-
 bool Request::checkTrigger(std::string edgeType, float currentSample, float nextSample)
 {
     if (!edgeType.compare("Rising"))
@@ -359,6 +359,3 @@ std::string Request::getDefaultRequestEndpoint()
 {
     return defaultRequestEndpoint;
 }
-
-
-

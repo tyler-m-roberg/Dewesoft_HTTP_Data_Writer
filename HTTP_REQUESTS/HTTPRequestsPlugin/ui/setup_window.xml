@@ -78,6 +78,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="20"/>
                     <RowDefinition Height="20"/>
+                    <RowDefinition Height="10"/>
                     <RowDefinition Height="100%"/>
                 </Grid.RowDefinitions>
 
@@ -87,7 +88,7 @@
                     <ColumnDefinition Width="5%"/>
                 </Grid.ColumnDefinitions>
                 
-                <DSDrawGrid Grid.Row="2" Grid.Column="1" Name="selectedChannelsGrid" Align="Fill"/>
+                <DSDrawGrid Grid.Row="3" Grid.Column="1" Name="selectedChannelsGrid" Align="Fill"/>
                 <Button Grid.Row="1" Grid.Column="1" Label="Add Channel" Name="addChannelBtn" FontWeight="Bold" Align="Top"/> 
 
             </Grid>
