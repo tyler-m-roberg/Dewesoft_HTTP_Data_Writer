@@ -39,6 +39,7 @@ SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
     addChannelBtn = Button::Connect(ui, "addChannelBtn");
 
     optionsStackPanel = StackPanel::Connect(ui, "optionsListStackPanel");
+    addEdgeCondToCBox(edgeTypeCBox);
     //********************************************************************
 
     // Add submit event to addChannelBtn
@@ -108,7 +109,7 @@ void SetupWindow::setupEnter()
 {
     // Fill comboboxes for channels
     addChannelsToTriggerChannelCBox(triggerChanCBox);
-    addEdgeCondToCBox(edgeTypeCBox);
+    
 
     // Add saved items to list box
     addItemsToChannelGrid();

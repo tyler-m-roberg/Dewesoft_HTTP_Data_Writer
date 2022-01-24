@@ -1,6 +1,16 @@
-﻿  Request.cpp
+﻿  AdditionalOptions.cpp
+  Request.cpp
+c:\users\theoz\appdata\local\dewesoft extensions\library\dcomlib\include\dcomlib\dcom_utils\plugin_types.h(6): warning C4278: 'GetCurrentTime': identifier in type library 'C:\Program Files\DewesoftX\Bin64\Dewesoft.exe' is already a macro; use the 'rename' qualifier
+c:\users\theoz\appdata\local\dewesoft extensions\library\dcomlib\include\dcomlib\dcom_utils\plugin_types.h(6): warning C4278: 'TextOut': identifier in type library 'C:\Program Files\DewesoftX\Bin64\Dewesoft.exe' is already a macro; use the 'rename' qualifier
 c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\x64\release\intermediate\dewesoft.tlh(12488): warning C4002: too many arguments for function-like macro invocation 'GetCurrentTime'
 c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\x64\release\intermediate\dewesoft.tlh(15430): warning C4002: too many arguments for function-like macro invocation 'GetCurrentTime'
 c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(306): warning C4834: discarding return value of function with 'nodiscard' attribute
 c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\request.cpp(307): warning C4553: '==': result of expression not used; did you intend '='?
+  SelectedChannel.cpp
+c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\x64\release\intermediate\dewesoft.tlh(12488): warning C4002: too many arguments for function-like macro invocation 'GetCurrentTime'
+c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\x64\release\intermediate\dewesoft.tlh(15430): warning C4002: too many arguments for function-like macro invocation 'GetCurrentTime'
+  SelectedChannelProperties.cpp
+c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\x64\release\intermediate\dewesoft.tlh(12488): warning C4002: too many arguments for function-like macro invocation 'GetCurrentTime'
+c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\x64\release\intermediate\dewesoft.tlh(15430): warning C4002: too many arguments for function-like macro invocation 'GetCurrentTime'
+  TextualChannel.cpp
   HTTPRequestsPluginLib.vcxproj -> C:\Users\theoz\OneDrive\Documents\GitHub\Dewesoft_HTTP_Data_Writer\x64\Release\HTTPRequestsPluginLib.lib
