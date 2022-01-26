@@ -105,6 +105,7 @@ void DewesoftBridge::onPreInitiate()
 
 void DewesoftBridge::onStartData()
 {
+    requestObj.lastPosChecked = 0;
 }
 
 void DewesoftBridge::onGetData(const AcquiredDataInfo& acquiredDataInfo)

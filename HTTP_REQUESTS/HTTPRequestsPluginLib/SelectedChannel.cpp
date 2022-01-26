@@ -19,8 +19,7 @@ SelectedChannel::SelectedChannel(std::string dataEntryType,
     , pageNum(pageNum)
     , cellRef(cellRef)
 {
-    channelValue = 0.0;
-    text = "";
+
 }
 
 void SelectedChannel::saveSetup(const NodePtr& node) const

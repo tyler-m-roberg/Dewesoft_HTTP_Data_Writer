@@ -153,13 +153,12 @@ void Request::getData(const AcquiredDataInfo& acquiredDataInfo, const _bstr_t& u
                         selectedChannel->channelValue =
                             selectedChannel->channelPtr->GetValueAtAbsPosDouble((long) lastPosChecked, seekPos, false);
 
-                        delete seekPos;
                     }
 
                     // If value is normal numeric channel get numeric value of channel
                     else
                     {
-                        double value = selectedChannel->channelPtr->DBValues[(lastPosChecked + 1) % selectedChannel->channelPtr->DBBufSize];
+                        float value = selectedChannel->channelPtr->DBValues[(lastPosChecked + 1) % selectedChannel->channelPtr->DBBufSize];
                         selectedChannel->channelValue = value;
                     }
                 }
@@ -238,8 +237,6 @@ void Request::loadSetup(const NodePtr& node)
     node->read(u8"ReportDirectory", reportDirectory, 1);
     node->read(u8"ReportName", reportName, 1);
 
-    selectedChannelList.clear();
-
     const auto selectedChannelsNode = node->findChildNode(u8"SelectedChannels");
     if (!selectedChannelsNode)
     {
@@ -309,6 +306,8 @@ void Request::clear()
     templateFile = "";
     reportDirectory = "";
     reportName = "";
+
+     selectedChannelList.clear();
 
     for (auto& option : additionalOptionsList)
     {

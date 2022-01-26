@@ -38,10 +38,9 @@ namespace HTTP_Requests
         std::string channelName;
         int pageNum;
         std::string cellRef;
-        
         long dataType;
         std::string text;
-        double channelValue;
+        float channelValue;
         IChannelPtr channelPtr;
     };
 }
