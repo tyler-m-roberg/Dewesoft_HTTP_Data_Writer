@@ -21,12 +21,10 @@ public:
     void setupEnter();
     void setupLeave();
 
-
     void addChannelsToTriggerChannelCBox(Dewesoft::MUI::ComboBox& comboBox);
 
     void addItemsToChannelGrid();
     void addItemsToOptionsListBox(Dewesoft::MUI::WindowPtr ui, Dewesoft::MUI::StackPanel& stackPanel);
-
 
     void addEdgeCondToCBox(Dewesoft::MUI::ComboBox& comboBox);
 

@@ -77,8 +77,7 @@ SetupWindow::SetupWindow(WindowPtr ui, DewesoftBridge& bridge)
                           selectedChannelsGrid.getWidth() * 0.3,
                           selectedChannelsGrid.getWidth() * 0.1,
                           selectedChannelsGrid.getWidth() * 0.1,
-                          selectedChannelsGrid.getWidth() * 0.1
-    };
+                          selectedChannelsGrid.getWidth() * 0.1};
 
     selectedChannelsGrid.setColumn(0, "Data Entry Type", ctCombobox, RtTrue, columnWidths[0], "dataEntryTypeDSGrid");
     selectedChannelsGrid.setColumn(1, "Channel Type", ctCombobox, RtTrue, columnWidths[1], "channelTypeDSGrid");
@@ -109,7 +108,6 @@ void SetupWindow::setupEnter()
 {
     // Fill comboboxes for channels
     addChannelsToTriggerChannelCBox(triggerChanCBox);
-    
 
     // Add saved items to list box
     addItemsToChannelGrid();
@@ -156,7 +154,6 @@ void SetupWindow::addEdgeCondToCBox(Dewesoft::MUI::ComboBox& comboBox)
 
 void SetupWindow::addItemsToChannelGrid()
 {
-
     selectedChannelsGrid.setGridSize(bridge.requestObj.selectedChannelList.size() + 1, CHANNEL_GRID_COLUMN_WIDTH);
 
     //// we're done setting column info
@@ -314,7 +311,28 @@ void SetupWindow::reportDirSelectClick(Dewesoft::MUI::Button& btn, Dewesoft::MUI
 void SetupWindow::onUiRefreshTimer(Timer& ctrl, Dewesoft::MUI::EventArgs& args)
 {
     if (selectedChannelsGrid.assigned())
+    {
+        int columnWidths[] = {selectedChannelsGrid.getWidth() * 0.2,
+                              selectedChannelsGrid.getWidth() * 0.2,
+                              selectedChannelsGrid.getWidth() * 0.3,
+                              selectedChannelsGrid.getWidth() * 0.1,
+                              selectedChannelsGrid.getWidth() * 0.1,
+                              selectedChannelsGrid.getWidth() * 0.1};
+
+        selectedChannelsGrid.getColumn(0).setWidth(columnWidths[0]);
+        selectedChannelsGrid.getColumn(1).setWidth(columnWidths[1]);
+        selectedChannelsGrid.getColumn(2).setWidth(columnWidths[2]);
+        selectedChannelsGrid.getColumn(3).setWidth(columnWidths[3]);
+        selectedChannelsGrid.getColumn(4).setWidth(columnWidths[4]);
+        selectedChannelsGrid.getColumn(5).setWidth(columnWidths[5]);
+
+        addChannelBtn.setWidth(selectedChannelsGrid.getWidth());
+
+        //// we're done setting column info
+        selectedChannelsGrid.applyColumns();
+
         selectedChannelsGrid.invalidate();
+    }
 }
 
 void SetupWindow::onGridGetProps(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MUI::DrawGridCellPropsArgs& args)
@@ -368,16 +386,15 @@ void SetupWindow::onCellInputEventHandler(Dewesoft::MUI::DSDrawGrid& grid, Dewes
 
                 if (!args.getText().toStdString().compare("Standard Channel"))
                 {
-
                     if (bridge.getUsedChannelsForUI().size() > 0)
                     {
                         std::string channelName = bridge.getUsedChannelsForUI()[0]->GetName();
                         bridge.requestObj.selectedChannelList[row - 1].setColItem((col + 1), channelName);
                     }
-                 }
+                }
                 else
                 {
-                    if(bridge.requestObj.specialChannelsList.size() > 0)
+                    if (bridge.requestObj.specialChannelsList.size() > 0)
                         bridge.requestObj.selectedChannelList[row - 1].setColItem((col + 1), bridge.requestObj.specialChannelsList[0]);
                 }
 
@@ -455,7 +472,7 @@ void SetupWindow::onGridComboItems(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MU
                 {
                     for (auto& specialChan : bridge.requestObj.specialChannelsList)
                     {
-                       args.add(specialChan);
+                        args.add(specialChan);
                     }
                 }
             }
@@ -465,4 +482,3 @@ void SetupWindow::onGridComboItems(Dewesoft::MUI::DSDrawGrid& grid, Dewesoft::MU
             break;
     }
 }
-
