@@ -105,7 +105,7 @@ void DewesoftBridge::onPreInitiate()
 
 void DewesoftBridge::onStartData()
 {
-    requestObj.lastPosChecked = 0;
+    requestObj.lastPosCheckedTrigger = 0;
 }
 
 void DewesoftBridge::onGetData(const AcquiredDataInfo& acquiredDataInfo)
@@ -128,9 +128,11 @@ void DewesoftBridge::onStartStoring()
     for (auto& selectedChannel : requestObj.selectedChannelList)
     {
         selectedChannel.channelPtr = getIChannelPtrFromChannelName(selectedChannel.channelName);
+        selectedChannel.lastPos = 0;
     }
 
     requestObj.triggerChannelPtr = getIChannelPtrFromChannelName(requestObj.triggerChannel);
+    requestObj.lastPosCheckedTrigger = 0;
 }
 
 void DewesoftBridge::onStopStoring()

@@ -42,5 +42,7 @@ namespace HTTP_Requests
         std::string text;
         float channelValue;
         IChannelPtr channelPtr;
+
+        uint64_t lastPos;
     };
 }

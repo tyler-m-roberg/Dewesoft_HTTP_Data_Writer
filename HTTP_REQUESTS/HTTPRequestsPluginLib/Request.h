@@ -13,61 +13,88 @@ class DewesoftBridge;
 namespace HTTP_Requests
 {
 
-    class Request
-    {
-    public:
-        using InputManagerImpl = Dewesoft::Utils::Dcom::InputChannel::InputManagerImpl;
-        using AcquiredDataInfo = Dewesoft::Utils::Dcom::InputChannel::AcquiredDataInfo;
+class Request
+{
+public:
+    using InputManagerImpl = Dewesoft::Utils::Dcom::InputChannel::InputManagerImpl;
+    using AcquiredDataInfo = Dewesoft::Utils::Dcom::InputChannel::AcquiredDataInfo;
 
-        explicit Request(InputManagerImpl& inputManager, IAppPtr app);
+    explicit Request(InputManagerImpl& inputManager, IAppPtr app);
 
-        explicit Request(InputManagerImpl& inputManager,
-                         IAppPtr app,
-                         std::string triggerChannel,
-                         double triggerLevel,
-                         std::string edgeType,
-                         std::string templateFile,
-                         std::string reportDirectory,
-                         std::string reportName);
+    explicit Request(InputManagerImpl& inputManager,
+                     IAppPtr app,
+                     std::string triggerChannel,
+                     double triggerLevel,
+                     std::string edgeType,
+                     std::string templateFile,
+                     std::string reportDirectory,
+                     std::string reportName);
 
-        void getData(const AcquiredDataInfo& acquiredDataInfo,const _bstr_t& usedFile);
-        int minBlockSize();
-        int getBlockSize(IChannelPtr channel);
-        bool checkTrigger(std::string edgeType, float currentSample, float nextSample);
+    void getData(const AcquiredDataInfo& acquiredDataInfo, const _bstr_t& usedFile);
+    int minBlockSize();
+    static int getBlockSize(IChannelPtr channel, uint64_t lastPosChecked);
+    static bool checkTrigger(const std::string& edgeType,
+                             const double& triggerLevel,
+                             const double& currentSample,
+                             const double& nextSample);
 
-        void saveSetup(const Dewesoft::Utils::Serialization::NodePtr& node) const;
-        void saveSettings(const Dewesoft::Utils::Serialization::NodePtr& node) const;
+    void saveSetup(const Dewesoft::Utils::Serialization::NodePtr& node) const;
+    void saveSettings(const Dewesoft::Utils::Serialization::NodePtr& node) const;
 
-        void loadSetup(const Dewesoft::Utils::Serialization::NodePtr& node);
-        void loadSettings(const Dewesoft::Utils::Serialization::NodePtr& node);
+    void loadSetup(const Dewesoft::Utils::Serialization::NodePtr& node);
+    void loadSettings(const Dewesoft::Utils::Serialization::NodePtr& node);
 
-        void clear();
+    void clear();
 
-        std::string triggerChannel;
-        IChannelPtr triggerChannelPtr;
-        double triggerLevel;
-        std::string edgeType;
-        std::string templateFile;
-        std::string reportDirectory;
-        std::string reportName;
+    static void curlThread(std::string data, std::string endpoint);
+    static double getTriggerTimeThread(IChannelPtr channel,
+                                       uint64_t* lastPosChecked,
+                                       const double& triggerValue,
+                                       const std::string& edgeType);
 
+    std::string triggerChannel;
+    IChannelPtr triggerChannelPtr;
+    double triggerLevel;
+    std::string edgeType;
+    std::string templateFile;
+    std::string reportDirectory;
+    std::string reportName;
 
-        int64_t lastPosChecked;
+    long long pointerValue;
+    double* valueP;
+    long dataType;
+    double deref;
+    double deref1;
+    double deref2;
+    double deref3;
+    long dbpos;
+    long dbuffsize;
 
-        std::vector<AdditionalOptions> additionalOptionsList;
-        std::vector<SelectedChannel> selectedChannelList;
-        std::vector<std::string> specialChannelsList;
+    double* timeP;
 
-        InputManagerImpl& inputManager;
-        IAppPtr app;
+    double time;
+    double time1;
+    double time2;
+    double time3;
+    bool triggered;
 
-        std::string getDefaultRequestEndpoint();
-        std::string requestEndpoint;
+    double threadReturn;
 
-        bool useDefaultRequestEndpoint;
+    uint64_t lastPosCheckedTrigger;
 
-     private:
-        std::string defaultRequestEndpoint = "localhost/dewesoft/realtime_excel/";
+    std::vector<AdditionalOptions> additionalOptionsList;
+    std::vector<SelectedChannel> selectedChannelList;
+    std::vector<std::string> specialChannelsList;
 
-    };
+    InputManagerImpl& inputManager;
+    IAppPtr app;
+
+    std::string getDefaultRequestEndpoint();
+    std::string requestEndpoint;
+
+    bool useDefaultRequestEndpoint;
+
+private:
+    std::string defaultRequestEndpoint = "localhost/dewesoft/realtime_excel/";
+};
 }  // namespace HTTP_Requests
