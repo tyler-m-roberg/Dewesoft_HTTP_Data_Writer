@@ -40,7 +40,7 @@ namespace HTTP_Requests
         std::string cellRef;
         long dataType;
         std::string text;
-        float channelValue;
+        double channelValue;
         IChannelPtr channelPtr;
 
         uint64_t lastPos;
