@@ -61,26 +61,6 @@ public:
     std::string reportDirectory;
     std::string reportName;
 
-    long long pointerValue;
-    double* valueP;
-    long dataType;
-    double deref;
-    double deref1;
-    double deref2;
-    double deref3;
-    long dbpos;
-    long dbuffsize;
-
-    double* timeP;
-
-    double time;
-    double time1;
-    double time2;
-    double time3;
-    bool triggered;
-
-    double threadReturn;
-
     uint64_t lastPosCheckedTrigger;
 
     std::vector<AdditionalOptions> additionalOptionsList;

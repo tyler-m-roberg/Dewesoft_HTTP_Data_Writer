@@ -5,44 +5,45 @@
 #include <dcomlib/dcom_output_channel/output_channel.h>
 #include <commonlib/serialization/node.h>
 #include <dcomlib/dcom_input_channel/input_manager_impl.h>
+#include <thread>
+#include <future>
 
 using json = nlohmann::json;
 
 namespace HTTP_Requests
 {
+class SelectedChannel
+{
+public:
+    explicit SelectedChannel();
 
-    class SelectedChannel
-    {
-    public:
+    explicit SelectedChannel(std::string dataEntryType, std::string channelType, std::string channelName, int pageNum, std::string cellRef);
 
-        explicit SelectedChannel();
+    void saveSetup(const Dewesoft::Utils::Serialization::NodePtr& node) const;
+    void loadSetup(const Dewesoft::Utils::Serialization::NodePtr& node);
 
-        explicit SelectedChannel(std::string dataEntryType, std::string channelType, std::string channelName, int pageNum, std::string cellRef);
+    static std::string stringifyChannel(const SelectedChannel* channel);
 
-        void saveSetup(const Dewesoft::Utils::Serialization::NodePtr& node) const;
-        void loadSetup(const Dewesoft::Utils::Serialization::NodePtr& node);
+    std::string getColItem(const int& colNum) const;
+    void setColItem(const int& colNum, const std::string& val);
 
-        static std::string stringifyChannel(const SelectedChannel* channel);
+    bool operator==(const SelectedChannel& selectedChannel) const;
+    bool operator==(const SelectedChannel* selectedChannel) const;
+    bool operator!=(const SelectedChannel& requestObj) const;
 
-        std::string getColItem(const int& colNum) const;
-        void setColItem(const int& colNum, const std::string& val);
+    json toJson() const;
 
-        bool operator==(const SelectedChannel& selectedChannel) const;
-        bool operator==(const SelectedChannel* selectedChannel) const;
-        bool operator!=(const SelectedChannel& requestObj) const;
+    std::string dataEntryType;
+    std::string channelType;
+    std::string channelName;
+    int pageNum;
+    std::string cellRef;
+    long dataType;
+    std::string text;
+    double channelValue;
+    IChannelPtr channelPtr;
 
-        json toJson() const;
-
-        std::string dataEntryType;
-        std::string channelType;
-        std::string channelName;
-        int pageNum;
-        std::string cellRef;
-        long dataType;
-        std::string text;
-        double channelValue;
-        IChannelPtr channelPtr;
-
-        uint64_t lastPos;
-    };
-}
+    uint64_t lastPos;
+    std::future<double> getChannelValueFuture;
+};
+}  // namespace HTTP_Requests
