@@ -66,7 +66,7 @@ void Request::getData(const AcquiredDataInfo& acquiredDataInfo, const _bstr_t& u
             return;
     }
 
-    std::future<double> triggerTimeFuture = std::async(getTriggerTimeThread, triggerChannelPtr, &lastPosCheckedTrigger, triggerLevel, edgeType);
+    std::future<double> triggerTimeFuture = std::async(std::launch::async, getTriggerTimeThread, triggerChannelPtr, &lastPosCheckedTrigger, triggerLevel, edgeType);
 
     double triggerTime  = triggerTimeFuture.get();
 
@@ -91,11 +91,13 @@ void Request::getData(const AcquiredDataInfo& acquiredDataInfo, const _bstr_t& u
 
         for (auto& selectedChannel : selectedChannelList)
         {
-            selectedChannel.dataType = selectedChannel.channelPtr->DataType;
-
-            if (!selectedChannel.channelType.compare("Standard Channel") && selectedChannel.dataType != 11)
+        
+            if (!selectedChannel.channelType.compare("Standard Channel"))
             {
-                selectedChannel.getChannelValueFuture = std::async(getChannelValueAtTimeThread, selectedChannel.channelPtr, &selectedChannel.lastPos, triggerTime);
+                selectedChannel.dataType = selectedChannel.channelPtr->DataType;
+
+                if (selectedChannel.dataType != 11)
+                    selectedChannel.getChannelValueFuture = std::async(std::launch::async, getChannelValueAtTimeThread, selectedChannel.channelPtr, &selectedChannel.lastPos, triggerTime);
             }
         }
 
@@ -110,7 +112,7 @@ void Request::getData(const AcquiredDataInfo& acquiredDataInfo, const _bstr_t& u
                     selectedChannel.text = selectedChannel.channelPtr->Text;
                 }
 
-                else if (selectedChannel.channelPtr->SingleValue)
+                else if(selectedChannel.channelPtr->IsSingleValue)
                 {
                     selectedChannel.channelValue = selectedChannel.channelPtr->SingleValue;
                 }
@@ -141,10 +143,24 @@ void Request::getData(const AcquiredDataInfo& acquiredDataInfo, const _bstr_t& u
         }
 
         postData["SelectedChannels"] = selectedChannelsJSON;  // Add selected channels to main request JSON Object
-
+     
         std::thread threadObj(curlThread, postData.dump(), requestEndpoint);  // Create new thread of curlThread with JSON postData as string
         threadObj.detach();                                 // Detatch thread to allow unblocking execution
 
+    }
+
+    else
+    {
+        for (auto& selectedChannel : selectedChannelList)
+        {
+            if (!selectedChannel.channelType.compare("Standard Channel"))
+            {
+                selectedChannel.dataType = selectedChannel.channelPtr->DataType;
+
+                if (selectedChannel.dataType != 11)
+                    selectedChannel.lastPos += getBlockSize(selectedChannel.channelPtr, selectedChannel.lastPos);
+            }
+        }
     }
 }
 
@@ -359,6 +375,8 @@ double Request::getTriggerTimeThread(IChannelPtr channel, uint64_t* lastPosCheck
         case ChannelDataType::Single:
             for (int i = 0; i < blockSize - 1; i++)
             {
+                double currentSampleDcom = channel->DBValues[(*lastPosChecked) % dbBuffSize];
+                double nextSampleDcom = channel->DBValues[((*lastPosChecked) + 1) % dbBuffSize];
                 double currentSampleTriggerChannel = static_cast<double>(((float*) channelBuffer)[(*lastPosChecked) % dbBuffSize]);
                 double nextSampleTriggerChannel = static_cast<double>(((float*) channelBuffer)[((*lastPosChecked) + 1) % dbBuffSize]);
 
@@ -645,6 +663,8 @@ double Request::getChannelValueAtTimeThread(IChannelPtr channel, uint64_t* lastP
                         if (nextSampleTime == time)
                         {
                             (*lastPosChecked)++;
+                            float channelDcomValue = channel->DBValues[*lastPosChecked % dbBuffSize];
+                            float value = ((float*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize];
                             return static_cast<double>(((float*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
                         }
                         else if (time - currentSampleTime < nextSampleTime - time)

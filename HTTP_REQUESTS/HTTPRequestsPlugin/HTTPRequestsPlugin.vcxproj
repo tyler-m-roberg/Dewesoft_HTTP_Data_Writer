@@ -120,19 +120,19 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>D:\C++_Libs\json-3.10.4\include;D:\C++_Libs\curl\builds\libcurl-vc-x64-release-static-ipv6-sspi-schannel\include;$(DCOM_LIB_ROOT)\include;$(ProjectDir)\Generated;$(MUI3_LIB_ROOT)\include;$(ProjectDir);../HTTPRequestsPluginLib/;$(IncludePath);$(COMMON_LIB_ROOT)\include\;$(COMMON_LIB_ROOT)\external\libxml\include</IncludePath>
+    <IncludePath>$(SolutionDir)Includes\json-3.10.4\include;$(SolutionDir)Includes\curl\builds\libcurl-vc-x64-release-static-ipv6-sspi-schannel\include;$(DCOM_LIB_ROOT)\include;$(ProjectDir)\Generated;$(MUI3_LIB_ROOT)\include;$(ProjectDir);../HTTPRequestsPluginLib/;$(IncludePath);$(COMMON_LIB_ROOT)\include\;$(COMMON_LIB_ROOT)\external\libxml\include</IncludePath>
     <OutDir>$(DEWESOFT_EXE_X64)\Addons64</OutDir>
     <IntDir>$(Platform)\$(Configuration)\Intermediate\</IntDir>
-    <LibraryPath>D:\C++_Libs\curl\builds\libcurl-vc-x64-release-static-ipv6-sspi-schannel\lib;$(DCOM_LIB_ROOT)\lib;$(MUI3_LIB_ROOT)\lib\;$(LibraryPath);$(COMMON_LIB_ROOT)\lib;$(COMMON_LIB_ROOT)\external\libxml\lib\lib64</LibraryPath>
+    <LibraryPath>$(SolutionDir)Includes\curl\builds\libcurl-vc-x64-release-static-ipv6-sspi-schannel\lib;$(DCOM_LIB_ROOT)\lib;$(MUI3_LIB_ROOT)\lib\;$(LibraryPath);$(COMMON_LIB_ROOT)\lib;$(COMMON_LIB_ROOT)\external\libxml\lib\lib64</LibraryPath>
     <ExecutablePath>$(DEWESOFT_EXE_X64);$(ExecutablePath)</ExecutablePath>
     <TargetName>$(ProjectName)64</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\theoz\OneDrive\Documents\GitHub\Dewesoft_HTTP_Data_Writer\Includes\json-3.10.4\include;C:\Users\theoz\OneDrive\Documents\GitHub\Dewesoft_HTTP_Data_Writer\Includes\curl\builds\libcurl-vc-x64-release-static-ipv6-sspi-schannel\include;$(DCOM_LIB_ROOT)\include;$(ProjectDir)\Generated;../HTTPRequestsPluginLib/;$(MUI3_LIB_ROOT)\include;$(ProjectDir);$(IncludePath);$(COMMON_LIB_ROOT)\include\;$(COMMON_LIB_ROOT)\external\libxml\include</IncludePath>
+    <IncludePath>$(SolutionDir)Includes\json-3.10.4\include;$(SolutionDir)Includes\curl\builds\libcurl-vc-x64-release-static-ipv6-sspi-schannel\include;$(DCOM_LIB_ROOT)\include;$(ProjectDir)\Generated;../HTTPRequestsPluginLib/;$(MUI3_LIB_ROOT)\include;$(ProjectDir);$(IncludePath);$(COMMON_LIB_ROOT)\include\;$(COMMON_LIB_ROOT)\external\libxml\include</IncludePath>
     <OutDir>$(DEWESOFT_EXE_X64)\Addons64</OutDir>
     <IntDir>$(Platform)\$(Configuration)\Intermediate\</IntDir>
-    <LibraryPath>C:\Users\theoz\OneDrive\Documents\GitHub\Dewesoft_HTTP_Data_Writer\Includes\curl\builds\libcurl-vc-x64-release-static-ipv6-sspi-schannel\lib;$(DCOM_LIB_ROOT)\lib;$(MUI3_LIB_ROOT)\lib;$(LibraryPath);$(COMMON_LIB_ROOT)\lib;$(COMMON_LIB_ROOT)\external\libxml\lib\lib64</LibraryPath>
+    <LibraryPath>$(SolutionDir)Includes\curl\builds\libcurl-vc-x64-release-static-ipv6-sspi-schannel\lib;$(DCOM_LIB_ROOT)\lib;$(MUI3_LIB_ROOT)\lib;$(LibraryPath);$(COMMON_LIB_ROOT)\lib;$(COMMON_LIB_ROOT)\external\libxml\lib\lib64</LibraryPath>
     <ExecutablePath>$(DEWESOFT_EXE_X64);$(ExecutablePath)</ExecutablePath>
     <TargetName>$(ProjectName)64</TargetName>
   </PropertyGroup>
