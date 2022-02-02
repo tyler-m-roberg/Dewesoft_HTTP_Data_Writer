@@ -31,8 +31,8 @@ public:
                      std::string reportName);
 
     void getData(const AcquiredDataInfo& acquiredDataInfo, const _bstr_t& usedFile);
-    int minBlockSize();
-    static int getBlockSize(IChannelPtr channel, uint64_t lastPosChecked);
+    uint64_t minBlockSize();
+    static uint64_t getBlockSize(IChannelPtr channel, uint64_t lastPosChecked);
     static bool checkTrigger(const std::string& edgeType,
                              const double& triggerLevel,
                              const double& currentSample,

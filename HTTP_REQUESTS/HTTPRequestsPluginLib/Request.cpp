@@ -158,6 +158,7 @@ void Request::getData(const AcquiredDataInfo& acquiredDataInfo, const _bstr_t& u
                 selectedChannel.dataType = selectedChannel.channelPtr->DataType;
 
                 if (selectedChannel.dataType != 11)
+                    uint64_t blockSize = getBlockSize(selectedChannel.channelPtr, selectedChannel.lastPos);
                     selectedChannel.lastPos += getBlockSize(selectedChannel.channelPtr, selectedChannel.lastPos);
             }
         }
@@ -299,9 +300,9 @@ bool Request::checkTrigger(const std::string& edgeType,
     }
 }
 
-int Request::minBlockSize()
+uint64_t Request::minBlockSize()
 {
-    int minBlockSizeRtn = (std::numeric_limits<int>::max)();
+    uint64_t minBlockSizeRtn = (std::numeric_limits<uint64_t>::max)();
 
     minBlockSizeRtn = getBlockSize(triggerChannelPtr, lastPosCheckedTrigger);
     for (auto& selectedChannel : selectedChannelList)
@@ -319,9 +320,9 @@ int Request::minBlockSize()
     return minBlockSizeRtn;
 }
 
-int Request::getBlockSize(IChannelPtr channel, uint64_t lastPosChecked)
+uint64_t Request::getBlockSize(IChannelPtr channel, uint64_t lastPosChecked)
 {
-    int blockSize = (channel->DBPos - (lastPosChecked % channel->DBBufSize) + channel->DBBufSize) % channel->DBBufSize;
+    uint64_t blockSize = (channel->DBPos - (lastPosChecked % channel->DBBufSize) + channel->DBBufSize) % channel->DBBufSize;
 
     return blockSize;
 }
@@ -365,7 +366,7 @@ void Request::curlThread(std::string data, std::string endpoint)
 
 double Request::getTriggerTimeThread(IChannelPtr channel, uint64_t* lastPosChecked, const double& triggerValue, const std::string& edgeType)
 {
-    int blockSize = getBlockSize(channel, *(lastPosChecked));
+    uint64_t blockSize = getBlockSize(channel, *(lastPosChecked));
     long dbBuffSize = channel->DBBufSize;
     void* channelBuffer = (void*) channel->GetDBAddress64();
     double* tsBuffer = (double*) channel->GetTSAddress64();
@@ -608,7 +609,7 @@ double Request::getTriggerTimeThread(IChannelPtr channel, uint64_t* lastPosCheck
 
 double Request::getChannelValueAtTimeThread(IChannelPtr channel, uint64_t* lastPosChecked, const double& time)
 {
-    int blockSize = getBlockSize(channel, *(lastPosChecked));
+    uint64_t blockSize = getBlockSize(channel, *(lastPosChecked));
     long dbBuffSize = channel->DBBufSize;
     void* channelBuffer = (void*) channel->GetDBAddress64();
     double* tsBuffer = (double*) channel->GetTSAddress64();
@@ -725,6 +726,7 @@ double Request::getChannelValueAtTimeThread(IChannelPtr channel, uint64_t* lastP
 
                 else
                 {
+                    double sampleRate = channel->GetSampleRate();
                     double currentSampleTime = (1.0 / channel->GetSampleRate()) * (*lastPosChecked);
                     double nextSampleTime = (1.0 / channel->GetSampleRate()) * ((*lastPosChecked) + 1);
 
