@@ -686,7 +686,7 @@ double Request::getChannelValueAtTimeThread(IChannelPtr channel, uint64_t* lastP
                 }
             }
 
-            return static_cast<double>(((float*) channelBuffer)[(firstPos) % dbBuffSize]);
+            return static_cast<double>(((float*) channelBuffer)[(*lastPosChecked) % dbBuffSize]);
 
             break;
 
@@ -754,7 +754,7 @@ double Request::getChannelValueAtTimeThread(IChannelPtr channel, uint64_t* lastP
                 }
             }
 
-            return static_cast<double>(((double*) channelBuffer)[(firstPos) % dbBuffSize]);
+            return static_cast<double>(((double*) channelBuffer)[(*lastPosChecked) % dbBuffSize]);
 
             break;
 
