@@ -158,8 +158,8 @@ void Request::getData(const AcquiredDataInfo& acquiredDataInfo, const _bstr_t& u
                 selectedChannel.dataType = selectedChannel.channelPtr->DataType;
 
                 if (selectedChannel.dataType != 11)
-                    uint64_t blockSize = getBlockSize(selectedChannel.channelPtr, selectedChannel.lastPos);
-                    selectedChannel.lastPos += getBlockSize(selectedChannel.channelPtr, selectedChannel.lastPos);
+                    long blockSize = getBlockSize(selectedChannel.channelPtr, selectedChannel.lastPos);
+                    selectedChannel.lastPos += (getBlockSize(selectedChannel.channelPtr, selectedChannel.lastPos) - 2);
             }
         }
     }
@@ -300,9 +300,9 @@ bool Request::checkTrigger(const std::string& edgeType,
     }
 }
 
-uint64_t Request::minBlockSize()
+long Request::minBlockSize()
 {
-    uint64_t minBlockSizeRtn = (std::numeric_limits<uint64_t>::max)();
+    long minBlockSizeRtn = (std::numeric_limits<long>::max)();
 
     minBlockSizeRtn = getBlockSize(triggerChannelPtr, lastPosCheckedTrigger);
     for (auto& selectedChannel : selectedChannelList)
@@ -320,9 +320,9 @@ uint64_t Request::minBlockSize()
     return minBlockSizeRtn;
 }
 
-uint64_t Request::getBlockSize(IChannelPtr channel, uint64_t lastPosChecked)
+long Request::getBlockSize(IChannelPtr channel, long lastPosChecked)
 {
-    uint64_t blockSize = (channel->DBPos - (lastPosChecked % channel->DBBufSize) + channel->DBBufSize) % channel->DBBufSize;
+    long blockSize = (channel->DBPos - (lastPosChecked % channel->DBBufSize) + channel->DBBufSize) % channel->DBBufSize;
 
     return blockSize;
 }
@@ -364,9 +364,9 @@ void Request::curlThread(std::string data, std::string endpoint)
     curl_global_cleanup();
 }
 
-double Request::getTriggerTimeThread(IChannelPtr channel, uint64_t* lastPosChecked, const double& triggerValue, const std::string& edgeType)
+double Request::getTriggerTimeThread(IChannelPtr channel, long* lastPosChecked, const double& triggerValue, const std::string& edgeType)
 {
-    uint64_t blockSize = getBlockSize(channel, *(lastPosChecked));
+    long blockSize = getBlockSize(channel, *(lastPosChecked));
     long dbBuffSize = channel->DBBufSize;
     void* channelBuffer = (void*) channel->GetDBAddress64();
     double* tsBuffer = (double*) channel->GetTSAddress64();
@@ -607,18 +607,19 @@ double Request::getTriggerTimeThread(IChannelPtr channel, uint64_t* lastPosCheck
     return 0;
 }
 
-double Request::getChannelValueAtTimeThread(IChannelPtr channel, uint64_t* lastPosChecked, const double& time)
+double Request::getChannelValueAtTimeThread(IChannelPtr channel, long* lastPosChecked, const double& time)
 {
-    uint64_t blockSize = getBlockSize(channel, *(lastPosChecked));
+    long blockSize = getBlockSize(channel, *(lastPosChecked));
     long dbBuffSize = channel->DBBufSize;
     void* channelBuffer = (void*) channel->GetDBAddress64();
     double* tsBuffer = (double*) channel->GetTSAddress64();
-    uint64_t firstPos = (*lastPosChecked);
+    long firstPos = (*lastPosChecked);
+    long dbBuffPos = channel->DBPos;
 
     switch (static_cast<ChannelDataType>(channel->DataType))
     {
         case ChannelDataType::Single:
-            for (int i = 0; i < blockSize - 1; i++)
+            for (int x = 0; x < (blockSize - 1); x++)
             {
                 if (channel->Async)
                 {
@@ -687,12 +688,12 @@ double Request::getChannelValueAtTimeThread(IChannelPtr channel, uint64_t* lastP
                 }
             }
 
-            return static_cast<double>(((float*) channelBuffer)[(*lastPosChecked) % dbBuffSize]);
+            return static_cast<double>(((float*) channelBuffer)[((*lastPosChecked) - 1) % dbBuffSize]);
 
             break;
 
         case ChannelDataType::Double:
-            for (int i = 0; i < blockSize - 1; i++)
+            for (int x = 0; x < (blockSize - 1); x++)
             {
                 if (channel->Async)
                 {
@@ -756,12 +757,12 @@ double Request::getChannelValueAtTimeThread(IChannelPtr channel, uint64_t* lastP
                 }
             }
 
-            return static_cast<double>(((double*) channelBuffer)[(*lastPosChecked) % dbBuffSize]);
+            return static_cast<double>(((double*) channelBuffer)[((*lastPosChecked) - 1) % dbBuffSize]);
 
             break;
 
         case ChannelDataType::CANMessage:
-            for (int i = 0; i < blockSize - 1; i++)
+            for (int x = 0; x < blockSize - 1; x++)
             {
                 if (channel->Async)
                 {
@@ -824,12 +825,12 @@ double Request::getChannelValueAtTimeThread(IChannelPtr channel, uint64_t* lastP
                 }
             }
 
-            return static_cast<double>(((double*) channelBuffer)[(firstPos) % dbBuffSize]);
+            return static_cast<double>(((double*) channelBuffer)[((*lastPosChecked) - 1) % dbBuffSize]);
 
             break;
 
         case ChannelDataType::Int64:
-            for (int i = 0; i < blockSize - 1; i++)
+            for (int x = 0; x < blockSize - 1; x++)
             {
                 if (channel->Async)
                 {
@@ -892,12 +893,12 @@ double Request::getChannelValueAtTimeThread(IChannelPtr channel, uint64_t* lastP
                 }
             }
 
-            return static_cast<double>(((int64_t*) channelBuffer)[(firstPos) % dbBuffSize]);
+            return static_cast<double>(((int64_t*) channelBuffer)[((*lastPosChecked) - 1) % dbBuffSize]);
 
             break;
 
         case ChannelDataType::Integer:
-            for (int i = 0; i < blockSize - 1; i++)
+            for (int x = 0; x < (blockSize - 1); x++)
             {
                 if (channel->Async)
                 {
@@ -960,10 +961,10 @@ double Request::getChannelValueAtTimeThread(IChannelPtr channel, uint64_t* lastP
                 }
             }
 
-            return static_cast<double>(((int*) channelBuffer)[(firstPos) % dbBuffSize]);
+            return static_cast<double>(((int*) channelBuffer)[((*lastPosChecked) - 1) % dbBuffSize]);
 
             break;
     }
 
-    return 0;
+    return -999999999;
 }

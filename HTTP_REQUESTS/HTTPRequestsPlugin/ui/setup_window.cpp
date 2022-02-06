@@ -236,7 +236,7 @@ void SetupWindow::onReportNameTextChanged(Dewesoft::MUI::TextBox& txtBox, Deweso
 void SetupWindow::onTriggerChanChanged(Dewesoft::MUI::ComboBox& comboBox, Dewesoft::MUI::EventArgs& args)
 {
     bridge.requestObj.triggerChannel = comboBox.getSelectedItem();
-    bridge.requestObj.triggerChannelPtr = bridge.getIChannelPtrFromChannelName(comboBox.getSelectedItem());
+    bridge.requestObj.triggerChannelPtr = bridge.getIChannelPtrFromChannelName(bridge.requestObj.triggerChannel);
 }
 void SetupWindow::onEdgeTypeChanged(Dewesoft::MUI::ComboBox& comboBox, Dewesoft::MUI::EventArgs& args)
 {

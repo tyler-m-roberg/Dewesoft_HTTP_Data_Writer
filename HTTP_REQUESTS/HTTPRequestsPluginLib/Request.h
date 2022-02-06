@@ -31,8 +31,8 @@ public:
                      std::string reportName);
 
     void getData(const AcquiredDataInfo& acquiredDataInfo, const _bstr_t& usedFile);
-    uint64_t minBlockSize();
-    static uint64_t getBlockSize(IChannelPtr channel, uint64_t lastPosChecked);
+    long minBlockSize();
+    static long getBlockSize(IChannelPtr channel, long lastPosChecked);
     static bool checkTrigger(const std::string& edgeType,
                              const double& triggerLevel,
                              const double& currentSample,
@@ -48,10 +48,10 @@ public:
 
     static void curlThread(std::string data, std::string endpoint);
     static double getTriggerTimeThread(IChannelPtr channel,
-                                       uint64_t* lastPosChecked,
+                                       long* lastPosChecked,
                                        const double& triggerValue,
                                        const std::string& edgeType);
-    static double getChannelValueAtTimeThread(IChannelPtr channel, uint64_t* lastPosChecked, const double& time);
+    static double getChannelValueAtTimeThread(IChannelPtr channel, long* lastPosChecked, const double& time);
 
     std::string triggerChannel;
     IChannelPtr triggerChannelPtr;
@@ -61,7 +61,7 @@ public:
     std::string reportDirectory;
     std::string reportName;
 
-    uint64_t lastPosCheckedTrigger;
+    long lastPosCheckedTrigger;
 
     std::vector<AdditionalOptions> additionalOptionsList;
     std::vector<SelectedChannel> selectedChannelList;

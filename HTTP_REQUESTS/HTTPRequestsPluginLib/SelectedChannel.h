@@ -43,7 +43,7 @@ public:
     double channelValue;
     IChannelPtr channelPtr;
 
-    uint64_t lastPos;
+    long lastPos;
     std::future<double> getChannelValueFuture;
 };
 }  // namespace HTTP_Requests
