@@ -690,7 +690,7 @@ double Request::getChannelValueAtTimeThread(IChannelPtr channel, long* lastPosCh
             }
 
             if (triggerTypeAsync)
-                return static_cast<double>(((float*) channelBuffer)[(((*lastPosChecked)) + 1) % dbBuffSize]);
+                return static_cast<double>(((float*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
             else
                 return static_cast<double>(((float*) channelBuffer)[((*lastPosChecked)) % dbBuffSize]);
 
@@ -762,7 +762,7 @@ double Request::getChannelValueAtTimeThread(IChannelPtr channel, long* lastPosCh
             }
 
             if (triggerTypeAsync)
-                return static_cast<double>(((double*) channelBuffer)[(((*lastPosChecked)) + 1) % dbBuffSize]);
+                return static_cast<double>(((double*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
             else
                 return static_cast<double>(((double*) channelBuffer)[((*lastPosChecked)) % dbBuffSize]);
 
@@ -833,7 +833,7 @@ double Request::getChannelValueAtTimeThread(IChannelPtr channel, long* lastPosCh
             }
 
             if (triggerTypeAsync)
-                return static_cast<double>(((double*) channelBuffer)[(((*lastPosChecked)) + 1) % dbBuffSize]);
+                return static_cast<double>(((double*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
             else
                 return static_cast<double>(((double*) channelBuffer)[((*lastPosChecked)) % dbBuffSize]);
 
@@ -904,7 +904,7 @@ double Request::getChannelValueAtTimeThread(IChannelPtr channel, long* lastPosCh
             }
 
             if (triggerTypeAsync)
-                return static_cast<double>(((int64_t*) channelBuffer)[(((*lastPosChecked)) + 1) % dbBuffSize]);
+                return static_cast<double>(((int64_t*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
             else
                 return static_cast<double>(((int64_t*) channelBuffer)[((*lastPosChecked)) % dbBuffSize]);
 
@@ -975,7 +975,7 @@ double Request::getChannelValueAtTimeThread(IChannelPtr channel, long* lastPosCh
             }
 
             if (triggerTypeAsync)
-                return static_cast<double>(((int*) channelBuffer)[(((*lastPosChecked)) + 1) % dbBuffSize]);
+                return static_cast<double>(((int*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
             else
                 return static_cast<double>(((int*) channelBuffer)[((*lastPosChecked)) % dbBuffSize]);
 
