@@ -81,8 +81,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IntDir>$(Platform)\$(Configuration)\Intermediate\</IntDir>
-    <IncludePath>C:\Users\theoz\OneDrive\Documents\GitHub\Dewesoft_HTTP_Data_Writer\Includes\curl\builds\libcurl-vc-x64-release-static-ipv6-sspi-schannel\include;C:\Users\theoz\OneDrive\Documents\GitHub\Dewesoft_HTTP_Data_Writer\Includes\json-3.10.4\include;$(DCOM_LIB_ROOT)/include;$(COMMON_LIB_ROOT)/include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\theoz\OneDrive\Documents\GitHub\Dewesoft_HTTP_Data_Writer\Includes\curl\builds\libcurl-vc-x64-release-static-ipv6-sspi-schannel\lib;$(DCOM_LIB_ROOT)/lib;$(COMMON_LIB_ROOT)/lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)Includes\curl\builds\libcurl-vc-x64-release-static-ipv6-sspi-schannel\include;$(SolutionDir)Includes\json-3.10.4\include;$(DCOM_LIB_ROOT)/include;$(COMMON_LIB_ROOT)/include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Includes\curl\builds\libcurl-vc-x64-release-static-ipv6-sspi-schannel\lib;$(DCOM_LIB_ROOT)/lib;$(COMMON_LIB_ROOT)/lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IntDir>$(Platform)\$(Configuration)\Intermediate\</IntDir>
