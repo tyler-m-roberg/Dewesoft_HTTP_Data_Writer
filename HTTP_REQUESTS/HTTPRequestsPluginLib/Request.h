@@ -51,7 +51,7 @@ public:
                                        long* lastPosChecked,
                                        const double& triggerValue,
                                        const std::string& edgeType);
-    static double getChannelValueAtTimeThread(IChannelPtr channel, long* lastPosChecked, const double& time);
+    static double getChannelValueAtTimeThread(IChannelPtr channel, long* lastPosChecked, const double& time, const bool& triggerTypeAsync);
 
     std::string triggerChannel;
     IChannelPtr triggerChannelPtr;

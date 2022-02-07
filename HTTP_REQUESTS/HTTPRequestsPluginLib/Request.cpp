@@ -66,9 +66,10 @@ void Request::getData(const AcquiredDataInfo& acquiredDataInfo, const _bstr_t& u
             return;
     }
 
-    std::future<double> triggerTimeFuture = std::async(std::launch::async, getTriggerTimeThread, triggerChannelPtr, &lastPosCheckedTrigger, triggerLevel, edgeType);
+    std::future<double> triggerTimeFuture =
+        std::async(std::launch::async, getTriggerTimeThread, triggerChannelPtr, &lastPosCheckedTrigger, triggerLevel, edgeType);
 
-    double triggerTime  = triggerTimeFuture.get();
+    double triggerTime = triggerTimeFuture.get();
 
     if (triggerTime)
     {
@@ -91,17 +92,21 @@ void Request::getData(const AcquiredDataInfo& acquiredDataInfo, const _bstr_t& u
 
         for (auto& selectedChannel : selectedChannelList)
         {
-        
             if (!selectedChannel.channelType.compare("Standard Channel"))
             {
                 selectedChannel.dataType = selectedChannel.channelPtr->DataType;
 
                 if (selectedChannel.dataType != 11)
-                    selectedChannel.getChannelValueFuture = std::async(std::launch::async, getChannelValueAtTimeThread, selectedChannel.channelPtr, &selectedChannel.lastPos, triggerTime);
+                    selectedChannel.getChannelValueFuture = std::async(std::launch::async,
+                                                                       getChannelValueAtTimeThread,
+                                                                       selectedChannel.channelPtr,
+                                                                       &selectedChannel.lastPos,
+                                                                       triggerTime,
+                                                                       triggerChannelPtr->Async);
             }
         }
 
-         nlohmann::json selectedChannelsJSON;  // Create JSON object to hold channel informaiton
+        nlohmann::json selectedChannelsJSON;  // Create JSON object to hold channel informaiton
 
         for (auto& selectedChannel : selectedChannelList)
         {
@@ -112,7 +117,7 @@ void Request::getData(const AcquiredDataInfo& acquiredDataInfo, const _bstr_t& u
                     selectedChannel.text = selectedChannel.channelPtr->Text;
                 }
 
-                else if(selectedChannel.channelPtr->IsSingleValue)
+                else if (selectedChannel.channelPtr->IsSingleValue)
                 {
                     selectedChannel.channelValue = selectedChannel.channelPtr->SingleValue;
                 }
@@ -143,10 +148,10 @@ void Request::getData(const AcquiredDataInfo& acquiredDataInfo, const _bstr_t& u
         }
 
         postData["SelectedChannels"] = selectedChannelsJSON;  // Add selected channels to main request JSON Object
-     
-        std::thread threadObj(curlThread, postData.dump(), requestEndpoint);  // Create new thread of curlThread with JSON postData as string
-        threadObj.detach();                                 // Detatch thread to allow unblocking execution
 
+        std::thread threadObj(
+            curlThread, postData.dump(), requestEndpoint);  // Create new thread of curlThread with JSON postData as string
+        threadObj.detach();                                 // Detatch thread to allow unblocking execution
     }
 
     else
@@ -159,7 +164,7 @@ void Request::getData(const AcquiredDataInfo& acquiredDataInfo, const _bstr_t& u
 
                 if (selectedChannel.dataType != 11)
                     long blockSize = getBlockSize(selectedChannel.channelPtr, selectedChannel.lastPos);
-                    selectedChannel.lastPos += (getBlockSize(selectedChannel.channelPtr, selectedChannel.lastPos) - 2);
+                selectedChannel.lastPos += (getBlockSize(selectedChannel.channelPtr, selectedChannel.lastPos) - 1);
             }
         }
     }
@@ -607,7 +612,7 @@ double Request::getTriggerTimeThread(IChannelPtr channel, long* lastPosChecked, 
     return 0;
 }
 
-double Request::getChannelValueAtTimeThread(IChannelPtr channel, long* lastPosChecked, const double& time)
+double Request::getChannelValueAtTimeThread(IChannelPtr channel, long* lastPosChecked, const double& time, const bool& triggerTypeAsync)
 {
     long blockSize = getBlockSize(channel, *(lastPosChecked));
     long dbBuffSize = channel->DBBufSize;
@@ -628,24 +633,20 @@ double Request::getChannelValueAtTimeThread(IChannelPtr channel, long* lastPosCh
 
                     if (currentSampleTime < time && nextSampleTime >= time)
                     {
-
                         if (nextSampleTime == time)
                         {
                             (*lastPosChecked)++;
                             return static_cast<double>(((float*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
-                            
                         }
                         else if (time - currentSampleTime < nextSampleTime - time)
                         {
                             (*lastPosChecked)++;
                             return static_cast<double>(((float*) channelBuffer)[(((*lastPosChecked) - 1)) % dbBuffSize]);
-                            
                         }
                         else
                         {
                             (*lastPosChecked)++;
                             return static_cast<double>(((float*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
-                            
                         }
                     }
 
@@ -680,7 +681,7 @@ double Request::getChannelValueAtTimeThread(IChannelPtr channel, long* lastPosCh
                             return static_cast<double>(((float*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
                         }
                     }
-                    
+
                     else
                     {
                         (*lastPosChecked)++;
@@ -688,7 +689,10 @@ double Request::getChannelValueAtTimeThread(IChannelPtr channel, long* lastPosCh
                 }
             }
 
-            return static_cast<double>(((float*) channelBuffer)[((*lastPosChecked) - 1) % dbBuffSize]);
+            if (triggerTypeAsync)
+                return static_cast<double>(((float*) channelBuffer)[(((*lastPosChecked)) + 1) % dbBuffSize]);
+            else
+                return static_cast<double>(((float*) channelBuffer)[((*lastPosChecked)) % dbBuffSize]);
 
             break;
 
@@ -757,7 +761,10 @@ double Request::getChannelValueAtTimeThread(IChannelPtr channel, long* lastPosCh
                 }
             }
 
-            return static_cast<double>(((double*) channelBuffer)[((*lastPosChecked) - 1) % dbBuffSize]);
+            if (triggerTypeAsync)
+                return static_cast<double>(((double*) channelBuffer)[(((*lastPosChecked)) + 1) % dbBuffSize]);
+            else
+                return static_cast<double>(((double*) channelBuffer)[((*lastPosChecked)) % dbBuffSize]);
 
             break;
 
@@ -825,7 +832,10 @@ double Request::getChannelValueAtTimeThread(IChannelPtr channel, long* lastPosCh
                 }
             }
 
-            return static_cast<double>(((double*) channelBuffer)[((*lastPosChecked) - 1) % dbBuffSize]);
+            if (triggerTypeAsync)
+                return static_cast<double>(((double*) channelBuffer)[(((*lastPosChecked)) + 1) % dbBuffSize]);
+            else
+                return static_cast<double>(((double*) channelBuffer)[((*lastPosChecked)) % dbBuffSize]);
 
             break;
 
@@ -893,7 +903,10 @@ double Request::getChannelValueAtTimeThread(IChannelPtr channel, long* lastPosCh
                 }
             }
 
-            return static_cast<double>(((int64_t*) channelBuffer)[((*lastPosChecked) - 1) % dbBuffSize]);
+            if (triggerTypeAsync)
+                return static_cast<double>(((int64_t*) channelBuffer)[(((*lastPosChecked)) + 1) % dbBuffSize]);
+            else
+                return static_cast<double>(((int64_t*) channelBuffer)[((*lastPosChecked)) % dbBuffSize]);
 
             break;
 
@@ -915,7 +928,7 @@ double Request::getChannelValueAtTimeThread(IChannelPtr channel, long* lastPosCh
                         else if (time - currentSampleTime < nextSampleTime - time)
                         {
                             (*lastPosChecked)++;
-                            return static_cast<double>(((int*) channelBuffer)[(((*lastPosChecked) - 1)) % dbBuffSize]);
+                            return static_cast<double>(((int*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
                         }
                         else
                         {
@@ -961,7 +974,10 @@ double Request::getChannelValueAtTimeThread(IChannelPtr channel, long* lastPosCh
                 }
             }
 
-            return static_cast<double>(((int*) channelBuffer)[((*lastPosChecked) - 1) % dbBuffSize]);
+            if (triggerTypeAsync)
+                return static_cast<double>(((int*) channelBuffer)[(((*lastPosChecked)) + 1) % dbBuffSize]);
+            else
+                return static_cast<double>(((int*) channelBuffer)[((*lastPosChecked)) % dbBuffSize]);
 
             break;
     }
