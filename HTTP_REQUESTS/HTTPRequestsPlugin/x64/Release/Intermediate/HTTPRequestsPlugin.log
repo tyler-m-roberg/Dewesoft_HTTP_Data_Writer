@@ -1,7 +1,1 @@
-﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(377,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
-  Embedding MUI resources.
-     Creating library x64\Release\Intermediate\HTTPRequestsPlugin64.lib and object x64\Release\Intermediate\HTTPRequestsPlugin64.exp
-  Generating code
-c:\users\theoz\onedrive\documents\github\dewesoft_http_data_writer\http_requests\httprequestspluginlib\selectedchannel.cpp(126): warning C4715: 'HTTP_Requests::SelectedChannel::getColItem': not all control paths return a value
-  Finished generating code
-  HTTPRequestsPlugin.vcxproj -> C:\Program Files\DewesoftX\Bin64\Addons64\HTTPRequestsPlugin64.dll
+﻿
