@@ -2,6 +2,7 @@
 #include "Request.h"
 #include <codecvt>
 #include <thread>
+#include <future>
 #include <chrono>
 #include <curl\curl.h>
 #include <nlohmann/json.hpp>
@@ -15,38 +16,6 @@ using namespace Dewesoft::Utils::Serialization;
 using namespace Dewesoft::Utils::Dcom::InputChannel;
 using namespace Dewesoft::Utils::Dcom::Utils;
 using namespace HTTP_Requests;
-
-void curlThread(std::string data, std::string endpoint)
-{
-    CURL* curl;
-    CURLcode res;
-
-    /* In windows, this will init the winsock stuff */
-    curl_global_init(CURL_GLOBAL_ALL);
-
-    /* get a curl handle */
-    curl = curl_easy_init();
-    if (curl)
-    {
-        /* First set the URL that is about to receive our POST. This URL can
-           just as well be a https:// URL if that is what should receive the
-           data. */
-        struct curl_slist* hs = NULL;
-        hs = curl_slist_append(hs, "Content-Type: application/json");
-        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, hs);
-        curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
-        /* Now specify the POST data */
-        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
-
-        /* Perform the request, res will get the return code */
-        res = curl_easy_perform(curl);
-        /* Check for errors */
-
-        /* always cleanup */
-        curl_easy_cleanup(curl);
-    }
-    curl_global_cleanup();
-}
 
 Request::Request(InputManagerImpl& inputManager, IAppPtr app)
     : Request(inputManager, app, "", 1.0, "Rising", "", "", "")
@@ -71,15 +40,14 @@ Request::Request(InputManagerImpl& inputManager,
     , reportDirectory(reportDirectory)
     , reportName(reportName)
 {
-
-    //Add additional options to object
+    // Add additional options to object
     additionalOptionsList.emplace_back("Append Date To Report Filename", false);
     additionalOptionsList.emplace_back("Open Excel On New Data", false);
     additionalOptionsList.emplace_back("Force Close Excel On New Data", false);
     additionalOptionsList.emplace_back("Create New File On Write Error", false);
     additionalOptionsList.emplace_back("Use Relative Report Directories", false);
 
-    //Define special channels
+    // Define special channels
     specialChannelsList.emplace_back("Filename");
     specialChannelsList.emplace_back("Date");
 }
@@ -90,105 +58,116 @@ void Request::getData(const AcquiredDataInfo& acquiredDataInfo, const _bstr_t& u
     if (triggerChannelPtr == nullptr)
         return;
 
-    //Verify channel pointers are set for 
+    // Verify channel pointers are set and return if not
+
     for (auto& selectedChannel : selectedChannelList)
     {
         if (selectedChannel.channelPtr == nullptr && !selectedChannel.channelType.compare("Standard Channel"))
             return;
     }
 
-    nlohmann::json postData;  // JSON Data object for post request
+    std::future<double> triggerTimeFuture =
+        std::async(std::launch::async, getTriggerTimeThread, triggerChannelPtr, &lastPosCheckedTrigger, triggerLevel, edgeType);
 
-    // Convert setting strings to JSON entries
-    postData["Template_File_Opt"] = this->templateFile;
-    postData["Report_Directory_Opt"] = this->reportDirectory;
-    postData["Report_Name_Opt"] = this->reportName;
+    double triggerTime = triggerTimeFuture.get();
 
-    nlohmann::json additionalOptionsJSON;  // JSON Data object to hold additional options
-
-    // Loop through additional options and add each to additionalOptions JSON object
-    for (auto& option : additionalOptionsList)
+    if (triggerTime)
     {
-        additionalOptionsJSON.push_back(option.toJson());
-    }
+        nlohmann::json postData;  // JSON Data object for post request
 
-    postData["Options_Opt"] = additionalOptionsJSON;  // Add additional options JSON object to post data object
+        // Convert setting strings to JSON entries
+        postData["Template_File_Opt"] = this->templateFile;
+        postData["Report_Directory_Opt"] = this->reportDirectory;
+        postData["Report_Name_Opt"] = this->reportName;
 
-    //Get min blocksize to read
-    int minBlockSizeValue = minBlockSize();
+        nlohmann::json additionalOptionsJSON;  // JSON Data object to hold additional options
 
-    //Loop through samples up to the minimum block size to not read outside of channel memory of smaller channels
-    for (int i = 0; i < minBlockSizeValue - 1; i++)
-    {
-        //Get current and next sample of trigger channel for trigger logic. Logic allows loop back of sample buffer
-        float currentSampleTriggerChannel = triggerChannelPtr->DBValues[lastPosChecked % triggerChannelPtr->DBBufSize];
-        float nextSampleTriggerChannel = triggerChannelPtr->DBValues[(lastPosChecked + 1) % triggerChannelPtr->DBBufSize];
-
-        //Check trigger based on edge type and samples
-        if (checkTrigger(edgeType, currentSampleTriggerChannel, nextSampleTriggerChannel))
+        // Loop through additional options and add each to additionalOptions JSON object
+        for (auto& option : additionalOptionsList)
         {
-            nlohmann::json selectedChannelsJSON; //Create JSON object to hold channel informaiton
-
-            //Loop through selected channel list to build JSON object
-            for (auto& selectedChannel : selectedChannelList)
-            {
-                //Run if channel is standard channel
-                if (!selectedChannel.channelType.compare("Standard Channel"))
-                {
-    
-                    selectedChannel.dataType = selectedChannel.channelPtr->DataType;
-
-                    //If selected type is text update text value
-                    if (selectedChannel.dataType == 11)
-                        selectedChannel.text = selectedChannel.channelPtr->Text;
-
-                    // If is single value use single value accessor
-                    else if (selectedChannel.channelPtr->IsSingleValue) 
-                        selectedChannel.channelValue = selectedChannel.channelPtr->SingleValue;
-
-                    //Channel is async use get value at abs position to read in seek nearest async value
-                    else if (selectedChannel.channelPtr->Async)
-                    {
-                        long* seekPos = new long;
-                        selectedChannel.channelValue =
-                            selectedChannel.channelPtr->GetValueAtAbsPosDouble((long) lastPosChecked, seekPos, false);
-                    }
-
-                    //If value is normal numeric channel get numeric value of channel
-                    else
-                        selectedChannel.channelValue = selectedChannel.channelPtr->DBValues[(lastPosChecked + 1) % selectedChannel.channelPtr->DBBufSize];
-                }
-
-                //Handle speical channel cases
-                else
-                {
-                    //Handle special channel used file name
-                    if (!selectedChannel.channelName.compare("Filename"))
-                    {
-                        //Use codevect to convert file name to std string from _bstr_t
-                        //Warning codevect is depricated, no suitable alternatives replace when available
-                        std::string filename = std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(usedDataFile);
-
-                        //Set text to file name and data type to text
-                        selectedChannel.text = filename;
-                        selectedChannel.dataType = 11;
-                    }
-                }
-
-                //Add channel to JSON object
-                selectedChannelsJSON.push_back(selectedChannel.toJson());
-            }
-
-            postData["SelectedChannels"] = selectedChannelsJSON; //Add selected channels to main request JSON Object
-
-            std::thread threadObj(curlThread, postData.dump(), requestEndpoint);  // Create new thread of curlThread with JSON postData as string
-            threadObj.detach();                                  // Detatch thread to allow unblocking execution
+            additionalOptionsJSON.push_back(option.toJson());
         }
 
-        //Increment position in data buffer to check for data
-        lastPosChecked++;
+        postData["Options_Opt"] = additionalOptionsJSON;  // Add additional options JSON object to post data object
+
+        for (auto& selectedChannel : selectedChannelList)
+        {
+            if (!selectedChannel.channelType.compare("Standard Channel"))
+            {
+                selectedChannel.dataType = selectedChannel.channelPtr->DataType;
+
+                if (selectedChannel.dataType != 11)
+                    selectedChannel.getChannelValueFuture = std::async(std::launch::async,
+                                                                       getChannelValueAtTimeThread,
+                                                                       selectedChannel.channelPtr,
+                                                                       &selectedChannel.lastPos,
+                                                                       triggerTime,
+                                                                       triggerChannelPtr->Async);
+            }
+        }
+
+        nlohmann::json selectedChannelsJSON;  // Create JSON object to hold channel informaiton
+
+        for (auto& selectedChannel : selectedChannelList)
+        {
+            if (!selectedChannel.channelType.compare("Standard Channel"))
+            {
+                if (selectedChannel.dataType == 11)
+                {
+                    selectedChannel.text = selectedChannel.channelPtr->Text;
+                }
+
+                else if (selectedChannel.channelPtr->IsSingleValue)
+                {
+                    selectedChannel.channelValue = selectedChannel.channelPtr->SingleValue;
+                }
+
+                else
+                {
+                    selectedChannel.channelValue = selectedChannel.getChannelValueFuture.get();
+                }
+            }
+
+            else
+            {
+                // Handle special channel used file name
+                if (!selectedChannel.channelName.compare("Filename"))
+                {
+                    // Use codevect to convert file name to std string from _bstr_t
+                    // Warning codevect is depricated, no suitable alternatives replace when available
+                    std::string filename = std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(usedDataFile);
+
+                    // Set text to file name and data type to text
+                    selectedChannel.text = filename;
+                    selectedChannel.dataType = 11;
+                }
+            }
+
+            // Add channel to JSON object
+            selectedChannelsJSON.push_back(selectedChannel.toJson());
+        }
+
+        postData["SelectedChannels"] = selectedChannelsJSON;  // Add selected channels to main request JSON Object
+
+        std::thread threadObj(
+            curlThread, postData.dump(), requestEndpoint);  // Create new thread of curlThread with JSON postData as string
+        threadObj.detach();                                 // Detatch thread to allow unblocking execution
     }
-    
+
+    else
+    {
+        for (auto& selectedChannel : selectedChannelList)
+        {
+            if (!selectedChannel.channelType.compare("Standard Channel"))
+            {
+                selectedChannel.dataType = selectedChannel.channelPtr->DataType;
+
+                if (selectedChannel.dataType != 11)
+                    long blockSize = getBlockSize(selectedChannel.channelPtr, selectedChannel.lastPos);
+                selectedChannel.lastPos += (getBlockSize(selectedChannel.channelPtr, selectedChannel.lastPos) - 1);
+            }
+        }
+    }
 }
 
 void Request::saveSetup(const NodePtr& node) const
@@ -211,10 +190,10 @@ void Request::saveSetup(const NodePtr& node) const
 
     // Create subnode for selected channels and add each selected channel
     const auto selectedChannelsNode = node->addChild(u8"SelectedChannels");
-    for (const auto& item : selectedChannelList)
+    for (auto& selectedChannel : selectedChannelList)
     {
         const auto selectedChannelNode = selectedChannelsNode->addChild(u8"SelectedChannel");
-        item.saveSetup(selectedChannelNode);
+        selectedChannel.saveSetup(selectedChannelNode);
     }
 }
 
@@ -311,25 +290,26 @@ void Request::clear()
     }
 }
 
-
-bool Request::checkTrigger(std::string edgeType, float currentSample, float nextSample)
+bool Request::checkTrigger(const std::string& edgeType,
+                           const double& triggerLevelInput,
+                           const double& currentSample,
+                           const double& nextSample)
 {
     if (!edgeType.compare("Rising"))
     {
-        return currentSample <= triggerLevel && nextSample >= triggerLevel;
+        return currentSample <= triggerLevelInput && nextSample >= triggerLevelInput;
     }
     else
     {
-        return currentSample >= triggerLevel && nextSample <= triggerLevel;
+        return currentSample >= triggerLevelInput && nextSample <= triggerLevelInput;
     }
 }
 
-int Request::minBlockSize()
+long Request::minBlockSize()
 {
-    int minBlockSizeRtn = (std::numeric_limits<int>::max)();
+    long minBlockSizeRtn = (std::numeric_limits<long>::max)();
 
-    minBlockSizeRtn = getBlockSize(triggerChannelPtr);
-
+    minBlockSizeRtn = getBlockSize(triggerChannelPtr, lastPosCheckedTrigger);
     for (auto& selectedChannel : selectedChannelList)
     {
         if (!selectedChannel.channelType.compare("Standard Channel"))
@@ -338,16 +318,16 @@ int Request::minBlockSize()
             bool checkIfNotAsync = !selectedChannel.channelPtr->GetAsync();
 
             if (checkIfNotSingleValueChannel && checkIfNotAsync)
-                minBlockSizeRtn = (std::min)(minBlockSizeRtn, getBlockSize(selectedChannel.channelPtr));
+                minBlockSizeRtn = (std::min)(minBlockSizeRtn, getBlockSize(selectedChannel.channelPtr, selectedChannel.lastPos));
         }
     }
 
     return minBlockSizeRtn;
 }
 
-int Request::getBlockSize(IChannelPtr channel)
+long Request::getBlockSize(IChannelPtr channel, long lastPosChecked)
 {
-    int blockSize = (channel->DBPos - (lastPosChecked % channel->DBBufSize) + channel->DBBufSize) % channel->DBBufSize;
+    long blockSize = (channel->DBPos - (lastPosChecked % channel->DBBufSize) + channel->DBBufSize) % channel->DBBufSize;
 
     return blockSize;
 }
@@ -355,4 +335,652 @@ int Request::getBlockSize(IChannelPtr channel)
 std::string Request::getDefaultRequestEndpoint()
 {
     return defaultRequestEndpoint;
+}
+
+void Request::curlThread(std::string data, std::string endpoint)
+{
+    CURL* curl;
+    CURLcode res;
+
+    /* In windows, this will init the winsock stuff */
+    curl_global_init(CURL_GLOBAL_ALL);
+
+    /* get a curl handle */
+    curl = curl_easy_init();
+    if (curl)
+    {
+        /* First set the URL that is about to receive our POST. This URL can
+           just as well be a https:// URL if that is what should receive the
+           data. */
+        struct curl_slist* hs = NULL;
+        hs = curl_slist_append(hs, "Content-Type: application/json");
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, hs);
+        curl_easy_setopt(curl, CURLOPT_URL, endpoint.c_str());
+        /* Now specify the POST data */
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
+
+        /* Perform the request, res will get the return code */
+        res = curl_easy_perform(curl);
+        /* Check for errors */
+
+        /* always cleanup */
+        curl_easy_cleanup(curl);
+    }
+    curl_global_cleanup();
+}
+
+double Request::getTriggerTimeThread(IChannelPtr channel, long* lastPosChecked, const double& triggerValue, const std::string& edgeType)
+{
+    long blockSize = getBlockSize(channel, *(lastPosChecked));
+    long dbBuffSize = channel->DBBufSize;
+    void* channelBuffer = (void*) channel->GetDBAddress64();
+    double* tsBuffer = (double*) channel->GetTSAddress64();
+
+    switch (static_cast<ChannelDataType>(channel->DataType))
+    {
+        case ChannelDataType::Single:
+            for (int i = 0; i < blockSize - 1; i++)
+            {
+                double currentSampleDcom = channel->DBValues[(*lastPosChecked) % dbBuffSize];
+                double nextSampleDcom = channel->DBValues[((*lastPosChecked) + 1) % dbBuffSize];
+                double currentSampleTriggerChannel = static_cast<double>(((float*) channelBuffer)[(*lastPosChecked) % dbBuffSize]);
+                double nextSampleTriggerChannel = static_cast<double>(((float*) channelBuffer)[((*lastPosChecked) + 1) % dbBuffSize]);
+
+                bool triggered = false;
+
+                if (!edgeType.compare("Rising"))
+                {
+                    triggered = currentSampleTriggerChannel < triggerValue && nextSampleTriggerChannel >= triggerValue;
+                }
+                else
+                {
+                    triggered = currentSampleTriggerChannel > triggerValue && nextSampleTriggerChannel <= triggerValue;
+                }
+
+                if (triggered)
+                {
+                    (*lastPosChecked)++;
+                    if (channel->Async)
+                    {
+                        long long tsAddress = channel->GetTSAddress64();
+                        return ((double*) channel->GetTSAddress64())[(((*lastPosChecked))) % dbBuffSize];
+                    }
+
+                    else
+                    {
+                        return (1.0 / channel->GetSampleRate()) * (*lastPosChecked);
+                    }
+                }
+                else
+                {
+                    (*lastPosChecked)++;
+                }
+            }
+            break;
+
+        case ChannelDataType::Double:
+            for (int i = 0; i < blockSize - 1; i++)
+            {
+                double currentSampleTriggerChannel = static_cast<double>(((double*) channelBuffer)[(*lastPosChecked) % dbBuffSize]);
+                double nextSampleTriggerChannel = static_cast<double>(((double*) channelBuffer)[((*lastPosChecked) + 1) % dbBuffSize]);
+
+                bool triggered = false;
+
+                if (!edgeType.compare("Rising"))
+                {
+                    triggered = currentSampleTriggerChannel < triggerValue && nextSampleTriggerChannel >= triggerValue;
+                }
+                else
+                {
+                    triggered = currentSampleTriggerChannel > triggerValue && nextSampleTriggerChannel <= triggerValue;
+                }
+
+                if (triggered)
+                {
+                    (*lastPosChecked)++;
+                    if (channel->Async)
+                    {
+                        long long tsAddress = channel->GetTSAddress64();
+                        return ((double*) channel->GetTSAddress64())[(((*lastPosChecked))) % dbBuffSize];
+                    }
+
+                    else
+                    {
+                        return (1.0 / channel->GetSampleRate()) * (*lastPosChecked);
+                    }
+                }
+                else
+                {
+                    (*lastPosChecked)++;
+                }
+            }
+            break;
+
+        case ChannelDataType::Byte:
+            for (int i = 0; i < blockSize - 1; i++)
+            {
+                double currentSampleTriggerChannel = static_cast<double>(((byte*) channelBuffer)[(*lastPosChecked) % dbBuffSize]);
+                double nextSampleTriggerChannel = static_cast<double>(((byte*) channelBuffer)[((*lastPosChecked) + 1) % dbBuffSize]);
+
+                bool triggered = false;
+
+                if (!edgeType.compare("Rising"))
+                {
+                    triggered = currentSampleTriggerChannel < triggerValue && nextSampleTriggerChannel >= triggerValue;
+                }
+                else
+                {
+                    triggered = currentSampleTriggerChannel > triggerValue && nextSampleTriggerChannel <= triggerValue;
+                }
+
+                if (triggered)
+                {
+                    (*lastPosChecked)++;
+                    if (channel->Async)
+                    {
+                        long long tsAddress = channel->GetTSAddress64();
+                        return ((double*) channel->GetTSAddress64())[(((*lastPosChecked))) % dbBuffSize];
+                    }
+
+                    else
+                    {
+                        return (1.0 / channel->GetSampleRate()) * (*lastPosChecked);
+                    }
+                }
+                else
+                {
+                    (*lastPosChecked)++;
+                }
+            }
+            break;
+
+        case ChannelDataType::CANMessage:
+            for (int i = 0; i < blockSize - 1; i++)
+            {
+                double currentSampleTriggerChannel = ((double*) channelBuffer)[(*lastPosChecked) % dbBuffSize];
+                double nextSampleTriggerChannel = ((double*) channelBuffer)[((*lastPosChecked) + 1) % dbBuffSize];
+
+                bool triggered = false;
+
+                if (!edgeType.compare("Rising"))
+                {
+                    triggered = currentSampleTriggerChannel < triggerValue && nextSampleTriggerChannel >= triggerValue;
+                }
+                else
+                {
+                    triggered = currentSampleTriggerChannel > triggerValue && nextSampleTriggerChannel <= triggerValue;
+                }
+
+                if (triggered)
+                {
+                    (*lastPosChecked)++;
+                    if (channel->Async)
+                    {
+                        long long tsAddress = channel->GetTSAddress64();
+                        return ((double*) channel->GetTSAddress64())[(((*lastPosChecked))) % dbBuffSize];
+                    }
+
+                    else
+                    {
+                        return (1.0 / channel->GetSampleRate()) * (*lastPosChecked);
+                    }
+                }
+                else
+                {
+                    (*lastPosChecked)++;
+                }
+            }
+            break;
+
+        case ChannelDataType::Int64:
+            for (int i = 0; i < blockSize - 1; i++)
+            {
+                double currentSampleTriggerChannel = static_cast<double>(((int64_t*) channelBuffer)[(*lastPosChecked) % dbBuffSize]);
+                double nextSampleTriggerChannel = static_cast<double>(((int64_t*) channelBuffer)[((*lastPosChecked) + 1) % dbBuffSize]);
+
+                bool triggered = false;
+
+                if (!edgeType.compare("Rising"))
+                {
+                    triggered = currentSampleTriggerChannel < triggerValue && nextSampleTriggerChannel >= triggerValue;
+                }
+                else
+                {
+                    triggered = currentSampleTriggerChannel > triggerValue && nextSampleTriggerChannel <= triggerValue;
+                }
+
+                if (triggered)
+                {
+                    (*lastPosChecked)++;
+                    if (channel->Async)
+                    {
+                        long long tsAddress = channel->GetTSAddress64();
+                        return ((double*) channel->GetTSAddress64())[(((*lastPosChecked))) % dbBuffSize];
+                    }
+
+                    else
+                    {
+                        return (1.0 / channel->GetSampleRate()) * (*lastPosChecked);
+                    }
+                }
+                else
+                {
+                    (*lastPosChecked)++;
+                }
+            }
+            break;
+
+        case ChannelDataType::Integer:
+            for (int i = 0; i < blockSize - 1; i++)
+            {
+                double currentSampleTriggerChannel = static_cast<double>(((int*) channelBuffer)[(*lastPosChecked) % dbBuffSize]);
+                double nextSampleTriggerChannel = static_cast<double>(((int*) channelBuffer)[((*lastPosChecked) + 1) % dbBuffSize]);
+
+                bool triggered = false;
+
+                if (!edgeType.compare("Rising"))
+                {
+                    triggered = currentSampleTriggerChannel < triggerValue && nextSampleTriggerChannel >= triggerValue;
+                }
+                else
+                {
+                    triggered = currentSampleTriggerChannel > triggerValue && nextSampleTriggerChannel <= triggerValue;
+                }
+
+                if (triggered)
+                {
+                    (*lastPosChecked)++;
+                    if (channel->Async)
+                    {
+                        long long tsAddress = channel->GetTSAddress64();
+                        return ((double*) channel->GetTSAddress64())[(((*lastPosChecked))) % dbBuffSize];
+                    }
+
+                    else
+                    {
+                        return (1.0 / channel->GetSampleRate()) * (*lastPosChecked);
+                    }
+                }
+                else
+                {
+                    (*lastPosChecked)++;
+                }
+            }
+            break;
+    }
+
+    return 0;
+}
+
+double Request::getChannelValueAtTimeThread(IChannelPtr channel, long* lastPosChecked, const double& time, const bool& triggerTypeAsync)
+{
+    long blockSize = getBlockSize(channel, *(lastPosChecked));
+    long dbBuffSize = channel->DBBufSize;
+    void* channelBuffer = (void*) channel->GetDBAddress64();
+    double* tsBuffer = (double*) channel->GetTSAddress64();
+    long firstPos = (*lastPosChecked);
+    long dbBuffPos = channel->DBPos;
+
+    switch (static_cast<ChannelDataType>(channel->DataType))
+    {
+        case ChannelDataType::Single:
+            for (int x = 0; x < (blockSize - 1); x++)
+            {
+                if (channel->Async)
+                {
+                    double currentSampleTime = (tsBuffer)[(((*lastPosChecked))) % dbBuffSize];
+                    double nextSampleTime = (tsBuffer)[(((*lastPosChecked) + 1)) % dbBuffSize];
+
+                    if (currentSampleTime < time && nextSampleTime >= time)
+                    {
+                        if (nextSampleTime == time)
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((float*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+                        }
+                        else if (time - currentSampleTime < nextSampleTime - time)
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((float*) channelBuffer)[(((*lastPosChecked) - 1)) % dbBuffSize]);
+                        }
+                        else
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((float*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+                        }
+                    }
+
+                    else
+                    {
+                        (*lastPosChecked)++;
+                    }
+                }
+
+                else
+                {
+                    double currentSampleTime = (1.0 / channel->GetSampleRate()) * (*lastPosChecked);
+                    double nextSampleTime = (1.0 / channel->GetSampleRate()) * ((*lastPosChecked) + 1);
+
+                    if (currentSampleTime < time && nextSampleTime >= time)
+                    {
+                        if (nextSampleTime == time)
+                        {
+                            (*lastPosChecked)++;
+                            float channelDcomValue = channel->DBValues[*lastPosChecked % dbBuffSize];
+                            float value = ((float*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize];
+                            return static_cast<double>(((float*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+                        }
+                        else if (time - currentSampleTime < nextSampleTime - time)
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((float*) channelBuffer)[(((*lastPosChecked) - 1)) % dbBuffSize]);
+                        }
+                        else
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((float*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+                        }
+                    }
+
+                    else
+                    {
+                        (*lastPosChecked)++;
+                    }
+                }
+            }
+
+            if (triggerTypeAsync)
+                return static_cast<double>(((float*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+            else
+                return static_cast<double>(((float*) channelBuffer)[((*lastPosChecked)) % dbBuffSize]);
+
+            break;
+
+        case ChannelDataType::Double:
+            for (int x = 0; x < (blockSize - 1); x++)
+            {
+                if (channel->Async)
+                {
+                    double currentSampleTime = (tsBuffer)[(((*lastPosChecked))) % dbBuffSize];
+                    double nextSampleTime = (tsBuffer)[(((*lastPosChecked) + 1)) % dbBuffSize];
+
+                    if (currentSampleTime < time && nextSampleTime >= time)
+                    {
+                        if (nextSampleTime == time)
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((double*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+                        }
+                        else if (time - currentSampleTime < nextSampleTime - time)
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((double*) channelBuffer)[(((*lastPosChecked) - 1)) % dbBuffSize]);
+                        }
+                        else
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((double*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+                        }
+                    }
+
+                    else
+                    {
+                        (*lastPosChecked)++;
+                    }
+                }
+
+                else
+                {
+                    double sampleRate = channel->GetSampleRate();
+                    double currentSampleTime = (1.0 / channel->GetSampleRate()) * (*lastPosChecked);
+                    double nextSampleTime = (1.0 / channel->GetSampleRate()) * ((*lastPosChecked) + 1);
+
+                    if (currentSampleTime < time && nextSampleTime >= time)
+                    {
+                        if (nextSampleTime == time)
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((double*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+                        }
+                        else if (time - currentSampleTime < nextSampleTime - time)
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((double*) channelBuffer)[(((*lastPosChecked) - 1)) % dbBuffSize]);
+                        }
+                        else
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((double*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+                        }
+                    }
+
+                    else
+                    {
+                        (*lastPosChecked)++;
+                    }
+                }
+            }
+
+            if (triggerTypeAsync)
+                return static_cast<double>(((double*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+            else
+                return static_cast<double>(((double*) channelBuffer)[((*lastPosChecked)) % dbBuffSize]);
+
+            break;
+
+        case ChannelDataType::CANMessage:
+            for (int x = 0; x < blockSize - 1; x++)
+            {
+                if (channel->Async)
+                {
+                    double currentSampleTime = (tsBuffer)[(((*lastPosChecked))) % dbBuffSize];
+                    double nextSampleTime = (tsBuffer)[(((*lastPosChecked) + 1)) % dbBuffSize];
+
+                    if (currentSampleTime < time && nextSampleTime >= time)
+                    {
+                        if (nextSampleTime == time)
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((double*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+                        }
+                        else if (time - currentSampleTime < nextSampleTime - time)
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((double*) channelBuffer)[(((*lastPosChecked) - 1)) % dbBuffSize]);
+                        }
+                        else
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((double*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+                        }
+                    }
+
+                    else
+                    {
+                        (*lastPosChecked)++;
+                    }
+                }
+
+                else
+                {
+                    double currentSampleTime = (1.0 / channel->GetSampleRate()) * (*lastPosChecked);
+                    double nextSampleTime = (1.0 / channel->GetSampleRate()) * ((*lastPosChecked) + 1);
+
+                    if (currentSampleTime < time && nextSampleTime >= time)
+                    {
+                        if (nextSampleTime == time)
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((double*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+                        }
+                        else if (time - currentSampleTime < nextSampleTime - time)
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((double*) channelBuffer)[(((*lastPosChecked) - 1)) % dbBuffSize]);
+                        }
+                        else
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((double*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+                        }
+                    }
+
+                    else
+                    {
+                        (*lastPosChecked)++;
+                    }
+                }
+            }
+
+            if (triggerTypeAsync)
+                return static_cast<double>(((double*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+            else
+                return static_cast<double>(((double*) channelBuffer)[((*lastPosChecked)) % dbBuffSize]);
+
+            break;
+
+        case ChannelDataType::Int64:
+            for (int x = 0; x < blockSize - 1; x++)
+            {
+                if (channel->Async)
+                {
+                    double currentSampleTime = (tsBuffer)[(((*lastPosChecked))) % dbBuffSize];
+                    double nextSampleTime = (tsBuffer)[(((*lastPosChecked) + 1)) % dbBuffSize];
+
+                    if (currentSampleTime < time && nextSampleTime >= time)
+                    {
+                        if (nextSampleTime == time)
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((int64_t*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+                        }
+                        else if (time - currentSampleTime < nextSampleTime - time)
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((int64_t*) channelBuffer)[(((*lastPosChecked) - 1)) % dbBuffSize]);
+                        }
+                        else
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((int64_t*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+                        }
+                    }
+
+                    else
+                    {
+                        (*lastPosChecked)++;
+                    }
+                }
+
+                else
+                {
+                    double currentSampleTime = (1.0 / channel->GetSampleRate()) * (*lastPosChecked);
+                    double nextSampleTime = (1.0 / channel->GetSampleRate()) * ((*lastPosChecked) + 1);
+
+                    if (currentSampleTime < time && nextSampleTime >= time)
+                    {
+                        if (nextSampleTime == time)
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((int64_t*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+                        }
+                        else if (time - currentSampleTime < nextSampleTime - time)
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((int64_t*) channelBuffer)[(((*lastPosChecked) - 1)) % dbBuffSize]);
+                        }
+                        else
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((int64_t*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+                        }
+                    }
+
+                    else
+                    {
+                        (*lastPosChecked)++;
+                    }
+                }
+            }
+
+            if (triggerTypeAsync)
+                return static_cast<double>(((int64_t*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+            else
+                return static_cast<double>(((int64_t*) channelBuffer)[((*lastPosChecked)) % dbBuffSize]);
+
+            break;
+
+        case ChannelDataType::Integer:
+            for (int x = 0; x < (blockSize - 1); x++)
+            {
+                if (channel->Async)
+                {
+                    double currentSampleTime = (tsBuffer)[(((*lastPosChecked))) % dbBuffSize];
+                    double nextSampleTime = (tsBuffer)[(((*lastPosChecked) + 1)) % dbBuffSize];
+
+                    if (currentSampleTime < time && nextSampleTime >= time)
+                    {
+                        if (nextSampleTime == time)
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((int*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+                        }
+                        else if (time - currentSampleTime < nextSampleTime - time)
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((int*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+                        }
+                        else
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((int*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+                        }
+                    }
+
+                    else
+                    {
+                        (*lastPosChecked)++;
+                    }
+                }
+
+                else
+                {
+                    double currentSampleTime = (1.0 / channel->GetSampleRate()) * (*lastPosChecked);
+                    double nextSampleTime = (1.0 / channel->GetSampleRate()) * ((*lastPosChecked) + 1);
+
+                    if (currentSampleTime < time && nextSampleTime >= time)
+                    {
+                        if (nextSampleTime == time)
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((int*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+                        }
+                        else if (time - currentSampleTime < nextSampleTime - time)
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((int*) channelBuffer)[(((*lastPosChecked) - 1)) % dbBuffSize]);
+                        }
+                        else
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((int*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+                        }
+                    }
+
+                    else
+                    {
+                        (*lastPosChecked)++;
+                    }
+                }
+            }
+
+            if (triggerTypeAsync)
+                return static_cast<double>(((int*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+            else
+                return static_cast<double>(((int*) channelBuffer)[((*lastPosChecked)) % dbBuffSize]);
+
+            break;
+    }
+
+    return -999999999;
 }

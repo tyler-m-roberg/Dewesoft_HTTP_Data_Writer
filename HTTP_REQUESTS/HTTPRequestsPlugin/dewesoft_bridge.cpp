@@ -105,7 +105,7 @@ void DewesoftBridge::onPreInitiate()
 
 void DewesoftBridge::onStartData()
 {
-
+    requestObj.lastPosCheckedTrigger = 0;
 }
 
 void DewesoftBridge::onGetData(const AcquiredDataInfo& acquiredDataInfo)
@@ -117,7 +117,6 @@ void DewesoftBridge::onGetData(const AcquiredDataInfo& acquiredDataInfo)
     _bstr_t dataFile = app->GetUsedDatafile();
 
     requestObj.getData(acquiredDataInfo, dataFile);
-
 }
 
 void DewesoftBridge::onStopData()
@@ -126,13 +125,14 @@ void DewesoftBridge::onStopData()
 
 void DewesoftBridge::onStartStoring()
 {
-    requestObj.lastPosChecked = 0;
     for (auto& selectedChannel : requestObj.selectedChannelList)
     {
         selectedChannel.channelPtr = getIChannelPtrFromChannelName(selectedChannel.channelName);
+        selectedChannel.lastPos = 0;
     }
 
     requestObj.triggerChannelPtr = getIChannelPtrFromChannelName(requestObj.triggerChannel);
+    requestObj.lastPosCheckedTrigger = 0;
 }
 
 void DewesoftBridge::onStopStoring()
@@ -231,7 +231,6 @@ std::string DewesoftBridge::getStringChannelValue(long index)
 {
     return std::string(app->Data->GetUsedChannels()->GetItem(index)->Text);
 }
-
 
 IChannelPtr DewesoftBridge::getIChannelPtrFromChannelName(std::string chanName)
 {

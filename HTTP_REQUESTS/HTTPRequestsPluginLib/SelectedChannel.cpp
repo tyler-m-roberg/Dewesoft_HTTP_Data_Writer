@@ -18,11 +18,8 @@ SelectedChannel::SelectedChannel(std::string dataEntryType,
     , channelName(channelName)
     , pageNum(pageNum)
     , cellRef(cellRef)
-    , text("")
-    , channelValue(0)
-    
-
 {
+
 }
 
 void SelectedChannel::saveSetup(const NodePtr& node) const
@@ -45,7 +42,7 @@ void SelectedChannel::loadSetup(const NodePtr& node)
 
 }
 
-std::string SelectedChannel::stringifyChannel(SelectedChannel* channel)
+std::string SelectedChannel::stringifyChannel(const SelectedChannel* channel)
 {
     return std::string("Data Entry Type:") + channel->dataEntryType + ",Channel Type:" + channel->channelType +
                                 ",Channel:" + channel->channelName + ",Page #:" + std::to_string(channel->pageNum) +
@@ -71,7 +68,7 @@ bool SelectedChannel::operator!=(const SelectedChannel& selectedChannel) const
     return !(*this == selectedChannel);
 }
 
-json SelectedChannel::toJson()
+json SelectedChannel::toJson() const
 {
     return json{
 
@@ -91,14 +88,66 @@ json SelectedChannel::toJson()
             "ChannelType", this->channelType
         },
         {
-            "DataType", this->dataType
+            "DataType", dataType
         },
         {
-            "Text", this->text
+            "Text", text
         },
         {
-            "ChannelValue", this->channelValue
+            "ChannelValue", channelValue
         }
-
     };
+}
+
+std::string SelectedChannel::getColItem(const int& colNum) const
+{
+    switch (colNum)
+    {
+        case 0:
+            return dataEntryType;
+            break;
+
+        case 1:
+            return channelType;
+            break;
+
+        case 2:
+            return channelName;
+            break;
+
+        case 3:
+            return std::to_string(pageNum);
+            break;
+
+        case 4:
+            return cellRef;
+            break;
+    }
+}
+
+
+void SelectedChannel::setColItem(const int& colNum, const std::string& val)
+{
+    switch (colNum)
+    {
+        case 0:
+            dataEntryType = val;
+            break;
+
+        case 1:
+            channelType = val;
+            break;
+
+        case 2:
+            channelName = val;
+            break;
+
+        case 3:
+            pageNum = std::stoi(val);
+            break;
+
+        case 4:
+            cellRef = val;
+            break;
+    }
 }

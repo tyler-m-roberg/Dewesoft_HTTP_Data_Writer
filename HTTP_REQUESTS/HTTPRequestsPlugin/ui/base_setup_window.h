@@ -30,26 +30,17 @@ protected:
     Dewesoft::MUI::ComboBox edgeTypeCBox;
     Dewesoft::MUI::Label templateFileLabel;
     Dewesoft::MUI::TextBox templateFileTextBox;
+    Dewesoft::MUI::Button templateBtn;
     Dewesoft::MUI::Label reportDirLabel;
     Dewesoft::MUI::TextBox reportDirTextBox;
+    Dewesoft::MUI::Button reportDirBtn;
     Dewesoft::MUI::Label reportNameLabel;
     Dewesoft::MUI::TextBox reportNameTextBox;
     Dewesoft::MUI::CaptionPanel optionsListPanel;
     Dewesoft::MUI::StackPanel optionsListStackPanel;
-    Dewesoft::MUI::CaptionPanel addChannelPanel;
-    Dewesoft::MUI::Label dataEntryTypeLabel;
-    Dewesoft::MUI::ComboBox dataEntryTypeCBox;
-    Dewesoft::MUI::ComboBox channelTypeCBox;
-    Dewesoft::MUI::Label channelSelectionLabel;
-    Dewesoft::MUI::ComboBox channelSelectionCBox;
-    Dewesoft::MUI::Label pageNumLabel;
-    Dewesoft::MUI::TextBox pageNumTextBox;
-    Dewesoft::MUI::Label cellRefLabel;
-    Dewesoft::MUI::TextBox cellRefTextBox;
+    Dewesoft::MUI::CaptionPanel dsGridPanel;
+    Dewesoft::MUI::DSDrawGrid selectedChannelsGrid;
     Dewesoft::MUI::Button addChannelBtn;
-    Dewesoft::MUI::CaptionPanel currentChannelsPanel;
-    Dewesoft::MUI::Button deleteChannelBtn;
-    Dewesoft::MUI::ListBox channelListBox;
 
     BaseSetupWindow(Dewesoft::MUI::WindowPtr& ui, DewesoftBridge& bridge, std::string pathToXmlFile) : DSWindow (ui, pathToXmlFile), bridge(bridge)
     {
@@ -63,25 +54,16 @@ protected:
         edgeTypeCBox = Dewesoft::MUI::ComboBox::Connect(ui, "edgeTypeCBox");
         templateFileLabel = Dewesoft::MUI::Label::Connect(ui, "templateFileLabel");
         templateFileTextBox = Dewesoft::MUI::TextBox::Connect(ui, "templateFileTextBox");
+        templateBtn = Dewesoft::MUI::Button::Connect(ui, "templateBtn");
         reportDirLabel = Dewesoft::MUI::Label::Connect(ui, "reportDirLabel");
         reportDirTextBox = Dewesoft::MUI::TextBox::Connect(ui, "reportDirTextBox");
+        reportDirBtn = Dewesoft::MUI::Button::Connect(ui, "reportDirBtn");
         reportNameLabel = Dewesoft::MUI::Label::Connect(ui, "reportNameLabel");
         reportNameTextBox = Dewesoft::MUI::TextBox::Connect(ui, "reportNameTextBox");
         optionsListPanel = Dewesoft::MUI::CaptionPanel::Connect(ui, "optionsListPanel");
         optionsListStackPanel = Dewesoft::MUI::StackPanel::Connect(ui, "optionsListStackPanel");
-        addChannelPanel = Dewesoft::MUI::CaptionPanel::Connect(ui, "addChannelPanel");
-        dataEntryTypeLabel = Dewesoft::MUI::Label::Connect(ui, "dataEntryTypeLabel");
-        dataEntryTypeCBox = Dewesoft::MUI::ComboBox::Connect(ui, "dataEntryTypeCBox");
-        channelTypeCBox = Dewesoft::MUI::ComboBox::Connect(ui, "channelTypeCBox");
-        channelSelectionLabel = Dewesoft::MUI::Label::Connect(ui, "channelSelectionLabel");
-        channelSelectionCBox = Dewesoft::MUI::ComboBox::Connect(ui, "channelSelectionCBox");
-        pageNumLabel = Dewesoft::MUI::Label::Connect(ui, "pageNumLabel");
-        pageNumTextBox = Dewesoft::MUI::TextBox::Connect(ui, "pageNumTextBox");
-        cellRefLabel = Dewesoft::MUI::Label::Connect(ui, "cellRefLabel");
-        cellRefTextBox = Dewesoft::MUI::TextBox::Connect(ui, "cellRefTextBox");
+        dsGridPanel = Dewesoft::MUI::CaptionPanel::Connect(ui, "dsGridPanel");
+        selectedChannelsGrid = Dewesoft::MUI::DSDrawGrid::Connect(ui, "selectedChannelsGrid");
         addChannelBtn = Dewesoft::MUI::Button::Connect(ui, "addChannelBtn");
-        currentChannelsPanel = Dewesoft::MUI::CaptionPanel::Connect(ui, "currentChannelsPanel");
-        deleteChannelBtn = Dewesoft::MUI::Button::Connect(ui, "deleteChannelBtn");
-        channelListBox = Dewesoft::MUI::ListBox::Connect(ui, "channelListBox");
     }
 };
