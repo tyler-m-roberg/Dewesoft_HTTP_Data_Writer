@@ -980,6 +980,77 @@ double Request::getChannelValueAtTimeThread(IChannelPtr channel, long* lastPosCh
                 return static_cast<double>(((int*) channelBuffer)[((*lastPosChecked)) % dbBuffSize]);
 
             break;
+
+        case ChannelDataType::Byte:
+            for (int x = 0; x < (blockSize - 1); x++)
+            {
+                if (channel->Async)
+                {
+                    double currentSampleTime = (tsBuffer)[(((*lastPosChecked))) % dbBuffSize];
+                    double nextSampleTime = (tsBuffer)[(((*lastPosChecked) + 1)) % dbBuffSize];
+
+                    if (currentSampleTime < time && nextSampleTime >= time)
+                    {
+                        if (nextSampleTime == time)
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((byte*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+                        }
+                        else if (time - currentSampleTime < nextSampleTime - time)
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((byte*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+                        }
+                        else
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((byte*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+                        }
+                    }
+
+                    else
+                    {
+                        (*lastPosChecked)++;
+                    }
+                }
+
+                else
+                {
+                    double currentSampleTime = (1.0 / channel->GetSampleRate()) * (*lastPosChecked);
+                    double nextSampleTime = (1.0 / channel->GetSampleRate()) * ((*lastPosChecked) + 1);
+
+                    if (currentSampleTime < time && nextSampleTime >= time)
+                    {
+                        if (nextSampleTime == time)
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((byte*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+                        }
+                        else if (time - currentSampleTime < nextSampleTime - time)
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((byte*) channelBuffer)[(((*lastPosChecked) - 1)) % dbBuffSize]);
+                        }
+                        else
+                        {
+                            (*lastPosChecked)++;
+                            return static_cast<double>(((byte*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+                        }
+                    }
+
+                    else
+                    {
+                        (*lastPosChecked)++;
+                    }
+                }
+            }
+
+            if (triggerTypeAsync)
+                return static_cast<double>(((byte*) channelBuffer)[(((*lastPosChecked))) % dbBuffSize]);
+            else
+                return static_cast<double>(((byte*) channelBuffer)[((*lastPosChecked)) % dbBuffSize]);
+
+            break;
     }
 
     return -999999999;
